@@ -1,0 +1,22 @@
+[
+  {
+    "label": "Announcement",
+    "url": "/"
+  },
+  {
+    "label": "Thesis",
+    "url": "/thesis"
+  },
+  {
+    "label": "Journal",
+    "url": "/journal"
+  },
+  {
+    "label": "Downloads",
+    "url": "/downloads"
+  },
+  {
+    "label": "Library",
+    "url": "/library"
+  }
+]

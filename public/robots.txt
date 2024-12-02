@@ -1,0 +1,7 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /teacher/
+Disallow: /api/
+Disallow: /logs
+
+Sitemap: https://smcc-research-hub.site/sitemap.xml

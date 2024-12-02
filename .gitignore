@@ -1,0 +1,12 @@
+/node_modules
+/package-lock.json
+/composer.lock
+/jsxbuild
+/uploads/**/*.pdf
+/uploads/**/*.log
+/uploads/downloadable/**/*.*
+/uploads/thumbnail/**/*.*
+.env*.local
+
+
+/src/Views/react/dist

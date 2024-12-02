@@ -1,0 +1,12 @@
+RewriteEngine On
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [L,QSA]
+
+ErrorDocument 404 /index.php
+
+<FilesMatch "^\.">
+    Order deny,allow
+    Deny from all
+</FilesMatch>

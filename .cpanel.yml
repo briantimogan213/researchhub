@@ -1,0 +1,12 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/smccrese/public_html/
+    - /bin/cp .htaccess $DEPLOYPATH/.htaccess
+    - /bin/cp .env.production $DEPLOYPATH/.env.production
+    - /bin/cp index.php $DEPLOYPATH/index.php
+    - /bin/cp -R config $DEPLOYPATH
+    - /bin/cp -R public $DEPLOYPATH
+    - /bin/cp -R src $DEPLOYPATH
+    - /bin/cp -R vendor $DEPLOYPATH
+    - /bin/cp -R uploads/videolink $DEPLOYPATH/videolink

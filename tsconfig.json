@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "jsx": "react",
+    "moduleResolution": "Bundler",
+    "outDir": "./src/Views/react/dist",
+    "sourceMap": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "baseUrl": "./src/Views/react/src",
+    "paths": {
+      "/jsx/*": ["./*"]
+    }
+  },
+  "exclude": ["node_modules", "vendor", "public", "jsxbuild"],
+  "include": [
+    "src/Views/react/src/**/*.ts",
+    "src/Views/react/src/**/*.tsx",
+  ]
+}

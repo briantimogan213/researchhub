@@ -1,0 +1,200 @@
+
+#notfound {
+  position: relative;
+  height: 100vh;
+}
+
+#notfound .notfound {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+.notfound {
+  max-width: 560px;
+  width: 100%;
+  padding-left: 160px;
+  line-height: 1.1;
+}
+
+.notfound .notfound-404 {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: inline-block;
+  width: 140px;
+  height: 140px;
+  background-size: cover;
+}
+
+.notfound .notfound-404.error-500 {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: inline-block;
+  width: 140px;
+  height: 140px;
+  background-size: cover;
+}
+
+.notfound .notfound-404:before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  -webkit-transform: scale(2.4);
+  -ms-transform: scale(2.4);
+  transform: scale(2.4);
+  border-radius: 50%;
+  background-color: #f2f5f8;
+  z-index: -1;
+}
+
+.notfound h1 {
+  font-family: 'Nunito', sans-serif;
+  font-size: 65px;
+  font-weight: 700;
+  margin-top: 0px;
+  margin-bottom: 10px;
+  color: #151723;
+  text-transform: uppercase;
+}
+
+.notfound h2 {
+  font-family: 'Nunito', sans-serif;
+  font-size: 21px;
+  font-weight: 400;
+  margin: 0;
+  text-transform: uppercase;
+  color: #151723;
+}
+
+.notfound p {
+  font-family: 'Nunito', sans-serif;
+  color: #999fa5;
+  font-weight: 400;
+}
+
+.notfound p.error-message {
+  text-wrap: pretty;
+  width: 600px;
+  padding: 1rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid red;
+  border-radius: 4px;
+  color: red;
+  background-color: rgb(255, 243, 243);
+  min-height: 50px;
+  /* text-align: justify; */
+}
+
+.notfound a {
+  font-family: 'Nunito', sans-serif;
+  display: inline-block;
+  font-weight: 700;
+  border-radius: 40px;
+  text-decoration: none;
+  color: #388dbc;
+}
+
+@media only screen and (max-width: 767px) {
+  .notfound .notfound-404 {
+    width: 110px;
+    height: 110px;
+  }
+
+  .notfound {
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-top: 110px;
+  }
+}
+
+/* Apply styles only within elements with the class "announcement" */
+
+/* Bold (b) */
+.announcement b {
+  font-weight: bold;
+}
+
+/* Italic (i) */
+.announcement i {
+  font-style: italic;
+}
+
+/* Header (h1) */
+.announcement h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 0.5rem;
+  color: #212529; /* Default dark color */
+}
+
+/* Image (img) */
+.announcement img {
+  max-width: 400px;
+  height: auto;
+  display: block;
+}
+
+/* Anchor (a) */
+.announcement a {
+  color: #007bff; /* Default primary color */
+  text-decoration: none; /* By default, remove underline */
+}
+
+.announcement a:hover {
+  text-decoration: underline; /* Add underline on hover */
+}
+
+/* Unordered List (ul) */
+.announcement ul {
+  list-style-type: disc; /* Default bullet style */
+  margin-left: 1.5rem;
+}
+
+/* Ordered List (ol) */
+.announcement ol {
+  list-style-type: decimal; /* Numbered list */
+  margin-left: 1.5rem;
+}
+
+/* Underline (u) */
+.announcement u {
+  text-decoration: underline;
+}
+
+/* Strikethrough (s) */
+.announcement strike {
+  text-decoration: line-through;
+}
+
+
+/* Center Align */
+.announcement .center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+/* Right Align */
+.announcement .right {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  text-align: right;
+}
+
+/* Left Align */
+.announcement .left {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  text-align: left;
+}

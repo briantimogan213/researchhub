@@ -1,0 +1,16 @@
+{
+    "name": "smcc/research-hub",
+    "description": "Web-based Research Hub for SMCC",
+    "type": "project",
+    "require": {
+        "ext-pdo_mysql": "*",
+        "ext-fileinfo": "*",
+        "ext-mysqli": "*",
+        "ext-pdo": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Smcc\\ResearchHub\\": "src/"
+        }
+    }
+}
