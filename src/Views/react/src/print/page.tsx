@@ -12,6 +12,7 @@ export default import(pathname("/jsx/imports")).then(async ({ React, getAsyncImp
     const title = React.useMemo(() => searchParams.get('title'), [searchParams])
     const department = React.useMemo(() => searchParams.get('department'), [searchParams])
     const course = React.useMemo(() => searchParams.get('course'), [searchParams])
+    const year = React.useMemo(() => searchParams.get('year'), [searchParams])
     const [isError, setError] = React.useState(false)
     const pageData = React.useContext(MainContext)
     const thesis = React.useMemo(() => {
@@ -22,8 +23,11 @@ export default import(pathname("/jsx/imports")).then(async ({ React, getAsyncImp
       if (!!course) {
         data = data.filter((d) => d.course?.toString() === course?.toString())
       }
+      if (!!year) {
+        data = data.filter((d) => d.year?.toString() === year?.toString())
+      }
       return data;
-    }, [pageData])
+    }, [pageData, department, course, year])
 
     React.useEffect(() => {
       if (title) {

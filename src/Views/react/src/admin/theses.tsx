@@ -28,10 +28,12 @@ export default import(pathname("/jsx/imports")).then(async ({ React, Sweetalert2
     const [pdfTitle, setPdfTitle] = React.useState("")
     const [pdfAuthor, setPdfAuthor] = React.useState("")
     const [tableData, setTableData] = React.useState([])
+    const [thesisYear, setThesisYear] = React.useState("")
     const [thesisDepartment, setThesisDepartment] = React.useState("");
     const [thesisCourse, setThesisCourse] = React.useState("");
     const departmentList = React.useMemo(() => Object.keys(DepartmentCourses).map((d) => ({ label: d, value: d })), [])
     const courseList = React.useMemo(() => !!thesisDepartment ? DepartmentCourses[thesisDepartment].map((d: any) => ({ label: d, value: d })) : [], [thesisDepartment])
+    const yearsList = React.useMemo(() => Array.from({ length: (new Date()).getFullYear() - 2000 }, (_, i) => (new Date()).getFullYear() - i).map((y) => ({ label: y.toString(), value: y.toString() })), [])
 
     const fetchList = () => {
       fetch(pathname('/api/thesis/all'))
@@ -259,8 +261,11 @@ export default import(pathname("/jsx/imports")).then(async ({ React, Sweetalert2
       if (!!thesisCourse) {
         url.searchParams.append('course', thesisCourse);
       }
+      if (!!thesisYear) {
+        url.searchParams.append('year', thesisYear);
+      }
       window.open(url, '_blank', 'width=1000,height=1000, menubar=no, toolbar=no, scrollbars=yes, location=no, status=no');
-    }, [thesisDepartment, thesisCourse])
+    }, [thesisDepartment, thesisCourse, thesisYear])
 
     React.useEffect(() => {
       if (!pdfUrl) {
@@ -278,9 +283,9 @@ export default import(pathname("/jsx/imports")).then(async ({ React, Sweetalert2
     }, [thesisDepartment])
 
     const finalData = React.useMemo(() => !!thesisDepartment
-      ? tableData?.filter((td: any) => td.department?.toString() === thesisDepartment?.toString() && (!!thesisCourse ? td.course?.toString() === thesisCourse?.toString() : true))
-      : tableData
-    , [tableData, thesisDepartment, thesisCourse])
+      ? tableData?.filter((td: any) => td.department?.toString() === thesisDepartment?.toString() && (!!thesisCourse ? td.course?.toString() === thesisCourse?.toString() : true) && (!!thesisYear ? td.year?.toString() === thesisYear?.toString() : true))
+      : (!!thesisYear ? tableData?.filter((td: any) => td.year?.toString() === thesisYear?.toString()) : tableData)
+    , [tableData, thesisDepartment, thesisCourse, thesisYear])
 
     return (
       <div className="w-full min-h-[calc(100vh-160px)] h-fit bg-[#37414e] p-4 min-w-fit">
@@ -288,10 +293,13 @@ export default import(pathname("/jsx/imports")).then(async ({ React, Sweetalert2
         <Table columns={columns} items={finalData}>
           {/* Additional Toolbar Button */}
           <div className="px-4">
-            <Select className="max-w-[180px] text-black" items={[{ label: "Department", value: "" }, ...departmentList]} label="Department" name="department" value={thesisDepartment} onChange={(e: any) => { setThesisDepartment(e.target.value); setThesisCourse(""); }} />
+            <Select className="max-w-[120px] min-w-[120px] text-black" items={[{ label: "Department", value: "" }, ...departmentList]} label="Department" name="department" value={thesisDepartment} onChange={(e: any) => { setThesisDepartment(e.target.value); setThesisCourse(""); }} />
           </div>
           <div className="px-4">
-            <Select className="max-w-[370px] text-black" items={[{ label: "Course", value: "" }, ...courseList]} label="Course" name="course" value={thesisCourse} onChange={(e: any) => setThesisCourse(e.target.value)} disabled={!thesisDepartment} />
+            <Select className="max-w-[120px] min-w-[120px] text-black" items={[{ label: "Course", value: "" }, ...courseList]} label="Course" name="course" value={thesisCourse} onChange={(e: any) => setThesisCourse(e.target.value)} disabled={!thesisDepartment} />
+          </div>
+          <div className="px-4">
+            <Select className="max-w-[100px] min-w-[100px] text-black" items={[{ label: "Year", value: "" }, ...yearsList]} label="Year" name="year" value={thesisYear} onChange={(e: any) => setThesisYear(e.target.value)} />
           </div>
           <div className="px-4">
             <button type="button" onClick={() => handlePrint()} className="hover:text-blue-500 text-blue-200" title="Print List"><span className="material-symbols-outlined text-blue-200 hover:text-blue-500">print</span></button>
