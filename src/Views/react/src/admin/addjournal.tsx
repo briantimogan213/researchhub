@@ -21,8 +21,8 @@ export default import(pathname("/jsx/imports")).then(async ({ React, Sweetalert2
     const [uploadProgress, setUploadProgress] = React.useState(0)
     const [xhr, setXhr] = React.useState(null)
     const yearsList = React.useMemo(() => Array.from({ length: (new Date()).getFullYear() - 2000 }, (_, i) => (new Date()).getFullYear() - i).map((y) => ({ label: y.toString(), value: y.toString() })), [])
-    const departmentList = React.useMemo(() => Object.keys(DepartmentCourses).map((d) => ({ label: d, value: d })))
-    const courseList = React.useMemo(() => DepartmentCourses[journalDepartment].map((d: any) => ({ label: d, value: d })))
+    const departmentList = React.useMemo(() => Object.keys(DepartmentCourses).map((d) => ({ label: d, value: d })), [])
+    const courseList = React.useMemo(() => DepartmentCourses[journalDepartment].map((d: any) => ({ label: d, value: d })), [journalDepartment])
     const isFormDisabled = React.useMemo(() => uploadProgress !== 0, [uploadProgress]);
 
     React.useEffect(() => {

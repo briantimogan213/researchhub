@@ -73,7 +73,6 @@ class Template
         data-react-app="<?= htmlspecialchars($reactAppPath); ?>"
         data-page-data="<?= htmlspecialchars(json_encode($data)); ?>"
       ></main>
-      <?php Footer::default(); ?>
       <script>
         window.URI_PREFIX = `<?= Router::getPathname("") ?>`;
         window.pathname = function(path_name) {

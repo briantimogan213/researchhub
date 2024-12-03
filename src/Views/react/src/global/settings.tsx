@@ -70,8 +70,6 @@ export default import(pathname("/jsx/imports")).then(async ({ React, Sweetalert2
 
     const account = React.useMemo(() => authenticated ? authData.account : null, [authenticated, authData])
 
-    console.log(authenticated, authData, account)
-
     const [formData, setFormData] = React.useState({
       username: account === 'admin' ? authData?.admin_user || '' : account === 'student' ? authData?.student_id || '' : account === 'personnel' ? authData?.personnel_id || '' : '',
       full_name: authData?.full_name || '',

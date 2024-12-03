@@ -140,7 +140,7 @@ export enum Year {
 // -Ship's Catering Services NC I
 
 export enum Departments {
-  CCIS = 'College of Computing Information Sciences',
+  CCIS = 'College of Computing and Information Sciences',
   CAS = 'College of Arts and Sciences',
   CBM = 'College of Business Management',
   CCJE = 'College of Criminal Justice Education',

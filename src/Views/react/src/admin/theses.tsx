@@ -1,9 +1,11 @@
 export default import(pathname("/jsx/imports")).then(async ({ React, Sweetalert2, getAsyncImport }) => {
   const { CellAlign, TableCellType } = await import(pathname("/jsx/types"));
+  const { Courses, Departments, DepartmentCourses }  = await import(pathname("/jsx/types"));
   const { default: AddThesisForm } = await getAsyncImport("/jsx/admin/addthesis");
   const { default: Modal } = await getAsyncImport("/jsx/global/modal");
   const { default: PdfViewer } = await getAsyncImport("/jsx/global/pdfviewer");
   const { default: { Table, TableRowAction } } = await getAsyncImport("/jsx/admin/table");
+  const { default: { Select } } = await getAsyncImport("/jsx/global/input");
 
   const columns = [
     { label: "#", key: "id", sortable: true, filterable: true, cellType: TableCellType.Number, align: CellAlign.Center },
@@ -26,6 +28,10 @@ export default import(pathname("/jsx/imports")).then(async ({ React, Sweetalert2
     const [pdfTitle, setPdfTitle] = React.useState("")
     const [pdfAuthor, setPdfAuthor] = React.useState("")
     const [tableData, setTableData] = React.useState([])
+    const [thesisDepartment, setThesisDepartment] = React.useState("");
+    const [thesisCourse, setThesisCourse] = React.useState("");
+    const departmentList = React.useMemo(() => Object.keys(DepartmentCourses).map((d) => ({ label: d, value: d })), [])
+    const courseList = React.useMemo(() => !!thesisDepartment ? DepartmentCourses[thesisDepartment].map((d: any) => ({ label: d, value: d })) : [], [thesisDepartment])
 
     const fetchList = () => {
       fetch(pathname('/api/thesis/all'))
@@ -244,6 +250,18 @@ export default import(pathname("/jsx/imports")).then(async ({ React, Sweetalert2
       })
     };
 
+    const handlePrint = React.useCallback(() => {
+      const url = new URL(pathname('/admin/print/theses'), window.location.origin)
+      url.searchParams.append('title', 'Theses Print');
+      if (!!thesisDepartment) {
+        url.searchParams.append('department', thesisDepartment);
+      }
+      if (!!thesisCourse) {
+        url.searchParams.append('course', thesisCourse);
+      }
+      window.open(url, '_blank', 'width=1000,height=1000, menubar=no, toolbar=no, scrollbars=yes, location=no, status=no');
+    }, [thesisDepartment, thesisCourse])
+
     React.useEffect(() => {
       if (!pdfUrl) {
         setPdfTitle("");
@@ -255,13 +273,30 @@ export default import(pathname("/jsx/imports")).then(async ({ React, Sweetalert2
       fetchList();
     }, [])
 
+    React.useEffect(() => {
+      setThesisCourse("")
+    }, [thesisDepartment])
+
+    const finalData = React.useMemo(() => !!thesisDepartment
+      ? tableData?.filter((td: any) => td.department?.toString() === thesisDepartment?.toString() && (!!thesisCourse ? td.course?.toString() === thesisCourse?.toString() : true))
+      : tableData
+    , [tableData, thesisDepartment, thesisCourse])
+
     return (
       <div className="w-full min-h-[calc(100vh-160px)] h-fit bg-[#37414e] p-4 min-w-fit">
         <h1 className="text-white text-2xl my-2">Thesis/Capstone List</h1>
-        <Table columns={columns} items={tableData}>
+        <Table columns={columns} items={finalData}>
           {/* Additional Toolbar Button */}
           <div className="px-4">
-            {/* Refresh Button */}
+            <Select className="max-w-[180px] text-black" items={[{ label: "Department", value: "" }, ...departmentList]} label="Department" name="department" value={thesisDepartment} onChange={(e: any) => { setThesisDepartment(e.target.value); setThesisCourse(""); }} />
+          </div>
+          <div className="px-4">
+            <Select className="max-w-[370px] text-black" items={[{ label: "Course", value: "" }, ...courseList]} label="Course" name="course" value={thesisCourse} onChange={(e: any) => setThesisCourse(e.target.value)} disabled={!thesisDepartment} />
+          </div>
+          <div className="px-4">
+            <button type="button" onClick={() => handlePrint()} className="hover:text-blue-500 text-blue-200" title="Print List"><span className="material-symbols-outlined text-blue-200 hover:text-blue-500">print</span></button>
+          </div>
+          <div className="px-4">
             <button type="button" onClick={() => fetchList()} className="hover:text-yellow-500" title="Refresh List"><span className="material-symbols-outlined">refresh</span></button>
           </div>
           <div className="px-4">

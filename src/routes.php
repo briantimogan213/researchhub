@@ -44,6 +44,8 @@ Router::GET('/read/journal', [FileController::class, 'viewPdfFile']);
 Router::GET('/download/downloadable', [FileController::class, 'downloadFile']);
 Router::GET('/settings', [ViewController::class, 'accountSettings']);
 Router::GET('/logs', [ViewController::class, 'logs']);
+Router::GET('/admin/print/theses', [ViewController::class, 'adminPrintThesis']);
+Router::GET('/admin/print/journals', [ViewController::class, 'adminPrintJournal']);
 
 /* API GET METHOD */
 Router::GET('/api/test', [ApiController::class, 'test']); // test api route

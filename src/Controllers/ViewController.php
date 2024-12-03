@@ -6,8 +6,10 @@ namespace Smcc\ResearchHub\Controllers;
 
 use Smcc\ResearchHub\Models\Admin;
 use Smcc\ResearchHub\Models\Database;
+use Smcc\ResearchHub\Models\Journal;
 use Smcc\ResearchHub\Models\Personnel;
 use Smcc\ResearchHub\Models\Student;
+use Smcc\ResearchHub\Models\Thesis;
 use Smcc\ResearchHub\Router\Response;
 use Smcc\ResearchHub\Router\Session;
 use Smcc\ResearchHub\Views\Global\View;
@@ -98,6 +100,30 @@ class ViewController extends Controller
       return Response::redirect("/admin/login");
     }
     return AdminPages::view("Journal List - Admin", [], '/jsx/admin/journal');
+  }
+
+  public function adminPrintThesis(): View|Response
+  {
+    if (!Session::isAuthenticated() || Session::getUserAccountType() !== "admin") {
+      return Response::redirect("/admin/login");
+    }
+    $db = Database::getInstance();
+    $thesis = $db->getAllRows(Thesis::class);
+    return ReactPages::view("Print Theses/Capstones", [
+      'thesis' => [...array_map(fn(Thesis $th) => $th->toArray(true), $thesis)],
+    ], '/jsx/print/page');
+  }
+
+  public function adminPrintJournal(): View|Response
+  {
+    if (!Session::isAuthenticated() || Session::getUserAccountType() !== "admin") {
+      return Response::redirect("/admin/login");
+    }
+    $db = Database::getInstance();
+    $journal = $db->getAllRows(Journal::class);
+    return ReactPages::view("Print Journals", [
+      'journal' => [...array_map(fn(Journal $jn): array => $jn->toArray(true), $journal)],
+    ], '/jsx/print/page');
   }
 
   public function adminDepartmentList(): View|Response
