@@ -20,13 +20,13 @@ async function main() {
 
     console.log('Running Tailwind build watcher...');
     // Run postcss with Tailwind CSS in watch mode
-    runCommand('npx', ['postcss', './src/tailwind.css', '-o', './public/css/main.min.css', '--watch']);
-
-    await new Promise((resolve) => setTimeout(resolve, 2000)); // Wait for second
+    runCommand('npm', ['run' ,'watch:tailwind']);
 
     console.log('Running Typescript build watcher...');
     // Run TypeScript compiler in watch mode
-    runCommand('npx', ['tsc', '--watch']);
+    // runCommand('npx', ['tsc']);
+    runCommand('node', ['watch-and-transfer.js']);
+    await new Promise((resolve) => {}); // Wait forever
 }
 
 // Execute the main function

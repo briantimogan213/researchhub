@@ -1,30 +1,26 @@
 // @ts-nocheck
-import { Scanner as ReactQrScanner } from "@yudiel/react-qr-scanner";
-import clsx from "clsx";
-import React from "react";
-import ReactDOM from "react-dom";
-import ReactDOMServer from "react-dom/server";
-import * as ReactPDF from "react-pdf";
-import ReactPlayer from "react-player";
-import ReactPlayerYoutube from "react-player/youtube";
+export { Scanner as ReactQrScanner } from "@yudiel/react-qr-scanner";
+export { default as clsx } from "clsx";
+export { default as React } from "react";
+export { default as ReactDOMClient } from "react-dom";
+export { default as ReactDOM } from "react-dom/client";
+export { default as ReactDOMServer } from "react-dom/server";
+export { default as ReactPlayer } from "react-player";
+export { default as ReactPlayerYoutube } from "react-player/youtube";
+export { default as Sweetalert2 } from "sweetalert2";
+import * as RPDF from "react-pdf";
 import sanitizeHTML from "sanitize-html";
-import Sweetalert2 from "sweetalert2";
 
-async function getAsyncImport(path: string): Promise<any>
-{
-  const allImports = await import(pathname(path));
-  return Object.entries(allImports).reduce(async (init, [key, value]) => ({ ...init, [key]: await value }), {})
+// @ts-ignore
+export const pathname = window.pathname;
+// @ts-ignore
+export const URI_PREFIX = window.URI_PREFIX;
+
+export function htmlToString(jsx: JSX.Element) {
+  return ReactDOMServer.renderToString(jsx)
 }
-
-ReactPDF.pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-  'https://esm.sh/pdfjs-dist@4.4.168/build/pdf.worker.min.mjs',
-  import.meta.url,
-).toString()
-
-function parseMarkup(inputString: string): string {
+export function parseMarkup(inputString: string): string {
   if (!inputString) return "";
-
-
   // Replace custom markup tags with corresponding HTML tags
   inputString = inputString.replace(/\[b\](.*?)\[\/b\]/g, '<b>$1</b>');        // Bold
   inputString = inputString.replace(/\[i\](.*?)\[\/i\]/g, '<i>$1</i>');        // Italic
@@ -77,32 +73,21 @@ function parseMarkup(inputString: string): string {
   return inputString;
 }
 
-function purifyHTML(inputString: string) {
+export function purifyHTML(inputString: string) {
   const clean = sanitizeHTML(inputString, {
     allowedTags: [], // No tags allowed, effectively removing all HTML
   });
   console.log(clean);
   return clean;
 }
-export {
-  clsx, getAsyncImport, parseMarkup, purifyHTML, React,
-  ReactDOM, ReactDOMServer, ReactPDF, ReactPlayer,
-  ReactPlayerYoutube,
-  ReactQrScanner, Sweetalert2
-};
 
-const imports = {
-  React,
-  ReactDOM,
-  ReactDOMServer,
-  ReactPlayer,
-  ReactPlayerYoutube,
-  ReactQrScanner,
-  Sweetalert2,
-  ReactPDF,
-  getAsyncImport,
-  clsx,
-  purifyHTML,
-  parseMarkup
-}
-export default imports
+/* @vite-ignore */
+RPDF.pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+/* @vite-ignore */
+  'https://esm.sh/pdfjs-dist@4.4.168/build/pdf.worker.min.mjs',
+/* @vite-ignore */
+  import.meta.url,
+/* @vite-ignore */
+).toString()
+
+export const ReactPDF = RPDF

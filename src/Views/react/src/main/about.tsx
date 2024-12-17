@@ -1,9 +1,7 @@
-export default import(pathname("/jsx/imports")).then(({ React }) => {
-  return function AboutUs() {
-    return (
-      <div>
-        About Us
-      </div>
-    )
-  }
-});
+import { React } from '../imports'
+const AboutUs: React.FC<any> = () => (
+  <div>
+    About Us
+  </div>
+)
+export default AboutUs

@@ -24,7 +24,7 @@ class View implements ViewBase {
   {
     $this->title = $title;
     $this->data = $data;
-    $this->reactAppPath = Router::getPathname($reactAppPath);
+    $this->reactAppPath = $reactAppPath;
   }
 
   /**

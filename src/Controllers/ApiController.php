@@ -10,6 +10,7 @@ use Smcc\ResearchHub\Models\Admin;
 use Smcc\ResearchHub\Models\AdminLogs;
 use Smcc\ResearchHub\Models\Database;
 use Smcc\ResearchHub\Models\Downloadables;
+use Smcc\ResearchHub\Models\Guest;
 use Smcc\ResearchHub\Models\Journal;
 use Smcc\ResearchHub\Models\JournalFavorites;
 use Smcc\ResearchHub\Models\JournalPersonnelFavorites;
@@ -231,13 +232,18 @@ class ApiController extends Controller
       }
 
       // Validate account type (admin, personnel, student)
-      if (!in_array($request->getBodyParam('account'), ['admin', 'personnel', 'student'])) {
+      if (!in_array($request->getBodyParam('account'), ['guest', 'admin', 'personnel', 'student'])) {
         return Response::json(['error' => 'Invalid account type.'], StatusCode::BAD_REQUEST);
       }
 
       $accountType = $request->getBodyParam('account');
       // Validate and sanitize inputs here
       $data = match ($accountType) {
+        'guest' => [
+          'email' => $request->getBodyParam('username'),
+          'full_name' => $request->getBodyParam('full_name'),
+          'password' => password_hash($request->getBodyParam('password'), PASSWORD_DEFAULT),
+        ],
         'admin' => [
           'admin_user' => $request->getBodyParam('username'),
           'full_name' => $request->getBodyParam('full_name'),
@@ -262,6 +268,10 @@ class ApiController extends Controller
         ],
       };
       switch ($accountType) {
+        case 'guest':
+          $model = new Guest($data);
+          $id = $model->create();
+          break;
         case 'admin':
           $model = new Admin($data);
           $id = $model->create();
@@ -311,13 +321,17 @@ class ApiController extends Controller
       }
 
       // Validate account type (admin, personnel, student)
-      if (!in_array($body['account'], ['admin', 'personnel', 'student'])) {
+      if (!in_array($body['account'], ['guest', 'admin', 'personnel', 'student'])) {
         return Response::json(['error' => 'Invalid account type.'], StatusCode::BAD_REQUEST);
       }
 
       $accountType = $body['account'];
       // Validate and sanitize inputs here
       $data = match ($accountType) {
+        'guest' => [
+          'full_name' => $body['full_name'],
+          'email' => $body['email'],
+        ],
         'admin' => [
           'full_name' => $body['full_name'],
           'email' => $body['email'],
@@ -342,15 +356,26 @@ class ApiController extends Controller
       }
       $db = Database::getInstance();
       switch ($accountType) {
+        case 'guest':
+          $id = RouterSession::getUserId();
+          $model = $db->fetchOne(Guest::class, ['id' => $id]);
+          if (!$model) {
+            return Response::json(['error' => 'Guest not found.'], StatusCode::NOT_FOUND);
+          }
+          $model->setAttributes($data);
+          if ($model->update()) {}
+          break;
         case 'admin':
           $id = RouterSession::getUserId();
-          $model = $db->fetchOne(Admin::class, conditions: ['id' => $id]);
+          $model = $db->fetchOne(Admin::class, ['id' => $id]);
           if (!$model) {
             return Response::json(['error' => 'Admin not found.'], StatusCode::NOT_FOUND);
           }
           $model->setAttributes($data);
           if ($model->update()) {
-            (new AdminLogs(['admin_id' => $model->getPrimaryKeyValue(), 'activity' => "Admin ID: {$id}, username: {$model->admin_user}, fullname: {$model->full_name} has newly been updated"]))->create();
+            if (!empty($body['username'])) {
+              (new AdminLogs(['admin_id' => RouterSession::getUserId(), 'activity' => "Personnel ID: {$id}, fullname: {$model->full_name} has been updated"]))->create();
+            }
           }
           break;
         case 'personnel':
@@ -409,7 +434,7 @@ class ApiController extends Controller
       }
 
       // Validate account type (admin, personnel, student)
-      if (!in_array($body['account'], ['admin', 'personnel', 'student'])) {
+      if (!in_array($body['account'], ['guest', 'admin', 'personnel', 'student'])) {
         return Response::json(['error' => 'Invalid account type.'], StatusCode::BAD_REQUEST);
       }
 
@@ -419,23 +444,40 @@ class ApiController extends Controller
       $username = $body['username'];
       $password = $body['password'];
 
-      $condition = ['student_id' => $username];
-      $modelClass = Student::class;
       switch ($account) {
-        case 'admin':
+        case 'guest': {
+          $condition = ['email' => $username];
+          $modelClass = Guest::class;
+          $user = $db->fetchOne($modelClass, $condition);
+          break;
+        }
+        case 'admin': {
           $condition = ['admin_user' => $username];
           $modelClass = Admin::class;
+          $user = $db->fetchOne($modelClass, $condition);
           break;
-        case 'personnel':
+        }
+        case 'personnel': {
           $condition = ['personnel_id' => $username];
           $modelClass = Personnel::class;
+          $user = $db->fetchOne($modelClass, $condition);
           break;
+        }
+        case 'student': {
+          $condition = ['student_id' => $username];
+          $modelClass = Student::class;
+          $user = $db->fetchOne($modelClass, $condition);
+          break;
+        }
+        default: {
+          $user = null;
+        }
       }
-      $user = $db->fetchOne($modelClass, $condition);
 
       // Check if password matches
       if ($user && password_verify($password, $user->password)) {
         $userId = match ($account) {
+          'guest' => $user->id,
           'admin' => $user->id,
           'personnel' => $user->personnel_id,
           'student' => $user->student_id,
@@ -448,6 +490,8 @@ class ApiController extends Controller
           // Logger::write_debug("User done: account={$account}, id={$userId}");
           $clientIp = RouterSession::getClientIpAddress();
           switch ($account) {
+            case 'guest':
+              break;
             case 'admin':
               (new AdminLogs(['admin_id' => $userId, 'activity' => "Logged in at {$clientIp}"]))->create();
               break;
@@ -494,6 +538,7 @@ class ApiController extends Controller
       return Response::json(['error'=> $e->getMessage()], StatusCode::INTERNAL_SERVER_ERROR);
     }
   }
+
   public function journalList(): Response
   {
     if (!RouterSession::isAuthenticated()) {
@@ -1011,4 +1056,112 @@ class ApiController extends Controller
     }
   }
 
+  public function addDepartment(Request $request): Response
+  {
+    try {
+      $department = $request->getBodyParam('department');
+      $jsonData = file_get_contents(implode(DIRECTORY_SEPARATOR, [UPLOADS_PATH, "departments", "departmentcourses.json"]));
+      $departments = json_decode($jsonData, true);
+      if (array_key_exists($department, $departments)) {
+        return Response::json(['error' => 'Department already exists.'], StatusCode::CONFLICT);
+      }
+      $departments[$department] = [];
+      file_put_contents(implode(DIRECTORY_SEPARATOR, [UPLOADS_PATH, "departments", "departmentcourses.json"]), json_encode($departments, JSON_PRETTY_PRINT));
+      return Response::json(['success' => ['department' => $department]], StatusCode::CREATED);
+    } catch (\Exception $e) {
+      return Response::json(['error' => $e->getMessage(), StatusCode::INTERNAL_SERVER_ERROR]);
+    }
+  }
+
+  public function addCourse(Request $request): Response
+  {
+    try {
+      $department = $request->getBodyParam('department');
+      $course = $request->getBodyParam('course');
+      $jsonData = file_get_contents(implode(DIRECTORY_SEPARATOR, [UPLOADS_PATH, "departments", "departmentcourses.json"]));
+      $departments = json_decode($jsonData, true);
+      if (!array_key_exists($department, $departments)) {
+        return Response::json(['error' => 'Department not found.'], StatusCode::NOT_FOUND);
+      }
+      $courses_added = 0;
+      if (in_array($course, $departments[$department])) {
+        return Response::json(['error' => 'Course already exists in this department.'], StatusCode::CONFLICT);
+      }
+      $departments[$department][] = $course;
+      file_put_contents(implode(DIRECTORY_SEPARATOR, [UPLOADS_PATH, "departments", "departmentcourses.json"]), json_encode($departments, JSON_PRETTY_PRINT));
+      return Response::json(['success' => true], StatusCode::CREATED);
+    } catch (\Exception $e) {
+      return Response::json(['error' => $e->getMessage(), StatusCode::INTERNAL_SERVER_ERROR]);
+    }
+  }
+
+  public function editDepartment(Request $request): Response
+  {
+    try {
+      $department = $request->getBodyParam(key: 'old_department');
+      $newDepartment = $request->getBodyParam(key: 'new_department');
+      $jsonData = file_get_contents(implode(DIRECTORY_SEPARATOR, [UPLOADS_PATH, "departments", "departmentcourses.json"]));
+      $departments = json_decode($jsonData, true);
+      if (!array_key_exists($department, $departments)) {
+        return Response::json(['error' => 'Department not found.'], StatusCode::NOT_FOUND);
+      }
+      $departments[$newDepartment] = $departments[$department];
+      unset($departments[$department]);
+      file_put_contents(implode(DIRECTORY_SEPARATOR, [UPLOADS_PATH, "departments", "departmentcourses.json"]), json_encode($departments, JSON_PRETTY_PRINT));
+      return Response::json(['success' => ['department' => $department]], StatusCode::OK);
+    } catch (\Exception $e) {
+      return Response::json(['error' => $e->getMessage(), StatusCode::INTERNAL_SERVER_ERROR]);
+    }
+  }
+
+  public function editDepartmentCourses(Request $request): Response
+  {
+    try {
+      $department = $request->getBodyParam('department');
+      $courses = $request->getBodyParam('courses');
+      $jsonData = file_get_contents(implode(DIRECTORY_SEPARATOR, [UPLOADS_PATH, "departments", "departmentcourses.json"]));
+      $departments = json_decode($jsonData, true);
+      if (!array_key_exists($department, $departments)) {
+        return Response::json(['error' => 'Department not found.'], StatusCode::NOT_FOUND);
+      }
+      $departments[$department] = [...$courses];
+      file_put_contents(implode(DIRECTORY_SEPARATOR, [UPLOADS_PATH, "departments", "departmentcourses.json"]), json_encode($departments, JSON_PRETTY_PRINT));
+      return Response::json(['success' => ['department' => $department]], StatusCode::OK);
+    } catch (\Exception $e) {
+      return Response::json(['error' => $e->getMessage(), StatusCode::INTERNAL_SERVER_ERROR]);
+    }
+  }
+
+  public function deleteDepartment(Request $request): Response
+  {
+    try {
+      $department = $request->getQueryParam('department');
+      $jsonData = file_get_contents(implode(DIRECTORY_SEPARATOR, [UPLOADS_PATH, "departments", "departmentcourses.json"]));
+      $departments = json_decode($jsonData, true);
+      if (!array_key_exists($department, $departments)) {
+        return Response::json(['error' => 'Department not found.'], StatusCode::NOT_FOUND);
+      }
+      unset($departments[$department]);
+      file_put_contents(implode(DIRECTORY_SEPARATOR, [UPLOADS_PATH, "departments", "departmentcourses.json"]), json_encode($departments, JSON_PRETTY_PRINT));
+      return Response::json(['success' => ['department' => $department]], StatusCode::OK);
+    } catch (\Exception $e) {
+      return Response::json(['error' => $e->getMessage(), StatusCode::INTERNAL_SERVER_ERROR]);
+    }
+  }
+
+  public function allDepartments(Request $request): Response
+  {
+    try {
+      $department = $request->getQueryParam('department');
+      $jsonData = file_get_contents(implode(DIRECTORY_SEPARATOR, [UPLOADS_PATH, "departments", "departmentcourses.json"]));
+      $departments = json_decode($jsonData, true);
+      if ($department && array_key_exists($department, $departments)) {
+        return Response::json(['success' => [$department => $departments[$department]]], StatusCode::OK);
+      } else {
+        return Response::json(['success' => $departments], StatusCode::OK);
+      }
+    } catch (\Exception $e) {
+      return Response::json(['error' => $e->getMessage(), StatusCode::INTERNAL_SERVER_ERROR]);
+    }
+  }
 }

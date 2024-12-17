@@ -17,14 +17,8 @@ class Router
   private array $files;
 
   static $Router__routes = [
-    'STATIC' => [],
-    'GET' => [],
-    'POST' => [],
-    'PUT' => [],
-    'PATCH' => [],
-    'DELETE' => [],
-    'NOTFOUND' => [],
-    'ERROR' => [],
+    'NOT_FOUND_PAGE' => null,
+    'ERROR_PAGE' => null,
   ];
 
   public function __construct()
@@ -49,28 +43,15 @@ class Router
     }
   }
 
-  public function run(): void
+  public function request(string $uriPath, string $method, callable|array $callable): void
   {
     try {
-      // check public files
-      $this->publicAssets();
-      // check static files
-      $paths = array_keys(Router::$Router__routes['STATIC']);
-      Logger::write_debug("PATHS: ". json_encode($paths));
-      $matchingPaths = array_filter($paths, function ($path) {
-        return str_starts_with($this->uri, $path);
-      });
-      Logger::write_debug("STATIC: " . json_encode($matchingPaths));
-      if ($matchingPath = reset($matchingPaths)) {
-        // static folder found
-        $this->staticPage(Router::$Router__routes['STATIC'][$matchingPath][0], strlen($matchingPath), Router::$Router__routes['STATIC'][$matchingPath][1]);
-      }
       // Request Method: GET, POST, PUT, PATCH, DELETE
       if (
-        in_array($this->method, ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'])
-        && isset(Router::$Router__routes[$this->method][$this->uri])
+        $this->method === $method
+        && $this->uri === $uriPath
       ) {
-        $route = Router::$Router__routes[$this->method][$this->uri];
+        $route = $callable;
         if (is_array($route) && count($route) === 2) {
           $class = $route[0];
           $method = $route[1];
@@ -100,36 +81,15 @@ class Router
           throw new Exception("Invalid route configuration for route: {$uri}");
         }
       }
-      // 404 Not Found
-      header('HTTP/1.1 404 Not Found');
-      Logger::write_info("{$_SERVER['REQUEST_URI']} (HTTP Response: 404)");
-      if (!empty(Router::$Router__routes['NOT_FOUND_PAGE'])) {
-        // 404 Not Found page exists
-        $class = Router::$Router__routes['NOT_FOUND_PAGE'][0];
-        $method = Router::$Router__routes['NOT_FOUND_PAGE'][1];
-        // Create an instance of the class
-        $instance = new $class();
-        if (method_exists($class, $method)) {
-          $view = call_user_func([$instance, $method]);
-          if ($view instanceof Response) {
-            $view->sendResponse();
-          } else if ($view instanceof View) {
-            $view->render();
-          }
-          exit;
-        }
-      }
-      // default not found page
-      echo 'Error 404 Not Found';
-      exit;
     } catch (\Throwable $e) {
       // 500 Error
       header('HTTP/1.1 500 Internal Server Error');
       Logger::write_info("{$_SERVER['REQUEST_URI']} (HTTP Response: 500)");
       Logger::write_error("Internal Server Error - " . $e->getMessage() . "\n" . $e->getTraceAsString());
-      if (!empty(Router::$Router__routes['ERROR_PAGE'])) {
-        $class = Router::$Router__routes['ERROR_PAGE'][0];
-        $method = Router::$Router__routes['ERROR_PAGE'][1];
+      $errorPage = Router::$Router__routes['ERROR_PAGE'];
+      if (is_array($errorPage)) {
+        $class = $errorPage[0];
+        $method = $errorPage[1];
         // Create an instance of the class
         $instance = new $class();
         if (method_exists($class, $method)) {
@@ -141,12 +101,75 @@ class Router
           }
           exit;
         }
+      } else if ($errorPage !== null && is_callable($errorPage)) {
+        call_user_func($errorPage, "Internal Server Error - " . str_replace("\n", "<br />", $e->getMessage() . "\n" . $e->getTraceAsString()));
       }
       // default error page
       echo 'Error 500 Internal Server Error';
       exit;
     }
   }
+
+  private function pageNotFound(callable|array $callable) {
+    try {
+        // 404 Not Found
+      header('HTTP/1.1 404 Not Found');
+      Logger::write_info("{$_SERVER['REQUEST_URI']} (HTTP Response: 404)");
+      $notFoundPage = $callable;
+      if (is_array($notFoundPage)) {
+        // 404 Not Found page exists
+        $class = $notFoundPage[0];
+        $method = $notFoundPage[1];
+        // Create an instance of the class
+        $instance = new $class();
+        if (method_exists($class, $method)) {
+          $view = call_user_func([$instance, $method]);
+          if ($view instanceof Response) {
+            $view->sendResponse();
+          } else if ($view instanceof View) {
+            $view->render();
+          }
+          exit;
+        }
+      } else {
+        // 404 Not Found page exists
+        if ($notFoundPage !== null && is_callable($notFoundPage)) {
+          call_user_func($notFoundPage);
+          exit;
+        }
+      }
+      // default not found page
+      echo 'Error 404 Not Found';
+      exit;
+    } catch (\Throwable $e) {
+      // 500 Error
+      header('HTTP/1.1 500 Internal Server Error');
+      Logger::write_info("{$_SERVER['REQUEST_URI']} (HTTP Response: 500)");
+      Logger::write_error("Internal Server Error - " . $e->getMessage() . "\n" . $e->getTraceAsString());
+      $errorPage = Router::$Router__routes['ERROR_PAGE'];
+      if (is_array($errorPage)) {
+        $class = $errorPage[0];
+        $method = $errorPage[1];
+        // Create an instance of the class
+        $instance = new $class();
+        if (method_exists($class, $method)) {
+          $view = call_user_func([$instance, $method], "Internal Server Error - " . str_replace("\n", "<br />", $e->getMessage() . "\n" . $e->getTraceAsString()));
+          if ($view instanceof Response) {
+            $view->sendResponse();
+          } else if ($view instanceof View) {
+            $view->render();
+          }
+          exit;
+        }
+      } else if ($errorPage !== null && is_callable($errorPage)) {
+        call_user_func($errorPage, "Internal Server Error - " . str_replace("\n", "<br />", $e->getMessage() . "\n" . $e->getTraceAsString()));
+      }
+      // default error page
+      echo 'Error 500 Internal Server Error';
+      exit;
+    }
+  }
+
 
   public static function getPathname(string $pathname) {
     return URI_PREFIX ? (str_starts_with(URI_PREFIX, "/")
@@ -163,9 +186,9 @@ class Router
     return $prefix ? str_replace($prefix, '', $uri) : $uri;
   }
 
-  private function publicAssets(): void
+  public static function publicAssets(): void
   {
-    $filePath = implode(DIRECTORY_SEPARATOR, [ASSETS_PATH, substr($this->uri, 1)]);
+    $filePath = implode(DIRECTORY_SEPARATOR, [ASSETS_PATH, substr(self::getUriPath(), 1)]);
     if (file_exists($filePath) && is_file($filePath) && is_readable($filePath)) {
       $lastModified = gmdate('D, d M Y H:i:s', filemtime($filePath)) . ' GMT';
       if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) && $_SERVER['HTTP_IF_MODIFIED_SINCE'] === $lastModified) {
@@ -184,6 +207,7 @@ class Router
       exit;
     }
   }
+
   private function staticPage(string $diskPath, int $offset, ?string $ignoreExtension): void
   {
     $filePath = implode(DIRECTORY_SEPARATOR, [$diskPath, substr($this->uri, $offset + 1)]);
@@ -192,7 +216,7 @@ class Router
       // no file extension
       // then try adding $ignoreExtension to the end of the path
       if (!empty($ignoreExtension)) {
-        $filePath .= '.' . $ignoreExtension;
+        $filePath .= ".{$ignoreExtension}";
       }
     }
     if (file_exists($filePath) && is_file($filePath) && is_readable($filePath)) {
@@ -213,38 +237,47 @@ class Router
       exit;
     }
   }
-  public static function GET(string $uriPath, callable|array $callable): void
+  public function GET(string $uriPath, callable|array $callable): void
   {
-    Router::$Router__routes['GET'][$uriPath] = $callable;
+    $this->request($uriPath, "GET", $callable);
   }
-  public static function POST(string $uriPath, callable|array $callable): void
+  public function POST(string $uriPath, callable|array $callable): void
   {
-    Router::$Router__routes['POST'][$uriPath] = $callable;
+    $this->request($uriPath, "POST", callable: $callable);
   }
-  public static function PUT(string $uriPath, callable|array $callable): void
+  public function PUT(string $uriPath, callable|array $callable): void
   {
-    Router::$Router__routes['PUT'][$uriPath] = $callable;
+    $this->request($uriPath, "PUT", callable: $callable);
   }
-  public static function PATCH(string $uriPath, callable|array $callable): void
+  public function PATCH(string $uriPath, callable|array $callable): void
   {
-    Router::$Router__routes['PATCH'][$uriPath] = $callable;
+    $this->request($uriPath, "PATCH", callable: $callable);
   }
-  public static function DELETE(string $uriPath, callable|array $callable): void
+  public function DELETE(string $uriPath, callable|array $callable): void
   {
-    Router::$Router__routes['DELETE'][$uriPath] = $callable;
+    $this->request($uriPath, "DELETE", callable: $callable);
   }
-  public static function STATIC(string $uriPath, string $diskPath, ?string $ignoreExtension = null): void
+  public function STATIC(string $uriPath, string $diskPath, ?string $ignoreExtension = null): void
   {
-    Router::$Router__routes['STATIC'][$uriPath] = [$diskPath, $ignoreExtension];
+    // check static files
+    $matchingPath = str_starts_with($this->uri, $uriPath);
+    if ($matchingPath) {
+        // static folder found
+      $this->staticPage($diskPath, strlen($uriPath), $ignoreExtension);
+    }
   }
 
-  public static function NOTFOUND(callable|array $callable): void
+  public function NOTFOUND(callable|array $callable): void
   {
-    Router::$Router__routes['NOT_FOUND_PAGE'] = $callable;
+    $this->pageNotFound($callable);
   }
 
   public static function ERROR(callable|array $callable): void
   {
-    Router::$Router__routes['ERROR_PAGE'] = $callable;
+    try {
+      Router::$Router__routes['ERROR_PAGE'] = $callable;
+    } catch (\Throwable $e) {
+      die("ERROR: " . $e->getMessage());
+    }
   }
 }

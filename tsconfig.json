@@ -1,22 +1,37 @@
+
 {
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",
     "jsx": "react",
-    "moduleResolution": "Bundler",
-    "outDir": "./src/Views/react/dist",
-    "sourceMap": true,
-    "strict": true,
     "esModuleInterop": true,
+    "moduleResolution": "node",
     "skipLibCheck": true,
-    "baseUrl": "./src/Views/react/src",
-    "paths": {
-      "/jsx/*": ["./*"]
-    }
+    "strict": true
   },
-  "exclude": ["node_modules", "vendor", "public", "jsxbuild"],
-  "include": [
-    "src/Views/react/src/**/*.ts",
-    "src/Views/react/src/**/*.tsx",
-  ]
+  "include": ["src/Views/react/src/**/*.ts", "src/Views/react/src/**/*.tsx"],
+  "exclude": ["node_modules"]
 }
+
+// {
+//   "compilerOptions": {
+//     "target": "ESNext",
+//     "module": "ESNext",
+//     "jsx": "react",
+//     "moduleResolution": "Bundler",
+//     "outDir": "./src/Views/react/dist",
+//     "sourceMap": true,
+//     "strict": true,
+//     "esModuleInterop": true,
+//     "skipLibCheck": true,
+//     "baseUrl": "./src/Views/react/src",
+//     "paths": {
+//       "/jsx/*": ["./*"]
+//     }
+//   },
+//   "exclude": ["node_modules", "vendor", "public"],
+//   "include": [
+//     "src/Views/react/src/**/*.ts",
+//     "src/Views/react/src/**/*.tsx",
+//   ]
+// }

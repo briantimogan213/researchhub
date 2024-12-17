@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Smcc\ResearchHub\Router;
 
 use Exception;
@@ -18,6 +17,7 @@ class Session
 {
   public static function index(): void
   {
+    session_start();
     try {
       $db = Database::getInstance();
       $cookieSession = Cookies::get('session_id');

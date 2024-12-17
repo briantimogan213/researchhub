@@ -16,7 +16,7 @@ define('VIEW_PATH', implode(DIRECTORY_SEPARATOR, [APP_PATH, 'src', 'Views']));
 define('MODELS_PATH', implode(DIRECTORY_SEPARATOR, [APP_PATH, 'src', 'Models']));
 define('REACT_SRC_PATH', implode(DIRECTORY_SEPARATOR, [APP_PATH, 'src', 'Views', 'react', 'src']));
 define('REACT_DIST_PATH', implode(DIRECTORY_SEPARATOR, [APP_PATH, 'src', 'Views', 'react', 'dist']));
-define('UPLOADS_PATH', implode(DIRECTORY_SEPARATOR, [APP_PATH, 'uploads']));
+define('UPLOADS_PATH', value: implode(DIRECTORY_SEPARATOR, [APP_PATH, 'uploads']));
 define('LOGGER_FILE_PATH', implode(DIRECTORY_SEPARATOR, [APP_PATH, "uploads", "mylogs.log"]));
 
 define('MAX_IMAGE_SIZE', 10 * 1024 * 1024); // 10 MB

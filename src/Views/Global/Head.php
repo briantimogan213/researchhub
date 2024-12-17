@@ -29,7 +29,8 @@ class Head
       <!-- Tailwind Minified CSS -->
       <link type="text/css" rel="stylesheet" href="<?= Router::getPathname('/css/style.css') ?>" />
       <link type="text/css" rel="stylesheet" href="<?= Router::getPathname('/css/main.min.css') ?>" />
-      <script type="importmap">
+      <link type="text/css" rel="stylesheet" href="<?= Router::getPathname('/css/richtext.css') ?>" />
+      <!-- <script type="importmap">
         {
           "imports": {
             "react": "https://esm.sh/react@18.3.1",
@@ -44,7 +45,7 @@ class Head
             "sanitize-html": "https://esm.sh/sanitize-html@2.13.1"
           }
         }
-      </script>
+      </script> -->
     </head>
 <?php
   }

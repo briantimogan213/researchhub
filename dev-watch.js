@@ -20,26 +20,18 @@ async function main() {
 
     console.log('Running Tailwind build watcher...');
     // Run postcss with Tailwind CSS in watch mode
-    runCommand('npx', ['postcss', './src/tailwind.css', '-o', './public/css/main.min.css', '--watch']);
-
-    await new Promise((resolve) => setTimeout(resolve, 2000)); // Wait for second
+    runCommand('npm', ['run' ,'watch:tailwind']);
 
     console.log('Running Typescript build watcher...');
     // Run TypeScript compiler in watch mode
-    runCommand('npx', ['tsc', '--watch']);
-
-    await new Promise((resolve) => setTimeout(resolve, 5000));
+    // runCommand('npx', ['tsc']);
+    runCommand('node', ['watch-and-transfer.js']);
 
     // console.log('Compiling ESM React Modules watcher...');
     // Run the custom compile script in watch mode
-
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    // console.log('\nWeb: http://localhost:8000');
-    // Start the PHP server
-    runCommand('php', ['-S', 'localhost:8000', 'index.php']);
-
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    runCommand('node', ['proxy.js']);
+    // runCommand('node', ['compile.js']);
+    runCommand('browser-sync', ["start", "--proxy", "localhost/smcc-research-hub", "--files", "public/jsx/react-app.umd.js"]);
+    await new Promise((resolve) => {}); // Wait forever
 }
 
 // Execute the main function

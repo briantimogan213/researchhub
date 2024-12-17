@@ -1,39 +1,34 @@
-export default import(pathname('/jsx/imports')).then(({ React }) => {
+import { React } from "./imports";
+// @ts-ignore
+export const MainContext = React.createContext<{
+  authenticated?: boolean;
+  authData?: any;
+  [key: string]: any;
+}>({});
+
+export function Context({
+  children,
+  pageData = {},
+  rootDOM,
+}: Readonly<{
+  children: React.ReactNode;
+  pageData: any;
+  rootDOM: HTMLElement;
+}>) {
   // @ts-ignore
-  const MainContext = React.createContext<{
+  const [data, setData] = React.useState<{
     authenticated?: boolean;
     authData?: any[];
     [key: string]: any;
-  }>({});
+  }>(JSON.parse(pageData || "{}"))
 
-  function Context({
-    children,
-    pageData = {},
-    rootDOM,
-  }: Readonly<{
-    children: React.ReactNode;
-    pageData: any;
-    rootDOM: HTMLDivElement;
-  }>) {
-    // @ts-ignore
-    const [data, setData] = React.useState<{
-      authenticated?: boolean;
-      authData?: any[];
-      [key: string]: any;
-    }>(JSON.parse(pageData || "{}"))
+  React.useEffect(() => {
+    setData(JSON.parse(rootDOM?.dataset?.pageData || "{}"))
+  }, [rootDOM?.dataset?.pageData])
 
-    React.useEffect(() => {
-      setData(JSON.parse(rootDOM?.dataset?.pageData || "{}"))
-    }, [rootDOM?.dataset?.pageData])
-
-    return (
-      <MainContext.Provider value={data}>
-        {children}
-      </MainContext.Provider>
-    );
-  }
-  return {
-    MainContext,
-    Context,
-  }
-});
+  return (
+    <MainContext.Provider value={data}>
+      {children}
+    </MainContext.Provider>
+  );
+}

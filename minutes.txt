@@ -1,0 +1,11 @@
+TODO:
+(DONE) 1. Remove the existing admin/teacher accounts listed below
+(DONE) 2. There should only be one login form for admin/teacher/student
+(DONE) 3. Remove the Mon-Sun section from the admin dashboard
+(DONE) 4. Enlarge the form for uploading thesis.
+(DONE) 5. Implement Filtering for the Journal List, similar to the thesis Filtering
+(DONE) 6. Add an additional form for departments
+(DONE) 7. Create Accounts for Guest Users
+(DONE) 8. Check the System Process or Performance
+(DONE) 8. Ensure Uniformity of Colors Throughout the System
+(DONE) 9. Use the Rich text editor setup for announcements

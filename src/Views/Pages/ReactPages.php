@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Smcc\ResearchHub\Views\Pages\Admin;
+namespace Smcc\ResearchHub\Views\Pages;
 
 use Smcc\ResearchHub\Views\Global\Template;
 use Smcc\ResearchHub\Views\Global\View;

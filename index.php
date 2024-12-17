@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 session_start();
 
+require_once implode(DIRECTORY_SEPARATOR, [__DIR__, 'vendor', 'autoload.php']);
 // Set error reporting level
+
 error_reporting(E_ALL);
 ini_set('display_errors', 0);
 ini_set('log_errors', 1);
 
 define('APP_PATH', realpath(__DIR__ . '/.'));
-
 
 // Define the path to the .env files
 $envFiles = ['.env.local', '.env.development', '.env', '.env.production'];
@@ -49,5 +50,5 @@ if (file_exists($envFile)) {
   }
 }
 
-require_once implode(DIRECTORY_SEPARATOR, [APP_PATH, 'vendor', 'autoload.php']);
-require_once implode(DIRECTORY_SEPARATOR, [APP_PATH, 'config', 'bootstrap.php']);
+require_once implode(DIRECTORY_SEPARATOR, [__DIR__, 'config', 'define.php']);
+require_once implode(DIRECTORY_SEPARATOR, [__DIR__, 'config', 'bootstrap.php']);

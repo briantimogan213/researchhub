@@ -16,6 +16,11 @@ class Template
       <main
         id="root"
         class="relative w-full"
+        <?php if ($reactFileName !== null):
+          $fileReact = htmlspecialchars($reactFileName);
+        ?>
+          data-react-app="<?= $fileReact ?>";
+        <?php endif ?>
         data-page-data="<?= htmlspecialchars(json_encode($data)); ?>"
       >
         <?php if (is_callable($method)) { $method($data); }?>
@@ -27,8 +32,11 @@ class Template
           return `${window.URI_PREFIX}${path_name}`;
         }
       </script>
-      <?php if (!empty($reactFileName)) { ?>
-        <script type="module" src="<?= $reactFileName; ?>"></script>
+      <?php if ($reactFileName !== null) { ?>
+        <script src="<?= Router::getPathname("/jsx/react-app.umd.js") ?>"></script>
+        <script>
+          ReactApp.renderApp('root', false, true);
+        </script>
       <?php } ?>
     </body>
   <?php
@@ -43,6 +51,11 @@ class Template
       <main
         id="root"
         class="relative w-full"
+        <?php if ($reactFileName !== null):
+          $fileReact = htmlspecialchars($reactFileName);
+        ?>
+          data-react-app="<?= $fileReact ?>";
+        <?php endif ?>
         data-page-data="<?= htmlspecialchars(json_encode($data)); ?>"
       >
         <?php if (is_callable($method)) { $method($data); }?>
@@ -54,10 +67,10 @@ class Template
           return `${window.URI_PREFIX}${path_name}`;
         }
       </script>
-      <script type="module" src="<?= Router::getPathname('/jsx/global/header') ?>"></script>
-      <?php if (!empty($reactFileName)) { ?>
-      <script type="module" src="<?= $reactFileName; ?>"></script>
-      <?php } ?>
+      <script src="<?= Router::getPathname("/jsx/react-app.umd.js") ?>"></script>
+      <script>
+        ReactApp.renderApp('root', true, <?php if ($reactFileName === null): ?> true <?php else: ?> false <?php endif ?>);
+      </script>
     </body>
   <?php
   }
@@ -79,7 +92,10 @@ class Template
           return `${window.URI_PREFIX}${path_name}`;
         }
       </script>
-      <script type="module" src="<?= Router::getPathname('/jsx/main') ?>"></script>
+      <script src="<?= Router::getPathname("/jsx/react-app.umd.js") ?>"></script>
+      <script>
+        ReactApp.renderApp('root');
+      </script>
     </body>
   <?php
   }
@@ -103,8 +119,10 @@ class Template
           return `${window.URI_PREFIX}${path_name}`;
         }
       </script>
-      <script type="module" src="<?= Router::getPathname('/jsx/global/header') ?>"></script>
-      <script type="module" src="<?= Router::getPathname('/jsx/main') ?>"></script>
+      <script src="<?= Router::getPathname("/jsx/react-app.umd.js") ?>"></script>
+      <script>
+        ReactApp.renderApp('root', true);
+      </script>
     </body>
   <?php
   }
@@ -138,7 +156,7 @@ class Template
           </div>
         </nav>
         </aside>
-        <main class="relative max-h-screen overflow-y-auto flex-grow min-h-screen">
+        <main class="relative max-h-screen overflow-y-auto flex-grow min-h-screen bg-[#37414e]">
           <?php Header::admin(); ?>
           <div
             id="root"
@@ -146,7 +164,7 @@ class Template
             data-react-app="<?= htmlspecialchars($reactAppPath); ?>"
             data-page-data="<?= htmlspecialchars(json_encode($data)); ?>"
           ></div>
-          <?php Footer::default(); ?>
+          <?php Footer::admin(); ?>
         </main>
       </div>
       <script>
@@ -155,9 +173,10 @@ class Template
           return `${window.URI_PREFIX}${path_name}`;
         }
       </script>
-      <script type="module" src="<?= Router::getPathname('/jsx/admin/sidebar') ?>"></script>
-      <script type="module" src="<?= Router::getPathname('/jsx/admin/header') ?>"></script>
-      <script type="module" src="<?= Router::getPathname('/jsx/main') ?>"></script>
+      <script src="<?= Router::getPathname("/jsx/react-app.umd.js") ?>"></script>
+      <script>
+        ReactApp.renderApp('root', true, false, true);
+      </script>
     </body>
   <?php
   }

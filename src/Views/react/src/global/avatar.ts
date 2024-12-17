@@ -1,4 +1,4 @@
-export default function() {
+export default function avatar() {
   // dropdown avatar
   const avatarBtn = document.getElementById("profile-avatar-dropdown-btn");
   const avatarDropdown = document.getElementById("profile-avatar-dropdown");

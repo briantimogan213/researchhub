@@ -231,6 +231,5 @@ export const DepartmentCourses: { [key: Departments|string]: Courses[] } = {
     Courses.HUMSS,
     Courses.STEM,
     Courses.ICT,
-
   ]
 }

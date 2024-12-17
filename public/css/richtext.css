@@ -1,0 +1,123 @@
+/* General Text Styling */
+.rich-text-editor .editor-area b,
+.rich-text-editor .editor-area strong {
+  font-weight: bold;
+}
+
+.rich-text-editor .editor-area i,
+.rich-text-editor .editor-area em {
+  font-style: italic;
+}
+
+.rich-text-editor .editor-area u {
+  text-decoration: underline;
+}
+
+.rich-text-editor .editor-area strike,
+.rich-text-editor .editor-area s {
+  text-decoration: line-through;
+}
+
+.rich-text-editor .editor-area sub {
+  font-size: 0.75em;
+  vertical-align: sub;
+}
+
+.rich-text-editor .editor-area sup {
+  font-size: 0.75em;
+  vertical-align: super;
+}
+
+/* Highlight and Font Color */
+.rich-text-editor .editor-area span[style*="background-color"] {
+  padding: 2px 4px;
+  border-radius: 2px;
+}
+
+.rich-text-editor .editor-area span[style*="color"] {
+  padding: 2px 4px;
+}
+
+/* Lists */
+.rich-text-editor .editor-area ul {
+  margin: 8px 0;
+  padding-left: 20px;
+  list-style-type: disc;
+}
+
+.rich-text-editor .editor-area ol {
+  margin: 8px 0;
+  padding-left: 20px;
+  list-style-type: decimal;
+}
+
+.rich-text-editor .editor-area li {
+  margin-bottom: 4px;
+}
+
+/* Table Styling */
+.rich-text-editor .editor-area table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 10px 0;
+}
+
+.rich-text-editor .editor-area td,
+.rich-text-editor .editor-area th {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: left;
+}
+
+.rich-text-editor .editor-area th {
+  background-color: #f1f1f1;
+  font-weight: bold;
+}
+
+.rich-text-editor .editor-area td {
+  background-color: #fff;
+}
+
+/* Links */
+.rich-text-editor .editor-area a {
+  color: #007bff;
+  text-decoration: underline;
+}
+
+.rich-text-editor .editor-area a:hover {
+  color: #0056b3;
+}
+
+/* Images */
+.rich-text-editor .editor-area img {
+  max-width: 100%;
+  height: auto;
+  margin: 10px 0;
+  display: block;
+}
+
+/* Paragraphs and Line Spacing */
+.rich-text-editor .editor-area p {
+  margin: 8px 0;
+}
+
+.rich-text-editor .editor-area p[style*="line-height"] {
+  line-height: inherit;
+}
+
+/* Alignment */
+.rich-text-editor .editor-area p[style*="text-align: left"] {
+  text-align: left;
+}
+
+.rich-text-editor .editor-area p[style*="text-align: center"] {
+  text-align: center;
+}
+
+.rich-text-editor .editor-area p[style*="text-align: right"] {
+  text-align: right;
+}
+
+.rich-text-editor .editor-area p[style*="text-align: justify"] {
+  text-align: justify;
+}
