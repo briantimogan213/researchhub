@@ -1124,7 +1124,7 @@ class ApiController extends Controller
       if (!array_key_exists($department, $departments)) {
         return Response::json(['error' => 'Department not found.'], StatusCode::NOT_FOUND);
       }
-      $departments[$department] = [...$courses];
+      $departments[$department] = count($departments[$department]) === 1 && !$courses ? [] : [...$courses];
       file_put_contents(implode(DIRECTORY_SEPARATOR, [UPLOADS_PATH, "departments", "departmentcourses.json"]), json_encode($departments, JSON_PRETTY_PRINT));
       return Response::json(['success' => ['department' => $department]], StatusCode::OK);
     } catch (\Exception $e) {
