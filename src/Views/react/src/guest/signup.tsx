@@ -29,7 +29,7 @@ export default function GuestSignup() {
         'Content-Type': 'application/json; charset=UTF-8',
         'Accept': 'application/json; charset=UTF-8',
       },
-      body: JSON.stringify({ account: 'guest', username: email, full_name: fullName, password, email }),
+      body: JSON.stringify({ account: 'guest', username: email, full_name: fullName, password, email, school, position, reasons }),
     })
     .then(response => response.json())
     .then(({ error, success }) => {
