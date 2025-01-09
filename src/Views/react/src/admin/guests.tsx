@@ -1,22 +1,22 @@
-
-import { Table, TableRowAction } from "../admin/table";
-import { Input, Select } from "../global/input";
+import { Input } from "../global/input";
 import Modal from "../global/modal";
 import { React, Sweetalert2, pathname } from '../imports';
-import { CellAlign, Courses, Departments, TableCellType, TableColumn, Year } from '../types';
+import { CellAlign, TableCellType, TableColumn } from '../types';
+import { Table, TableRowAction } from "./table";
+
+console.log("What?!")
 
 const columns: TableColumn[] = [
-  { label: "Student ID", key: "student_id", sortable: true, filterable: true, cellType: TableCellType.Number, align: CellAlign.Center },
-  { label: "Full Name", key: "full_name", sortable: true, cellType: TableCellType.String, align: CellAlign.Center },
+  { label: "#", key: "no", sortable: true, cellType: TableCellType.Number, align: CellAlign.Center },
+  { label: "Guest Name", key: "full_name", sortable: true, cellType: TableCellType.String, align: CellAlign.Center },
+  { label: "Role", key: "role", sortable: true, cellType: TableCellType.String, align: CellAlign.Center },
   { label: "Email Address", key: "email", sortable: true, cellType: TableCellType.String, align: CellAlign.Center },
-  { label: "Department", key: "department", sortable: true, cellType: TableCellType.String, align: CellAlign.Center },
-  { label: "Course", key: "course", sortable: true, cellType: TableCellType.String, align: CellAlign.Center },
-  { label: "Year", key: "year", sortable: true, cellType: TableCellType.Number, align: CellAlign.Center },
-  { label: "Date Registered", key: "created_at", sortable: true, cellType: TableCellType.Date, align: CellAlign.Center },
+  { label: "School", key: "school", sortable: true, cellType: TableCellType.String, align: CellAlign.Center },
+  { label: "Position", key: "position", sortable: true, cellType: TableCellType.String, align: CellAlign.Center },
   { label: "Action", key: "action", sortable: false, cellType: TableCellType.Custom, align: CellAlign.Center },
 ];
 
-function EditStudent({
+function EditGuest({
   formData,
   onChange,
 }:
@@ -26,81 +26,80 @@ function EditStudent({
   }) {
   return (
     <div className="p-8">
-      <Input disabled label="Student ID" inputClassName="border-black" className="mb-2" labelColor="black" name="edit_student_id" placeholder="Student ID" value={formData.username} onChange={(e: any) => onChange({ ...formData, username: e.target.value })} />
-      <Input disabled label="Full Name" inputClassName="border-black" className="mb-2" labelColor="black" name="edit_full_name" placeholder="Full Name" value={formData.full_name} onChange={(e: any) => onChange({ ...formData, full_name: e.target.value })} required />
-      <Input type="email" label="Email Address" inputClassName="border-black" className="mb-2" labelColor="black" name="edit_email" placeholder="Email Address" value={formData.email} onChange={(e: any) => onChange({ ...formData, email: e.target.value })} required />
-      <Select labelColor="black" items={Object.entries(Departments).map(([key, value]) => ({ label: value, value }))} label="Department" name="edit_department" value={formData.department} onChange={(e: any) => onChange({ ...formData, department: e.target.value })} required />
-      <Select labelColor="black" items={Object.entries(Courses).map(([key, value]) => ({ label: value, value }))} label="Course" name="edit_course" value={formData.course} onChange={(e: any) => onChange({ ...formData, course: e.target.value })} required />
-      <Select labelColor="black" items={Object.entries(Year).map(([key, value]) => ({ label: value, value }))} label="Year" name="edit_year" value={formData.year} onChange={(e: any) => onChange({ ...formData, year: e.target.value })} required />
+      <Input disabled type="email" label="Email Address" inputClassName="border-black" className="mb-2" labelColor="black" name="edit_email" placeholder="Email Address" value={formData.email} onChange={(e: any) => onChange({ ...formData, email: e.target.value })} required />
+      <Input label="Full Name" inputClassName="border-black" className="mb-2" labelColor="black" name="edit_full_name" placeholder="Full Name" value={formData.full_name} onChange={(e: any) => onChange({ ...formData, full_name: e.target.value })} required />
+      <Input disabled={(formData.position.length > 0 && formData.position.toLowerCase() !== "none")} required={!formData.position || formData.position.toLowerCase() === "none"} inputClassName="border-black" className="mb-2" labelColor="black" placeholder="Leave blank or type NONE if not a student" label="School" name="edit_school" value={formData.school} onChange={(e: any) => onChange({ ...formData, school: e.target.value })} />
+      <Input disabled={(formData.school.length > 0 && formData.school.toLowerCase() !== "none")} required={!formData.school || formData.school.toLowerCase() === "none"} inputClassName="border-black" className="mb-2" labelColor="black" placeholder="Leave blank or type NONE if not an employee" label="Position" name="edit_position" value={formData.position} onChange={(e: any) => onChange({ ...formData, position: e.target.value })} />
+      <Input readOnly inputClassName="border-black" className="mb-2" labelColor="black" placeholder="Why you want to access this hub?" label="Reasons" name="edit_reasons" value={formData.reasons} />
       <Input type="password" label="Password" inputClassName="border-black" className="mb-2" labelColor="black" name="edit_password" placeholder="Password (Leave blank if not change)" value={formData.password} onChange={(e: any) => onChange({ ...formData, password: e.target.value })} />
     </div>
   )
 }
 
-export default function StudentsPage() {
+
+export default function GuestsPage() {
+  console.log("in page?!")
   const [tableData, setTableData] = React.useState([])
   const [formData, setFormData] = React.useState({
-    account: 'student',
-    username: '',
+    account: 'guest',
     full_name: '',
     email: '',
     password: '',
-    department: Departments.CCIS,
-    course: Courses.BSIT,
-    year: Year.FirstYear,
+    school: '',
+    position: '',
+    reasons: '',
   })
 
   const onCloseModal = React.useCallback(() => {
     setFormData({
-      account: 'student',
-      username: '',
+      account: 'guest',
       full_name: '',
       email: '',
       password: '',
-      department: Departments.CCIS,
-      course: Courses.BSIT,
-      year: Year.FirstYear,
+      school: '',
+      position: '',
+      reasons: '',
     })
   }, [])
 
-  const [openEditStudent, setOpenEditStudent] = React.useState(false)
+  const [openEditGuest, setOpenEditGuest] = React.useState(false)
 
-  const onOpenEditStudent = React.useCallback((data: any) => {
+  const onOpenEditGuest = React.useCallback((data: any) => {
     setFormData({
-      account: 'student',
-      username: data.student_id,
+      account: 'guest',
       full_name: data.full_name,
       email: data.email,
       password: '',
-      department: data.department,
-      course: data.course,
-      year: data.year,
+      school: data.school || '',
+      position: data.position || '',
+      reasons: data.reasons
     })
-    setOpenEditStudent(true)
+    setOpenEditGuest(true)
   }, [])
 
   const fetchList = () => {
-    fetch(pathname('/api/student/all'))
+    fetch(pathname('/api/guest/all'))
       .then(response => response.json())
       .then(({ success, error }) => {
         if (error) {
           console.log(error);
         } else {
-          setTableData(success.map((data: any) => {
+          setTableData(success.map((data: any, i: number) => {
             return {
-              student_id: data.student_id,
+              no: i + 1,
+              id: data.id,
               created_at: data.created_at,
               full_name: data.full_name,
               email: data.email,
-              year: data.year,
-              department: data.department,
-              course: data.course,
-              action: <TableRowAction id={data.student_id} onEdit={(id: any) => {
-                if (id === data.student_id) {
-                  onOpenEditStudent(data);
+              role: data.role[0].toUpperCase() + data.role.substring(1),
+              school: data.school || 'NONE',
+              position: data.position || 'NONE',
+              reasons: data.reasons,
+              action: <TableRowAction id={data.id} onEdit={(id: any) => {
+                if (id === data.id) {
+                  onOpenEditGuest(data);
                 }
               }} onDelete={(id: any) => {
-                console.log("ON DELETE STUDENT ID:", id);
                 Sweetalert2.fire({
                   title: 'Are you sure?',
                   text: "You won't be able to revert this!",
@@ -108,10 +107,10 @@ export default function StudentsPage() {
                   showCancelButton: true,
                   confirmButtonColor: '#3085d6',
                   cancelButtonColor: '#d33',
-                  confirmButtonText: 'Yes, delete student account!'
+                  confirmButtonText: 'Yes, delete guest account!'
                 }).then(({ isConfirmed }: any) => {
                   if (isConfirmed) {
-                    fetch(pathname(`/api/student/delete?id=${id}`), { method: 'DELETE' })
+                    fetch(pathname(`/api/guest/delete?id=${id}`), { method: 'DELETE' })
                       .then(response => response.json())
                       .then(({ success, error }) => {
                         if (!success) {
@@ -119,7 +118,7 @@ export default function StudentsPage() {
                           Sweetalert2.fire({
                             icon: 'error',
                             title: 'Error',
-                            text: 'Failed to delete student account: ' + error,
+                            text: 'Failed to delete guest account: ' + error,
                             confirmButtonText: 'Try Again',
                           });
                         } else {
@@ -127,7 +126,7 @@ export default function StudentsPage() {
                           Sweetalert2.fire({
                             icon: 'success',
                             title: 'Deleted!',
-                            text: 'Student account has been deleted successfully.',
+                            text: 'Guest account has been deleted successfully.',
                             timer: 3000
                           });
                         }
@@ -137,7 +136,7 @@ export default function StudentsPage() {
                         Sweetalert2.fire({
                           icon: 'error',
                           title: 'Error',
-                          text: 'Failed to delete student account',
+                          text: 'Failed to delete guest account',
                           timer: 3000
                         });
                       })
@@ -153,7 +152,7 @@ export default function StudentsPage() {
         Sweetalert2.fire({
           icon: 'error',
           title: 'Error',
-          text: 'Failed to fetch student list',
+          text: 'Failed to fetch guest list',
           confirmButtonText: 'Try Again',
           showCancelButton: true,
         }).then(({ isConfirmed }: any) => {
@@ -168,7 +167,7 @@ export default function StudentsPage() {
     fetchList();
   }, [])
 
-  const handleEditStudent = React.useCallback(async (close: () => void) => {
+  const handleEditGuest = React.useCallback(async (close: () => void) => {
     console.log(formData)
     try {
       const response = await fetch(pathname('/api/update'), {
@@ -176,7 +175,11 @@ export default function StudentsPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          school: !formData.school ? 'none' : formData.school,
+          position: !formData.position ? 'none' : formData.position
+        }),
       })
       const data = await response.json()
 
@@ -186,7 +189,7 @@ export default function StudentsPage() {
         Sweetalert2.fire({
           icon: 'success',
           title: 'Success',
-          text: 'Student account has been updated successfully.',
+          text: 'Guest account has been updated successfully.',
           timer: 3000
         })
         setTimeout(() => fetchList(), 100)
@@ -202,20 +205,20 @@ export default function StudentsPage() {
       Sweetalert2.fire({
         icon: 'error',
         title: 'Error',
-        text: 'Failed to update student account',
+        text: 'Failed to update guest account',
         confirmButtonText: 'Try Again',
         showCancelButton: true,
       }).then(({ isConfirmed }: any) => {
         if (isConfirmed) {
-          setTimeout(() => handleEditStudent(close), 100)
+          setTimeout(() => handleEditGuest(close), 100)
         }
       })
     }
   }, [formData]);
 
   return (<>
-    <div className="text-black w-full min-h-[calc(100vh-160px)] h-fit p-4 min-w-fit">
-      <h1 className="text-black text-2xl my-2">Student List</h1>
+    <div className="w-full min-h-[calc(100vh-160px)] h-fit text-black p-4 min-w-fit">
+      <h1 className="text-black text-2xl my-2">Guest List</h1>
       <Table columns={columns} items={tableData}>
         {/* Additional Toolbar Button */}
         <div className="px-4">
@@ -224,6 +227,7 @@ export default function StudentsPage() {
         </div>
       </Table>
     </div>
-    <Modal open={openEditStudent} header={'Edit Student Account'} content={<EditStudent formData={formData} onChange={setFormData} />} onConfirm={handleEditStudent} onCancel={onCloseModal} onClose={() => setOpenEditStudent(false)} />
+    <Modal open={openEditGuest} header={'Edit Guest Account'} content={<EditGuest formData={formData} onChange={setFormData} />} onConfirm={handleEditGuest} onCancel={onCloseModal} onClose={() => setOpenEditGuest(false)} />
   </>)
 }
+

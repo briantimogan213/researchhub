@@ -107,8 +107,8 @@ class Header
   public static function admin()
   {
   ?>
-    <header class="font-[Quicksand] sticky top-0 left-0 h-[60px] w-full bg-[#343c44] z-10">
-      <div class="flex justify-between h-full text-slate-50">
+    <header class="font-[Quicksand] sticky top-0 left-0 h-[60px] w-full bg-[#F3F7FD] z-10">
+      <div class="flex justify-between h-full text-black">
         <div class="flex items-center justify-start h-full gap-x-4">
           <button type="button" id="sidebar-toggle-btn" class="aspect-square p-4">
             <span class="material-symbols-outlined">menu</span>
@@ -126,7 +126,7 @@ class Header
           </li>
           <li class="relative">
             <!-- tailwind dropdown start -->
-            <button id="profile-avatar-dropdown-btn" data-dropdown-toggle="profile-avatar-dropdown" class="text-white hover:text-sky-600 outline-none focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center" type="button">
+            <button id="profile-avatar-dropdown-btn" data-dropdown-toggle="profile-avatar-dropdown" class="hover:text-sky-600 outline-none focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center" type="button">
               <span class="material-symbols-outlined">
                 account_circle
               </span>

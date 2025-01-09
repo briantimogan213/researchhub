@@ -9,9 +9,11 @@ use Smcc\ResearchHub\Models\AdminLogs;
 use Smcc\ResearchHub\Models\Database;
 use Smcc\ResearchHub\Models\Downloadables;
 use Smcc\ResearchHub\Models\Journal;
+use Smcc\ResearchHub\Models\JournalGuestReads;
 use Smcc\ResearchHub\Models\JournalPersonnelReads;
 use Smcc\ResearchHub\Models\JournalReads;
 use Smcc\ResearchHub\Models\Thesis;
+use Smcc\ResearchHub\Models\ThesisGuestReads;
 use Smcc\ResearchHub\Models\ThesisPersonnelReads;
 use Smcc\ResearchHub\Models\ThesisReads;
 use Smcc\ResearchHub\Router\File;
@@ -226,6 +228,42 @@ class FileController extends Controller
                 ? new JournalPersonnelReads([
                   'journal_id' => $id,
                   'personnel_id' => Session::getUserId(),
+                ])
+                : null;
+              if ($readDocument) {
+                $readDocument->create();
+              }
+              break;
+            }
+            default:
+          }
+        } catch (\Throwable $e) {
+          Logger::write_error($e->getMessage());
+        }
+      }
+    } else if (Session::getUserAccountType() === 'guest') {
+      // Append Read
+      $id = $request->getQueryParam('id');
+      if ($id) {
+        try {
+          switch ($docType) {
+            case "thesis": {
+              $readDocument = in_array('thesis', $parts)
+                ? new ThesisGuestReads([
+                  'thesis_id' => $id,
+                  'guest_id' => Session::getUserId(),
+                ])
+                : null;
+              if ($readDocument) {
+                $readDocument->create();
+              }
+              break;
+            }
+            case "journal": {
+              $readDocument = in_array('journal', $parts)
+                ? new JournalGuestReads([
+                  'journal_id' => $id,
+                  'guest_id' => Session::getUserId(),
                 ])
                 : null;
               if ($readDocument) {

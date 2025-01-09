@@ -191,11 +191,11 @@ class Router
     $filePath = implode(DIRECTORY_SEPARATOR, [ASSETS_PATH, substr(self::getUriPath(), 1)]);
     if (file_exists($filePath) && is_file($filePath) && is_readable($filePath)) {
       $lastModified = gmdate('D, d M Y H:i:s', filemtime($filePath)) . ' GMT';
-      if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) && $_SERVER['HTTP_IF_MODIFIED_SINCE'] === $lastModified) {
-        header('HTTP/1.1 304 Not Modified');
-        Logger::write_info("{$_SERVER['REQUEST_URI']} (HTTP Response: 304)");
-        exit;
-      }
+      // if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) && $_SERVER['HTTP_IF_MODIFIED_SINCE'] === $lastModified) {
+      //   header('HTTP/1.1 304 Not Modified');
+      //   Logger::write_info("{$_SERVER['REQUEST_URI']} (HTTP Response: 304)");
+      //   exit;
+      // }
       $_splitted_ext = explode('.', strtolower($filePath));
       $ContentType = MIMETYPES['.' . array_pop($_splitted_ext)] . "; charset=utf-8";
       $_headerContentType = "Content-Type: $ContentType";

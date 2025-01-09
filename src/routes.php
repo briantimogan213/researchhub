@@ -8,6 +8,7 @@ use Smcc\ResearchHub\Controllers\ApiController;
 use Smcc\ResearchHub\Controllers\FileController;
 use Smcc\ResearchHub\Controllers\NotificationController;
 use Smcc\ResearchHub\Controllers\ViewController;
+use Smcc\ResearchHub\Router\Response;
 use Smcc\ResearchHub\Router\Router;
 use Smcc\ResearchHub\Router\Session;
 
@@ -26,8 +27,9 @@ class routes {
     // $app->STATIC('/jsx', REACT_DIST_PATH);
 
     /* GET METHOD */
-    $app->GET('/', [ViewController::class, 'root']);
-    $app->GET('/home', callable: [ViewController::class, 'home']);
+    $app->GET('/', fn() => Response::redirect("/home"));
+    $app->GET('/home', [ViewController::class, 'home']);
+    $app->GET('/login', [ViewController::class, 'root']);
     $app->GET('/guest/signup', [ViewController::class, 'guestSignup']);
     $app->GET('/guest/login', [ViewController::class, 'guestLogin']);
     $app->GET('/student/signup', [ViewController::class, 'studentSignup']);
@@ -43,8 +45,9 @@ class routes {
     $app->GET('/admin/downloads', [ViewController::class, 'adminDownloads']);
     $app->GET('/admin/students', [ViewController::class, 'adminStudentList']);
     $app->GET('/admin/teachers', [ViewController::class, 'adminTeacherAccounts']);
+    $app->GET('/admin/guests', [ViewController::class, 'adminGuestAccounts']);
     $app->GET('/admin/homepage', [ViewController::class, 'adminHomepage']);
-    $app->GET('/admin/departments', callable: [ViewController::class, 'manageDepartments']);
+    $app->GET('/admin/departments', [ViewController::class, 'manageDepartments']);
     $app->GET('/admin/settings', [ViewController::class, 'adminSettings']);
     $app->GET('/thesis', [ViewController::class, 'thesis']);
     $app->GET('/journal', [ViewController::class, 'journal']);
@@ -70,9 +73,10 @@ class routes {
     $app->GET('/api/logs', [NotificationController::class, 'logs']);
     $app->GET('/api/student/all', [ApiController::class,'allStudents']);
     $app->GET('/api/teacher/all', [ApiController::class,'allPersonnels']);
+    $app->GET('/api/guest/all', [ApiController::class,'allGuests']);
     $app->GET('/api/favorites/all', [ApiController::class,'allFavorites']);
     $app->GET('/api/downloadables/all', [ApiController::class,'allDownloadables']);
-    $app->GET('/api/downloadables/available', callable: [ApiController::class,'allAvaiableDownloadables']);
+    $app->GET('/api/downloadables/available', [ApiController::class,'allAvaiableDownloadables']);
     $app->GET('/api/home/announcements', [ApiController::class, 'homeAnnouncements']);
     $app->GET('/api/home/most-views', [ApiController::class, 'homeMostViews']);
     $app->GET('/api/departments', [ApiController::class, 'allDepartments']);
@@ -106,6 +110,7 @@ class routes {
     $app->DELETE('/api/journal/delete', [ApiController::class, 'deleteJournal']);
     $app->DELETE('/api/student/delete', [ApiController::class, 'deleteStudent']);
     $app->DELETE('/api/teacher/delete', [ApiController::class, 'deletePersonnel']);
+    $app->DELETE('/api/guest/delete', [ApiController::class, 'deleteGuest']);
     $app->DELETE('/api/downloadables/delete', [ApiController::class, 'deleteDownloadable']);
     $app->DELETE('/api/home/announcement/delete', [ApiController::class, 'deleteHomeAnnouncement']);
     $app->DELETE('/api/departments/delete', [ApiController::class, 'deleteDepartment']);
