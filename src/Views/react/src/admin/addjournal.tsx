@@ -1,3 +1,4 @@
+
 import { Input, Select, TextArea } from '../global/input'
 import Modal from '../global/modal'
 import PdfViewer from "../global/pdfviewer"
@@ -21,9 +22,10 @@ export default function AddJournalForm({ open, defaultOpen, className = "", onCl
   const [uploadProgress, setUploadProgress] = React.useState<number>(0)
   const [xhr, setXhr] = React.useState<XMLHttpRequest|null>(null)
   const yearsList = React.useMemo(() => Array.from({ length: (new Date()).getFullYear() - 2000 }, (_, i) => (new Date()).getFullYear() - i).map((y) => ({ label: y.toString(), value: y.toString() })), [])
-  const departmentList = React.useMemo(() => Object.keys(departmentsAndCourses).map((d) => ({ label: d, value: d })), [])
+  const departmentList = React.useMemo(() => Object.keys(departmentsAndCourses).map((d) => ({ label: d, value: d })), [departmentsAndCourses])
   const courseList = React.useMemo(() => departmentList.length > 0 ? departmentsAndCourses[journalDepartment]?.map((d: any) => ({ label: d, value: d })) || [] : [], [departmentList, journalDepartment])
   const isFormDisabled = React.useMemo(() => uploadProgress !== 0, [uploadProgress]);
+
 
   React.useEffect(() => {
     if (open !== undefined) {

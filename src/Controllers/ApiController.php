@@ -276,11 +276,10 @@ class ApiController extends Controller
       };
       switch ($accountType) {
         case 'guest':
-          if ($data['school'] !== null && strtolower($data['school']) === "none") {
-            $data['school'] = null;
-          }
-          if ($data['position'] !== null && strtolower($data['position']) === "none") {
+          if ($data['school'] !== null) {
             $data['position'] = null;
+          } else if ($data['position'] !== null) {
+            $data['school'] = null;
           }
           $data['role'] = $data['position'] !== null ? 'employee' : 'student';
           $model = new Guest($data);
@@ -378,11 +377,11 @@ class ApiController extends Controller
           if (!$model) {
             return Response::json(['error' => 'Guest not found.'], StatusCode::NOT_FOUND);
           }
-          if ($data['school'] !== null && strtolower($data['school']) === "none") {
-            $data['school'] = null;
-          }
-          if ($data['position'] !== null && strtolower($data['position']) === "none") {
+          if ($data['school'] !== null) {
             $data['position'] = null;
+          }
+          if ($data['position'] !== null) {
+            $data['school'] = null;
           }
           $model->setAttributes($data);
           if ($model->update()) {}

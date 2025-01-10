@@ -2,6 +2,7 @@ import { React, Sweetalert2, pathname } from "../imports";
 
 export default function GuestSignup() {
   const [email, setEmail] = React.useState('');
+  const [role, setRole] = React.useState('student');
   const [school, setSchool] = React.useState('');
   const [position, setPosition] = React.useState('');
   const [reasons, setReasons] = React.useState('');
@@ -118,36 +119,54 @@ export default function GuestSignup() {
               </div>
               <div>
                 <div className="mb-4">
-                  <label htmlFor="school" className="block text-gray-700 font-medium mb-2">
-                    School
+                  <label htmlFor="role" className="block text-gray-700 font-medium mb-2">
+                    Role
                   </label>
-                  <input
-                    type="text"
-                    id="school"
-                    value={school} onChange={(e: any) => setSchool(e.target.value)}
-                    placeholder={"Leave blank or type NONE if not a student"}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-400"
-                    required={!position || position.toLowerCase() === "none"}
-                    disabled={(position.length > 0 && position.toLowerCase() !== "none")}
-                  />
+                  <select
+                    id="role"
+                    value={role} onChange={(e: any) => setRole(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  >
+                    <option value="student">Student</option>
+                    <option value="employee">Employee</option>
+                  </select>
                 </div>
               </div>
-              <div>
-                <div className="mb-4">
-                  <label htmlFor="position" className="block text-gray-700 font-medium mb-2">
-                    Position (Employees only)
-                  </label>
-                  <input
-                    type="text"
-                    id="position"
-                    value={position} onChange={(e: any) => setPosition(e.target.value)}
-                    placeholder={"Leave blank or type NONE if not an employee"}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-400"
-                    required={!school || school.toLowerCase() === "none"}
-                    disabled={(school.length > 0 && school.toLowerCase() !== "none")}
-                  />
+              {role === "student" && (
+                <div>
+                  <div className="mb-4">
+                    <label htmlFor="school" className="block text-gray-700 font-medium mb-2">
+                      School
+                    </label>
+                    <input
+                      type="text"
+                      id="school"
+                      value={school} onChange={(e: any) => setSchool(e.target.value)}
+                      placeholder={"Name of School Attended"}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-400"
+                      required
+                    />
+                  </div>
                 </div>
-              </div>
+              )}
+              {role === "employee" && (
+                <div>
+                  <div className="mb-4">
+                    <label htmlFor="position" className="block text-gray-700 font-medium mb-2">
+                      Position (Employees only)
+                    </label>
+                    <input
+                      type="text"
+                      id="position"
+                      value={position} onChange={(e: any) => setPosition(e.target.value)}
+                      placeholder={"Position"}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-400"
+                      required
+                    />
+                  </div>
+                </div>
+              )}
               <div>
                 <div className="mb-4">
                   <label htmlFor="reasons" className="block text-gray-700 font-medium mb-2">

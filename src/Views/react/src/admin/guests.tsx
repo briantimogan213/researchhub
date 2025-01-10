@@ -1,4 +1,4 @@
-import { Input } from "../global/input";
+import { Input, Select } from "../global/input";
 import Modal from "../global/modal";
 import { React, Sweetalert2, pathname } from '../imports';
 import { CellAlign, TableCellType, TableColumn } from '../types';
@@ -28,8 +28,9 @@ function EditGuest({
     <div className="p-8">
       <Input disabled type="email" label="Email Address" inputClassName="border-black" className="mb-2" labelColor="black" name="edit_email" placeholder="Email Address" value={formData.email} onChange={(e: any) => onChange({ ...formData, email: e.target.value })} required />
       <Input label="Full Name" inputClassName="border-black" className="mb-2" labelColor="black" name="edit_full_name" placeholder="Full Name" value={formData.full_name} onChange={(e: any) => onChange({ ...formData, full_name: e.target.value })} required />
-      <Input disabled={(formData.position.length > 0 && formData.position.toLowerCase() !== "none")} required={!formData.position || formData.position.toLowerCase() === "none"} inputClassName="border-black" className="mb-2" labelColor="black" placeholder="Leave blank or type NONE if not a student" label="School" name="edit_school" value={formData.school} onChange={(e: any) => onChange({ ...formData, school: e.target.value })} />
-      <Input disabled={(formData.school.length > 0 && formData.school.toLowerCase() !== "none")} required={!formData.school || formData.school.toLowerCase() === "none"} inputClassName="border-black" className="mb-2" labelColor="black" placeholder="Leave blank or type NONE if not an employee" label="Position" name="edit_position" value={formData.position} onChange={(e: any) => onChange({ ...formData, position: e.target.value })} />
+      <Select items={[{label: "Student", value: "student"}, {label: "Employee", value: "employee"}]} label="Role" className="mb-2" labelColor="black" name="edit_role" value={formData.role} onChange={(e: any) => onChange({ ...formData, role: e.target.value })} required />
+      {formData.role === "student" && <Input required inputClassName="border-black" className="mb-2" labelColor="black" placeholder="Name of School Attended" label="School" name="edit_school" value={formData.school} onChange={(e: any) => onChange({ ...formData, school: e.target.value, position: null })} />}
+      {formData.role === "employee" && <Input required inputClassName="border-black" className="mb-2" labelColor="black" placeholder="Position" label="Position" name="edit_position" value={formData.position} onChange={(e: any) => onChange({ ...formData, position: e.target.value, school: null })} />}
       <Input readOnly inputClassName="border-black" className="mb-2" labelColor="black" placeholder="Why you want to access this hub?" label="Reasons" name="edit_reasons" value={formData.reasons} />
       <Input type="password" label="Password" inputClassName="border-black" className="mb-2" labelColor="black" name="edit_password" placeholder="Password (Leave blank if not change)" value={formData.password} onChange={(e: any) => onChange({ ...formData, password: e.target.value })} />
     </div>
@@ -168,7 +169,6 @@ export default function GuestsPage() {
   }, [])
 
   const handleEditGuest = React.useCallback(async (close: () => void) => {
-    console.log(formData)
     try {
       const response = await fetch(pathname('/api/update'), {
         method: 'POST',
