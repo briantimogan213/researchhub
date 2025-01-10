@@ -8,7 +8,9 @@ use DateTime;
 use Smcc\ResearchHub\Logger\Logger;
 use Smcc\ResearchHub\Models\Admin;
 use Smcc\ResearchHub\Models\AdminLogs;
+use Smcc\ResearchHub\Models\Courses;
 use Smcc\ResearchHub\Models\Database;
+use Smcc\ResearchHub\Models\Departments;
 use Smcc\ResearchHub\Models\Downloadables;
 use Smcc\ResearchHub\Models\Guest;
 use Smcc\ResearchHub\Models\Journal;
@@ -1225,14 +1227,19 @@ class ApiController extends Controller
   {
     try {
       $department = $request->getBodyParam('department');
-      $jsonData = file_get_contents(implode(DIRECTORY_SEPARATOR, [UPLOADS_PATH, "departments", "departmentcourses.json"]));
-      $departments = json_decode($jsonData, true);
-      if (array_key_exists($department, $departments)) {
+      $db = Database::getInstance();
+      $exists = $db->fetchOne(Departments::class, ['department' => $department]);
+      if ($exists) {
         return Response::json(['error' => 'Department already exists.'], StatusCode::CONFLICT);
       }
-      $departments[$department] = [];
-      file_put_contents(implode(DIRECTORY_SEPARATOR, [UPLOADS_PATH, "departments", "departmentcourses.json"]), json_encode($departments, JSON_PRETTY_PRINT));
-      return Response::json(['success' => ['department' => $department]], StatusCode::CREATED);
+      $dept = new Departments([
+        'department' => $department
+      ]);
+      $success = $dept->create();
+      if ($success) {
+        return Response::json(['success' => ['department' => $department]], StatusCode::CREATED);
+      }
+      throw new \Exception("Failed to add department '$department'");
     } catch (\Exception $e) {
       return Response::json(['error' => $e->getMessage(), StatusCode::INTERNAL_SERVER_ERROR]);
     }
@@ -1243,18 +1250,24 @@ class ApiController extends Controller
     try {
       $department = $request->getBodyParam('department');
       $course = $request->getBodyParam('course');
-      $jsonData = file_get_contents(implode(DIRECTORY_SEPARATOR, [UPLOADS_PATH, "departments", "departmentcourses.json"]));
-      $departments = json_decode($jsonData, true);
-      if (!array_key_exists($department, $departments)) {
-        return Response::json(['error' => 'Department not found.'], StatusCode::NOT_FOUND);
+      $db = Database::getInstance();
+      $exists = $db->fetchOne(Departments::class, ['department' => $department]);
+      if (!$exists) {
+        return Response::json(['error' => 'Department not found.'], StatusCode::CONFLICT);
       }
-      $courses_added = 0;
-      if (in_array($course, $departments[$department])) {
+      $courseExists = $db->fetchOne(Courses::class, ['course' => $course, 'department_id' => $exists->getPrimaryKeyValue()]);
+      if ($courseExists) {
         return Response::json(['error' => 'Course already exists in this department.'], StatusCode::CONFLICT);
       }
-      $departments[$department][] = $course;
-      file_put_contents(implode(DIRECTORY_SEPARATOR, [UPLOADS_PATH, "departments", "departmentcourses.json"]), json_encode($departments, JSON_PRETTY_PRINT));
-      return Response::json(['success' => true], StatusCode::CREATED);
+      $newCourse = new Courses([
+        'course' => $course,
+        'department_id' => $exists->getPrimaryKeyValue()
+      ]);
+      $success = $newCourse->create();
+      if ($success) {
+        return Response::json(['success' => true], StatusCode::CREATED);
+      }
+      throw new \Exception("Failed to add course '$course' to department '$department'");
     } catch (\Exception $e) {
       return Response::json(['error' => $e->getMessage(), StatusCode::INTERNAL_SERVER_ERROR]);
     }
@@ -1265,15 +1278,17 @@ class ApiController extends Controller
     try {
       $department = $request->getBodyParam(key: 'old_department');
       $newDepartment = $request->getBodyParam(key: 'new_department');
-      $jsonData = file_get_contents(implode(DIRECTORY_SEPARATOR, [UPLOADS_PATH, "departments", "departmentcourses.json"]));
-      $departments = json_decode($jsonData, true);
-      if (!array_key_exists($department, $departments)) {
-        return Response::json(['error' => 'Department not found.'], StatusCode::NOT_FOUND);
+      $db = Database::getInstance();
+      $exists = $db->fetchOne(Departments::class, ['department' => $department]);
+      if (!$exists) {
+        return Response::json(['error' => 'Department not found.'], StatusCode::CONFLICT);
       }
-      $departments[$newDepartment] = $departments[$department];
-      unset($departments[$department]);
-      file_put_contents(implode(DIRECTORY_SEPARATOR, [UPLOADS_PATH, "departments", "departmentcourses.json"]), json_encode($departments, JSON_PRETTY_PRINT));
-      return Response::json(['success' => ['department' => $department]], StatusCode::OK);
+      $exists->department = $newDepartment;
+      $success = $exists->update();
+      if ($success) {
+        return Response::json(['success' => ['department' => $newDepartment]], StatusCode::OK);
+      }
+      throw new \Exception("Failed to edit department '$department'");
     } catch (\Exception $e) {
       return Response::json(['error' => $e->getMessage(), StatusCode::INTERNAL_SERVER_ERROR]);
     }
@@ -1284,13 +1299,32 @@ class ApiController extends Controller
     try {
       $department = $request->getBodyParam('department');
       $courses = $request->getBodyParam('courses');
-      $jsonData = file_get_contents(implode(DIRECTORY_SEPARATOR, [UPLOADS_PATH, "departments", "departmentcourses.json"]));
-      $departments = json_decode($jsonData, true);
-      if (!array_key_exists($department, $departments)) {
-        return Response::json(['error' => 'Department not found.'], StatusCode::NOT_FOUND);
+      $db = Database::getInstance();
+      $exists = $db->fetchOne(Departments::class, ['department' => $department]);
+      if (!$exists) {
+        return Response::json(['error' => 'Department not found.'], StatusCode::CONFLICT);
       }
-      $departments[$department] = count($departments[$department]) === 1 && !$courses ? [] : [...$courses];
-      file_put_contents(implode(DIRECTORY_SEPARATOR, [UPLOADS_PATH, "departments", "departmentcourses.json"]), json_encode($departments, JSON_PRETTY_PRINT));
+      $allCourses = $db->fetchMany(Courses::class, ['department_id' => $exists->getPrimaryKeyValue()]);
+      $coursesLower = [...array_map(fn($c) => strtolower($c), $courses)];
+      foreach ($allCourses as $c) {
+        if (in_array(strtolower($c->course), $coursesLower)) {
+          $index = array_search(strtolower($c->course), $coursesLower);
+          if ($index !== false) {
+            unset($coursesLower[$index]);
+          }
+        } else {
+          $c->delete();
+        }
+      }
+      for ($i = 0; $i < count($courses); $i++) {
+        if (in_array(strtolower($courses[$i]), $coursesLower)) {
+          $c = new Courses([
+            'course' => $courses[$i],
+            'department_id' => $exists->getPrimaryKeyValue()
+          ]);
+          $c->create();
+        }
+      }
       return Response::json(['success' => ['department' => $department]], StatusCode::OK);
     } catch (\Exception $e) {
       return Response::json(['error' => $e->getMessage(), StatusCode::INTERNAL_SERVER_ERROR]);
@@ -1301,14 +1335,15 @@ class ApiController extends Controller
   {
     try {
       $department = $request->getQueryParam('department');
-      $jsonData = file_get_contents(implode(DIRECTORY_SEPARATOR, [UPLOADS_PATH, "departments", "departmentcourses.json"]));
-      $departments = json_decode($jsonData, true);
-      if (!array_key_exists($department, $departments)) {
-        return Response::json(['error' => 'Department not found.'], StatusCode::NOT_FOUND);
+      $db = Database::getInstance();
+      $exists = $db->fetchOne(Departments::class, ['department' => $department]);
+      if (!$exists) {
+        return Response::json(['error' => 'Department not found.'], StatusCode::CONFLICT);
       }
-      unset($departments[$department]);
-      file_put_contents(implode(DIRECTORY_SEPARATOR, [UPLOADS_PATH, "departments", "departmentcourses.json"]), json_encode($departments, JSON_PRETTY_PRINT));
-      return Response::json(['success' => ['department' => $department]], StatusCode::OK);
+      if ($exists->delete()) {
+        return Response::json(['success' => ['department' => $department]], StatusCode::OK);
+      }
+      throw new \Exception("Failed to delete department '$department'");
     } catch (\Exception $e) {
       return Response::json(['error' => $e->getMessage(), StatusCode::INTERNAL_SERVER_ERROR]);
     }
@@ -1318,13 +1353,26 @@ class ApiController extends Controller
   {
     try {
       $department = $request->getQueryParam('department');
-      $jsonData = file_get_contents(implode(DIRECTORY_SEPARATOR, [UPLOADS_PATH, "departments", "departmentcourses.json"]));
-      $departments = json_decode($jsonData, true);
-      if ($department && array_key_exists($department, $departments)) {
-        return Response::json(['success' => [$department => $departments[$department]]], StatusCode::OK);
-      } else {
-        return Response::json(['success' => $departments], StatusCode::OK);
+      $db = Database::getInstance();
+      if ($department) {
+        $exists = $db->fetchOne(Departments::class, ['department' => $department]);
+        if ($exists) {
+          $courses = $db->fetchMany(Courses::class, ['department_id' => $exists->getPrimaryKeyValue()]);
+          $courses = [...array_map(fn($c) => $c->course, $courses)];
+          return Response::json(['success' => [$department => $courses]], StatusCode::OK);
+        }
       }
+      $allDepts = $db->getAllRows(Departments::class);
+      $departments = [];
+      foreach ($allDepts as $dept) {
+        $deptName = $dept->department;
+        if (!in_array($deptName, $departments)) {
+          $courses = $db->fetchMany(Courses::class, ['department_id' => $dept->getPrimaryKeyValue()]);
+          $courses = [...array_map(fn($c) => $c->course, $courses)];
+          $departments[$deptName] = $courses;
+        }
+      }
+      return Response::json(['success' => $departments], StatusCode::OK);
     } catch (\Exception $e) {
       return Response::json(['error' => $e->getMessage(), StatusCode::INTERNAL_SERVER_ERROR]);
     }
