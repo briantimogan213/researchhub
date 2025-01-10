@@ -40,7 +40,7 @@ const EntriesList = [5, 10, 25, 50, 100, 200, 500, 1000]
 
 export function Table({ columns, items, search, children, defaultSortOrder, defaultSortColumn, onShowEntries = (entries: number) => {}, onSortColumn = (column: string) => {}, onSortOrder = (order: any) => {}, onSearch = (search: string) => {}, ...props }: any) {
   const [searchString, setSearch] = React.useState(search || "")
-  const [showEntries, setShowEntries] = React.useState(5)
+  const [showEntries, setShowEntries] = React.useState(25)
   const [sortColumn, setSortColumn] = React.useState(defaultSortColumn || (columns?.[0].sortable ? columns[0].key : ""))
   const [sortOrder, setSortOrder] = React.useState(defaultSortOrder || SortOrder.Ascending)
   const [page, setPage] = React.useState(items.length > 0 ? 1 : 0);
