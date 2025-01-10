@@ -56,7 +56,7 @@ class ApiController extends Controller
         'title' => $a->title,
         'url' => $a->url,
         'message' => $a->message,
-        'expires' => DateTime::createFromFormat("d-m-Y H:i:s", $a->expires)->format("c"),
+        'expires' => $a->expires->format("c"),
       ];
     }
     return Response::json(['success' => $data ?? []]);
