@@ -55,6 +55,7 @@ class ApiController extends Controller
         'type' => $a->a_type,
         'title' => $a->title,
         'url' => $a->url,
+        'message' => $a->message,
         'expires' => DateTime::createFromFormat("d-m-Y H:i:s", $a->expires)->format("c"),
       ];
     }
