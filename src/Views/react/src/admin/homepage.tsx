@@ -1,4 +1,4 @@
-interface Announcement { id: string, type: "text"|"video", title: string, url?: string, message?:string, expires: string }
+interface Announcement { id: string, a_type: "text"|"video", title: string, url?: string, message?:string, expires: string }
 
 
 import { parseMarkup, pathname, purifyHTML, React, ReactPlayerYoutube, Sweetalert2 } from '../imports';
@@ -101,7 +101,7 @@ export default function HomepageManagementPage() {
       <div className="p-4 tw-flex tw-flex-wrap tw-gap-8">
         {announcements.length === 0 ? <span className="">No Announcements</span> : announcements.map((announcement: Announcement) =>(
           <>
-          {announcement.type === "text" && (
+          {announcement.a_type === "text" && (
             <div key={announcement.id} className="rich-text-editor w-[500px] md:w-[700px] lg:w-[1000px] min-w-[500px] bg-gray-100 border-l-2 border-blue-500 rounded">
               <div className="text-xl py-3 px-4  border-b text-blue-500 font-semibold flex justify-between flex-nowrap">
                 <h2>{announcement.title}</h2>
@@ -118,7 +118,7 @@ export default function HomepageManagementPage() {
               </div>
             </div>
           )}
-          {announcement.type === "video" && (
+          {announcement.a_type === "video" && (
             <div key={announcement.id} className="w-[500px] md:w-[700px] lg:w-[1000px] min-w-[500px] bg-gray-100 border-l-2 border-blue-500 rounded">
               <div className="text-xl py-3 px-4 border-b  text-blue-500 font-semibold flex justify-between flex-nowrap">
                 <h2>{announcement.title}</h2>

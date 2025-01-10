@@ -52,7 +52,7 @@ class ApiController extends Controller
     foreach ($announcements as $a) {
       $data[] = [
         'id' => $a->getPrimaryKeyValue(),
-        'type' => $a->a_type,
+        'a_type' => $a->a_type,
         'title' => $a->title,
         'url' => $a->url,
         'message' => $a->message,

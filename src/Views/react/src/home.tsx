@@ -42,9 +42,9 @@ function Announcements() {
   }
 
   return <>
-  {announcements.map((announcement: {type: "video"|"text", url?: string, message?: string, title: string, expires: string, id?: string|number}, i: number) => (
+  {announcements.map((announcement: {a_type: "video"|"text", url?: string, message?: string, title: string, expires: string, id?: string|number}, i: number) => (
     <React.Fragment key={"announcement_" + i + announcement?.id}>
-      {announcement.type === "video" && !checkExpired(announcement.expires) && (
+      {announcement.a_type === "video" && !checkExpired(announcement.expires) && (
         <div className="w-[500px] md:w-[700px] lg:w-[1000px] min-w-[500px] bg-gray-100 border-l-2 border-blue-500 rounded">
           <div className="text-xl py-3 px-4 border-b  text-blue-500 font-semibold"><h2>{announcement.title}</h2></div>
           <div className="w-full h-full px-[10%] py-[5%] aspect-video">
@@ -52,7 +52,7 @@ function Announcements() {
           </div>
         </div>
       )}
-      {announcement.type === "text" && !checkExpired(announcement.expires) && (
+      {announcement.a_type === "text" && !checkExpired(announcement.expires) && (
         <div className="w-[500px] md:w-[700px] lg:w-[1000px] min-w-[500px] bg-gray-100 border-l-2 border-blue-500 rounded rich-text-editor">
           <div className="text-xl py-3 px-4  border-b text-blue-500 font-semibold"><h2>{announcement.title}</h2></div>
           <div className="text-center p-3 text-slate-900 my-3 announcement editor-area">

@@ -14,7 +14,7 @@ function genHexString(len = 24) {
 interface PayloadProps {
   id?: string;
   title: string;
-  type: "text"|"video"
+  a_type: "text"|"video"
   message?: string
   url?: string
   expires: string
@@ -50,7 +50,7 @@ export default function AddUpdateAnnouncement({ title, isOpen, onSuccess, onErro
   React.useEffect(() => {
     if (isUpdate && !!data) {
       setAnnouncementTitle(data.title)
-      setAnnouncementType(data.type)
+      setAnnouncementType(data.a_type || "text")
       setExpiresOn(new Date(data.expires).toISOString().slice(0, 10))
       setAnnouncementHTMLOrLink(data.message || "")
       setAnnouncementHTMLOrLink(data.url || "")
@@ -83,13 +83,13 @@ export default function AddUpdateAnnouncement({ title, isOpen, onSuccess, onErro
     const url = new URL(pathname(isUpdate ? '/api/home/announcement/edit' : '/api/home/announcement/add'), window.location.origin);
     const body: PayloadProps = {
       id: data?.id,
-      type: announcementType,
+      a_type: announcementType,
       title: announcementTitle,
       expires,
     };
-    if (body.type === "text") {
+    if (body.a_type === "text") {
       body.message = announementHTMLOrLink;
-    } else if (body.type === "video") {
+    } else if (body.a_type === "video") {
       body.url = announementHTMLOrLink;
     }
     fetch(url,{
