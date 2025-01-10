@@ -53,7 +53,7 @@ export default function AdminLogin() {
 
   return (
     <div className="relative w-full min-h-screen flex justify-center items-start">
-      <button type="button" onClick={() => window.location.replace(pathname("/"))} className="absolute top-0 left-0 ml-4 mt-4 text-sky-500 hover:text-sky-3 bg-white drop-shadow-lg pl-2 pr-3 py-1 rounded flex items-center"><span className="material-symbols-outlined">arrow_left</span> Back</button>
+      <button type="button" onClick={() => window.location.replace(pathname("/login"))} className="absolute top-0 left-0 ml-4 mt-4 text-sky-500 hover:text-sky-3 bg-white drop-shadow-lg pl-2 pr-3 py-1 rounded flex items-center"><span className="material-symbols-outlined">arrow_left</span> Back</button>
       <div style={{background: "transparent", boxShadow: "none", minWidth: "400px", maxWidth: "400px"}}>
         <div className="flex justify-center text-center w-full gap-x-4 my-8">
           <img src={pathname("/images/SMCC-logo.svg")} className="object-contain w-[120px] h-[120px]" alt="SMCC" />

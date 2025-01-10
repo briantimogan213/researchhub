@@ -93,7 +93,7 @@ class Header
           <?php
           } else {
           ?>
-            <p class="text-sm"><a href="<?= Router::getPathname("/signup") ?>">Sign Up</a></p>
+            <p class="text-sm"><a href="<?= Router::getPathname("/guest/signup") ?>">Sign Up</a></p>
             <p class="text-sm"><a href="<?= Router::getPathname("/login") ?>">Login</a></p>
           <?php
           }
