@@ -1,6 +1,7 @@
 import { MainContext } from "../context";
 import Modal from "../global/modal";
 import PdfViewer from "../global/pdfviewer";
+import { useDepartments } from "../global/useDepartments";
 import { React, Sweetalert2, clsx, pathname } from '../imports';
 import { Departments } from "../types";
 import SearchHeaderInput from "./search";
@@ -152,6 +153,8 @@ function ThumbnailJournal({
 }
 
 export default function Journal() {
+  const { departments } = useDepartments();
+  const departmentCourses = React.useMemo(() => Object.keys(departments), [departments]);
   const { authenticated, authData } = React.useContext(MainContext)
   const [search, setSearch] = React.useState((new URLSearchParams((new URL(window.location.href)).search)).get('search') || '')
   const searchParams = React.useMemo(() => new URLSearchParams((new URL(window.location.href)).search), []);
@@ -188,7 +191,7 @@ export default function Journal() {
     return Array.from({ length: maxYear - minYear + 1 }, (_, i) => minYear + i).reverse();
   }, [data]);
 
-  const [selectedDepartment, setSelectedDepartment] = React.useState(Departments.CCIS);
+  const [selectedDepartment, setSelectedDepartment] = React.useState<any>(Departments.CCIS);
   const [selectedYears, setSelectedYears] = React.useState(Object.fromEntries(Object.entries(Departments).map(([key, dep]: [string, string]) => [dep, (new Date()).getFullYear().toString()])));
 
   const displayData = React.useMemo(() => data.filter(
@@ -238,6 +241,7 @@ export default function Journal() {
     setPdfUrl(uri);
     setPdfAuthor(author);
   }, []);
+
   return (<>
     <div className="flex py-4 px-8 mt-4">
       <div className="flex-grow mt-3">
@@ -302,10 +306,15 @@ export default function Journal() {
           <div className="font-bold text-xl mb-4 w-full">
             Categories
           </div>
-          {Object.entries(Departments).map(([key, value]: any) => (
-            <div key={key} className="flex items-center px-4 py-2 text-left flex-nowrap relative">
+          {departmentCourses.length === 0 && (
+            <div>
+              Loading...
+            </div>
+          )}
+          {departmentCourses.map((value: string) => (
+            <div key={value + "dept"} className="flex items-center px-4 py-2 text-left flex-nowrap relative">
               <button
-                key={key}
+                key={value + "button"}
                 type="button"
                 className={clsx(`flex items-center pl-4 py-2 pr-[70px] text-left text-sm flex-nowrap flex-grow`, selectedDepartment === value ? "font-bold" : "")}
                 onClick={() => setSelectedDepartment(value)}
