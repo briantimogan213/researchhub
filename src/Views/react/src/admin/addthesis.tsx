@@ -23,7 +23,7 @@ export default function AddThesisForm({ open, defaultOpen, className = "", onClo
   const [xhr, setXhr] = React.useState<XMLHttpRequest|null>(null)
   const yearsList = React.useMemo(() => Array.from({ length: (new Date()).getFullYear() - 2000 }, (_, i) => (new Date()).getFullYear() - i).map((y) => ({ label: y.toString(), value: y.toString() })), [])
   const departmentList = React.useMemo(() => Object.keys(departmentsAndCourses).map((d) => ({ label: d, value: d })), [departmentsAndCourses])
-  const courseList = React.useMemo(() => departmentList.length > 0 ? departmentsAndCourses[thesisDepartment]?.map((d: any) => ({ label: d, value: d })) || [] : [], [departmentList, thesisDepartment])
+  const courseList = React.useMemo(() => departmentsAndCourses[thesisDepartment].map((d: any) => ({ label: d, value: d })), [thesisDepartment])
   const isFormDisabled = React.useMemo(() => uploadProgress !== 0, [uploadProgress]);
 
   React.useEffect(() => {
@@ -264,7 +264,7 @@ export default function AddThesisForm({ open, defaultOpen, className = "", onClo
         )}
         <div className="w-full py-2 flex justify-between items-center mt-2 px-4">
           <button type="submit" disabled={isFormDisabled} className="bg-sky-500 rounded-2xl px-4 py-1 text-white shadow-lg disabled:cursor-not-allowed disabled:bg-gray-400">{isFormDisabled ? "Submitting..." : "Submit"}</button>
-          <button type="reset" onClick={() => { if (isFormDisabled) { onCancelUpload(); onCloseModal(); } else onCloseModal(); }} className="bg-white rounded-2xl px-4 py-1 text-black">Cancel</button>
+          <button type="reset" onClick={() => { if (isFormDisabled) { onCancelUpload(); onCloseModal(); } else onCloseModal(); }} className="bg-[#333D49] rounded-2xl px-4 py-1 text-white">Cancel</button>
         </div>
       </form>
     </div>

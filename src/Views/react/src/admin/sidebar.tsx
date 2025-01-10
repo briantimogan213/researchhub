@@ -17,35 +17,28 @@ function SidebarNav({ defaultShow = true, sidebarList, toggleBtn }: { defaultSho
   return (
     <nav className={
       clsx(
-        "text-black bg-white max-w-[250px] h-full relative",
+        "text-slate-50 bg-[#262e36] max-w-[250px] h-full relative",
         show ? "w-[250px]" : "w-0 *:hidden",
         "transition-[width] duration-200 ease-in-out",
       )
     }>
-      <div className="w-full max-h-[60px] h-[60px] flex items-center justify-center bg-white">
+      <div className="w-full max-h-[60px] h-[60px] flex items-center justify-center bg-[#21282f]">
         <a href={pathname("/")} className="flex flex-nowrap h-full w-fit items-center justify-start">
           <SMCCLogo className="aspect-square h-full py-2" />
-          <h1 className="pr-3 font-[600] text-[#1764E8]">RESEARCH HUB</h1>
+          <h1 className="pr-3 font-[600]">RESEARCH HUB</h1>
         </a>
       </div>
-      <ul className="list-none p-0 bg-white py-4 w-full">
-        { sidebarList.map(({ label, url, icon }) => (
+      <ul className="list-none p-0 bg-[#191f26] py-4 w-full">
+        { sidebarList.map(({ label, url }) => (
             <li key={label}>
               <a
                 href={pathname(url)}
                 className={
-                  clsx("flex p-4 text-sm font-[400] hover:bg-sky-300 hover:text-black transition-colors duration-200 ease-in-out",
-                  pathname(url) === pathName ? "bg-[#F3F7FD] text-[#1764E8]" : "text-black")
+                  "flex p-4 text-sm font-medium hover:bg-sky-300 hover:text-black transition-colors duration-200 ease-in-out"
+                  + (pathname(url) === pathName ? " bg-yellow-300 text-black" : " text-white")
                 }
               >
-                <div className="flex justify-start items-center">
-                  <div className="min-w-[25px] h-[25px] px-2">
-                    {icon && <span className="material-symbols-outlined">{icon}</span>}
-                  </div>
-                  <div className="flex-grow">
-                    {label}
-                  </div>
-                </div>
+                {label}
               </a>
             </li>
           )
@@ -58,9 +51,9 @@ function SidebarNav({ defaultShow = true, sidebarList, toggleBtn }: { defaultSho
 function LoadingSidebar() {
   return (
     <nav className={
-      "text-black bg-white max-w-[250px] h-full relative w-[250px]"
+      "text-slate-50 bg-[#262e36] max-w-[250px] h-full relative w-[250px]"
     }>
-      <div className="w-full max-h-[60px] h-[60px] flex items-center justify-center bg-white">
+      <div className="w-full max-h-[60px] h-[60px] flex items-center justify-center bg-[#21282f]">
         <div className="flex flex-nowrap h-full w-fit items-center justify-start">
           <img src={pathname("/images/SMCC-logo.svg")} alt="SMCC Logo" className="aspect-square h-full py-2" />
           <h1 className="pr-3 font-[600]">RESEARCH HUB</h1>
@@ -79,8 +72,8 @@ export function render() {
 
   const root = ReactDOM.createRoot(containerRoot);
   if (containerRoot) {
-    // containerRoot.className = "";
-    // containerRoot.classList.add(...("flex-shrink max-w-[250px] max-h-screen bg-white text-black shadow-lg z-10".split(" ")));
+    containerRoot.className = "";
+    containerRoot.classList.add(...("flex-shrink max-w-[250px] max-h-screen bg-[#262e36]".split(" ")));
     const sidebarlist = JSON.parse(containerRoot.dataset.sidebarList as string);
     root.render(<SidebarNav sidebarList={sidebarlist} toggleBtn={toggleBtn} />);
   }

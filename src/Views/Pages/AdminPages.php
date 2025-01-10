@@ -19,47 +19,30 @@ class AdminPages extends View
         [
           'label' => 'Dashboard',
           'url' => '/admin/dashboard',
-          'icon' => 'dashboard'
         ],
         [
           'label' => 'Thesis List',
           'url' => '/admin/theses',
-          'icon' => 'tune'
         ],
         [
           'label' => 'Journal List',
           'url' => '/admin/journal',
-          'icon' => 'tune'
         ],
         [
           'label' => 'Upload Downloadables',
           'url' => '/admin/downloads',
-          'icon' => 'download'
         ],
         [
           'label' => 'Teacher Accounts',
           'url' => '/admin/teachers',
-          'icon' => 'diversity_3'
-        ],
-        [
-          'label' => 'Student Accounts',
-          'url' => '/admin/students',
-          'icon' => 'group'
-        ],
-        [
-          'label' => 'Guest Accounts',
-          'url' => '/admin/guests',
-          'icon' => 'groups'
         ],
         [
           'label' => 'Announcement',
           'url' => '/admin/homepage',
-          'icon' => 'home'
         ],
         [
           'label' => 'Manage Departments',
           'url' => '/admin/departments',
-          'icon' => 'domain'
         ],
       ]
     );

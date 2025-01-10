@@ -1,35 +1,48 @@
-import { React, Sweetalert2, pathname } from "../imports";
+import { React, Sweetalert2, clsx, pathname } from "../imports";
 
 export default function GuestSignup() {
   const [email, setEmail] = React.useState('');
-  const [school, setSchool] = React.useState('');
-  const [position, setPosition] = React.useState('');
-  const [reasons, setReasons] = React.useState('');
   const [password, setPassword] = React.useState<string>("")
   const [fullName, setFullName] = React.useState<string>("")
+  const [repeatPassword, setRepeatPassword] = React.useState('');
   const [pending, setPending] = React.useState(false);
+  const [errors, setErrors] = React.useState({
+    password: ''
+  });
 
   const disableSubmit = React.useMemo(() => !fullName || !email || !password, [fullName, email, password]);
 
   const clearForm = React.useCallback(() => {
     setEmail('');
     setFullName('');
-    setSchool('');
-    setPosition('');
-    setReasons('');
     setPassword('');
+    setRepeatPassword('');
   }, [])
 
   const onSubmit = React.useCallback((e: React.FormEvent) => {
     e.preventDefault()
     setPending(true)
+    if (password !== repeatPassword) {
+      setErrors({ password: 'Passwords do not match' });
+      Sweetalert2.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Passwords do not match',
+        toast: true,
+        showConfirmButton: false,
+        position: 'center',
+        timer: 3000,
+      });
+      setPending(false);
+      return;
+    }
     fetch(pathname('/api/signup'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json; charset=UTF-8',
         'Accept': 'application/json; charset=UTF-8',
       },
-      body: JSON.stringify({ account: 'guest', username: email, full_name: fullName, password, email, school, position, reasons }),
+      body: JSON.stringify({ account: 'guest', username: email, full_name: fullName, password, email }),
     })
     .then(response => response.json())
     .then(({ error, success }) => {
@@ -71,7 +84,7 @@ export default function GuestSignup() {
       setPassword('')
       setPending(false)
     })
-  }, [email, fullName, password, school, position, reasons]);
+  }, [email, fullName, password, repeatPassword]);
 
   return (
     <div className="relative w-full min-h-screen flex justify-center items-start">
@@ -97,7 +110,6 @@ export default function GuestSignup() {
                     id="fullname"
                     value={fullName} onChange={(e: any) => setFullName(e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
                   />
                 </div>
               </div>
@@ -107,59 +119,10 @@ export default function GuestSignup() {
                     Email
                   </label>
                   <input
-                    type="email"
+                    type="text"
                     id="email"
                     value={email} onChange={(e: any) => setEmail(e.target.value)}
-                    placeholder={"example@gmail.com"}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                  />
-                </div>
-              </div>
-              <div>
-                <div className="mb-4">
-                  <label htmlFor="school" className="block text-gray-700 font-medium mb-2">
-                    School
-                  </label>
-                  <input
-                    type="text"
-                    id="school"
-                    value={school} onChange={(e: any) => setSchool(e.target.value)}
-                    placeholder={"Leave blank or type NONE if not a student"}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-400"
-                    required={!position || position.toLowerCase() === "none"}
-                    disabled={(position.length > 0 && position.toLowerCase() !== "none")}
-                  />
-                </div>
-              </div>
-              <div>
-                <div className="mb-4">
-                  <label htmlFor="position" className="block text-gray-700 font-medium mb-2">
-                    Position (Employees only)
-                  </label>
-                  <input
-                    type="text"
-                    id="position"
-                    value={position} onChange={(e: any) => setPosition(e.target.value)}
-                    placeholder={"Leave blank or type NONE if not an employee"}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-400"
-                    required={!school || school.toLowerCase() === "none"}
-                    disabled={(school.length > 0 && school.toLowerCase() !== "none")}
-                  />
-                </div>
-              </div>
-              <div>
-                <div className="mb-4">
-                  <label htmlFor="reasons" className="block text-gray-700 font-medium mb-2">
-                    Reasons
-                  </label>
-                  <input
-                    type="text"
-                    id="reasons"
-                    value={reasons} onChange={(e: any) => setReasons(e.target.value)}
-                    placeholder={"Why you want to access this hub?"}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
                   />
                 </div>
               </div>
@@ -172,8 +135,20 @@ export default function GuestSignup() {
                     type="password"
                     id="pwd"
                     value={password} onChange={(e: any) => setPassword(e.target.value)}
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
+                    className={clsx("w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500", (errors.password ? " border-red-500" : "border-gray-300"))}
+                  />
+                </div>
+              </div>
+              <div>
+                <div className="mb-4">
+                  <label htmlFor="rpwd" className="block text-gray-700 font-medium mb-2">
+                    Confirm Password
+                  </label>
+                  <input
+                    type="password"
+                    id="rpwd"
+                    value={repeatPassword} onChange={(e: any) => setRepeatPassword(e.target.value)}
+                    className={clsx("w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500", (errors.password ? " border-red-500" : "border-gray-300"))}
                   />
                 </div>
               </div>

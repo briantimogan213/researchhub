@@ -13,8 +13,6 @@ use Smcc\ResearchHub\Models\Downloadables;
 use Smcc\ResearchHub\Models\Guest;
 use Smcc\ResearchHub\Models\Journal;
 use Smcc\ResearchHub\Models\JournalFavorites;
-use Smcc\ResearchHub\Models\JournalGuestFavorites;
-use Smcc\ResearchHub\Models\JournalGuestReads;
 use Smcc\ResearchHub\Models\JournalPersonnelFavorites;
 use Smcc\ResearchHub\Models\JournalPersonnelReads;
 use Smcc\ResearchHub\Models\JournalReads;
@@ -24,8 +22,6 @@ use Smcc\ResearchHub\Models\Student;
 use Smcc\ResearchHub\Models\StudentLogs;
 use Smcc\ResearchHub\Models\Thesis;
 use Smcc\ResearchHub\Models\ThesisFavorites;
-use Smcc\ResearchHub\Models\ThesisGuestFavorites;
-use Smcc\ResearchHub\Models\ThesisGuestReads;
 use Smcc\ResearchHub\Models\ThesisPersonnelFavorites;
 use Smcc\ResearchHub\Models\ThesisPersonnelReads;
 use Smcc\ResearchHub\Models\ThesisReads;
@@ -246,9 +242,6 @@ class ApiController extends Controller
         'guest' => [
           'email' => $request->getBodyParam('username'),
           'full_name' => $request->getBodyParam('full_name'),
-          'school' => $request->getBodyParam('school'),
-          'position' => $request->getBodyParam('position'),
-          'reasons' => $request->getBodyParam('reasons'),
           'password' => password_hash($request->getBodyParam('password'), PASSWORD_DEFAULT),
         ],
         'admin' => [
@@ -276,13 +269,6 @@ class ApiController extends Controller
       };
       switch ($accountType) {
         case 'guest':
-          if ($data['school'] !== null && strtolower($data['school']) === "none") {
-            $data['school'] = null;
-          }
-          if ($data['position'] !== null && strtolower($data['position']) === "none") {
-            $data['position'] = null;
-          }
-          $data['role'] = $data['position'] !== null ? 'employee' : 'student';
           $model = new Guest($data);
           $id = $model->create();
           break;
@@ -296,7 +282,7 @@ class ApiController extends Controller
           if ($db->fetchOne(Personnel::class, [(new Personnel())->getPrimaryKey() => $data['personnel_id']])) {
             return Response::json(['success' => false, 'error' => 'Employee ID already registered.']);
           }
-          Logger::write_info(json_encode(['Registering_data' => $data, 'accountType' => $accountType]));
+          Logger::write_info(json_encode(['REgistering_data' => $data, 'accountType' => $accountType]));
           $model = new Personnel($data);
           $id = $model->create(true);
           (new AdminLogs(['admin_id' => RouterSession::getUserId(), 'activity' => "Personnel ID: {$id}, fullname: {$model->full_name} has newly been registered"]))->create();
@@ -345,8 +331,6 @@ class ApiController extends Controller
         'guest' => [
           'full_name' => $body['full_name'],
           'email' => $body['email'],
-          'school' => $body['school'],
-          'position' => $body['position'],
         ],
         'admin' => [
           'full_name' => $body['full_name'],
@@ -377,12 +361,6 @@ class ApiController extends Controller
           $model = $db->fetchOne(Guest::class, ['id' => $id]);
           if (!$model) {
             return Response::json(['error' => 'Guest not found.'], StatusCode::NOT_FOUND);
-          }
-          if ($data['school'] !== null && strtolower($data['school']) === "none") {
-            $data['school'] = null;
-          }
-          if ($data['position'] !== null && strtolower($data['position']) === "none") {
-            $data['position'] = null;
           }
           $model->setAttributes($data);
           if ($model->update()) {}
@@ -741,30 +719,11 @@ class ApiController extends Controller
     }
   }
 
-  public static function getThesisViewCount($thesis_id): int
-  {
-    $db = Database::getInstance();
-    $viewCount = $db->getRowCount(ThesisReads::class, ['thesis_id' => $thesis_id]);
-    $viewCount += $db->getRowCount(ThesisPersonnelReads::class, ['thesis_id' => $thesis_id]);
-    $viewCount += $db->getRowCount(ThesisGuestReads::class, ['thesis_id' => $thesis_id]);
-    return $viewCount;
-  }
-
-  public static function getJournalViewCount($journal_id): int
-  {
-    $db = Database::getInstance();
-    $viewCount = $db->getRowCount(JournalReads::class, ['journal_id' => $journal_id]);
-    $viewCount += $db->getRowCount(JournalPersonnelReads::class, ['journal_id' => $journal_id]);
-    $viewCount += $db->getRowCount(JournalGuestReads::class, ['journal_id' => $journal_id]);
-    return $viewCount;
-  }
-
   public function allPublicTheses(Request $request): Response
   {
     try {
       $student = $request->getQueryParam('student');
       $teacher = $request->getQueryParam('personnel');
-      $guest = $request->getQueryParam('guest');
       if (($student || $teacher) && !RouterSession::isAuthenticated()) {
         return Response::json(['error' => 'Not authenticated.'], StatusCode::UNAUTHORIZED);
       }
@@ -777,7 +736,7 @@ class ApiController extends Controller
         $theses = array_map( fn($thesis) => [
           ...$thesis->toArray(true),
           "favorite" => in_array($thesis->getPrimaryKeyValue(), $mapped ?? []),
-          "totalViews" => self::getThesisViewCount($thesis->id),
+          "totalViews" => $db->getRowCount(ThesisReads::class, ['thesis_id' => $thesis->getPrimaryKeyValue()]),
         ], $valueTheses);
       } else if ($teacher) {
         $favorites = $db->fetchMany(ThesisPersonnelFavorites::class, ['personnel_id' => $teacher]);
@@ -785,21 +744,12 @@ class ApiController extends Controller
         $theses = array_map( fn($thesis) => [
           ...$thesis->toArray(true),
           "favorite" => in_array($thesis->getPrimaryKeyValue(), $mapped ?? []),
-          "totalViews" => self::getThesisViewCount($thesis->id),
-        ], $valueTheses);
-      } else if ($guest) {
-        $favorites = $db->fetchMany(ThesisGuestFavorites::class, ['guest_id' => $guest]);
-        $mapped = array_map(fn($fav) => $fav->thesis_id, $favorites);
-        $theses = array_map( fn($thesis) => [
-          ...$thesis->toArray(true),
-          "favorite" => in_array($thesis->getPrimaryKeyValue(), $mapped ?? []),
-          "totalViews" => self::getThesisViewCount($thesis->id),
+          "totalViews" => $db->getRowCount(ThesisReads::class, ['thesis_id' => $thesis->getPrimaryKeyValue()]),
         ], $valueTheses);
       } else {
         $theses = array_map(fn($t) => [
           ...$t->toArray(true),
-          "favorite" => false,
-          "totalViews" => self::getThesisViewCount($t->id),
+          "totalViews" => $db->getRowCount(ThesisReads::class, ['thesis_id' => $t->getPrimaryKeyValue()]),
         ], $valueTheses);
       }
       return Response::json(['success' => [...$theses]]);
@@ -813,7 +763,6 @@ class ApiController extends Controller
     try {
       $student = $request->getQueryParam('student');
       $teacher = $request->getQueryParam('personnel');
-      $guest = $request->getQueryParam('guest');
       if (($student || $teacher) && !RouterSession::isAuthenticated()) {
         return Response::json(['error' => 'Not authenticated.'], StatusCode::UNAUTHORIZED);
       }
@@ -826,7 +775,7 @@ class ApiController extends Controller
         $journals = array_map( fn($journal) => [
           ...$journal->toArray(true),
           "favorite" => in_array($journal->getPrimaryKeyValue(), $mapped ?? []),
-          "totalViews" => self::getJournalViewCount($journal->id),
+          "totalViews" => $db->getRowCount(JournalReads::class, ['journal_id' => $journal->getPrimaryKeyValue()]),
         ], $valueJournals);
       } else if ($teacher) {
         $favorites = $db->fetchMany(JournalPersonnelFavorites::class, ['personnel_id' => $teacher]);
@@ -834,21 +783,12 @@ class ApiController extends Controller
         $journals = array_map( fn($journal) => [
           ...$journal->toArray(true),
           "favorite" => in_array($journal->getPrimaryKeyValue(), $mapped ?? []),
-          "totalViews" => self::getJournalViewCount($journal->id),
-        ], $valueJournals);
-      } else if ($guest) {
-        $favorites = $db->fetchMany(JournalGuestFavorites::class, ['guest_id' => $guest]);
-        $mapped = array_map(fn($fav) => $fav->journal_id, $favorites);
-        $journals = array_map( fn($journal) => [
-          ...$journal->toArray(true),
-          "favorite" => in_array($journal->getPrimaryKeyValue(), $mapped ?? []),
-          "totalViews" => self::getJournalViewCount($journal->id),
+          "totalViews" => $db->getRowCount(JournalReads::class, ['journal_id' => $journal->getPrimaryKeyValue()]),
         ], $valueJournals);
       } else {
         $journals = array_map(fn($j) => [
           ...$j->toArray(true),
-          "favorites" => false,
-          "totalViews" => self::getJournalViewCount($j->id),
+          "totalViews" => $db->getRowCount(JournalReads::class, ['journal_id' => $j->getPrimaryKeyValue()]),
         ], $valueJournals);
       }
       return Response::json(['success' => [...$journals]]);
@@ -880,20 +820,6 @@ class ApiController extends Controller
       $db = Database::getInstance();
       $personnel = $db->getAllRows(Personnel::class);
       return Response::json(['success' => array_map(fn($s) => $s->toArray(), $personnel)]);
-    } catch (\Throwable $e) {
-      return Response::json(['error'=> $e->getMessage()], StatusCode::INTERNAL_SERVER_ERROR);
-    }
-  }
-
-  public function allGuests(): Response
-  {
-    if (!RouterSession::isAuthenticated() || RouterSession::getUserAccountType() !== 'admin') {
-      return Response::json(['error' => 'Not authenticated.'], StatusCode::UNAUTHORIZED);
-    }
-    try {
-      $db = Database::getInstance();
-      $guests = $db->getAllRows(Guest::class);
-      return Response::json(['success' => array_map(fn($s) => $s->toArray(), $guests)]);
     } catch (\Throwable $e) {
       return Response::json(['error'=> $e->getMessage()], StatusCode::INTERNAL_SERVER_ERROR);
     }
@@ -935,24 +861,6 @@ class ApiController extends Controller
     }
   }
 
-  public function deleteGuest(Request $request): Response
-  {
-    if (!RouterSession::isAuthenticated() || RouterSession::getUserAccountType() !== 'admin') {
-      return Response::json(['error' => 'Not authenticated.'], StatusCode::UNAUTHORIZED);
-    }
-    $id = $request->getQueryParam('id');
-    if (!$id) {
-      return Response::json(['error' => 'Missing Guest ID.'], StatusCode::BAD_REQUEST);
-    }
-    try {
-      $guest = Database::getInstance()->fetchOne(Guest::class, [(new Guest())->getPrimaryKey() => $id]);
-      $guest->delete();
-      return Response::json(['success'=> true]);
-    } catch (\PDOException $e) {
-      return Response::json(['error' => $e->getMessage()], StatusCode::INTERNAL_SERVER_ERROR);
-    }
-  }
-
   public function thesisMarkFavorite(Request $request): Response
   {
     if (!RouterSession::isAuthenticated() || RouterSession::getUserAccountType() === 'admin') {
@@ -961,45 +869,25 @@ class ApiController extends Controller
     $id = $request->getBodyParam('id');
     $student = $request->getBodyParam('student');
     $teacher = $request->getBodyParam('personnel');
-    $guest = $request->getBodyParam('guest');
     if (!$id) {
       return Response::json(['error' => 'Missing Thesis ID.'], StatusCode::BAD_REQUEST);
     }
-    if (!$student && !$teacher && !$guest) {
+    if (!$student && !$teacher) {
       return Response::json(['error' => 'Bad Request'], StatusCode::BAD_REQUEST);
     }
-    $role = $student ? 'student' : ($teacher ? 'teacher' : 'guest');
     try {
-      $condition = match($role) {
-        'student' => ['thesis_id' => $id, 'student_id' => $student],
-        'teacher' => ['thesis_id' => $id, 'personnel_id' => $teacher],
-        'guest' => ['thesis_id' => $id, 'guest_id' => $guest],
-        default => []
-      };
-      $modelClass = match($role) {
-        'student' => ThesisFavorites::class,
-        'teacher' => ThesisPersonnelFavorites::class,
-        'guest' => ThesisGuestFavorites::class,
-        default => null
-      };
-      $thesis = Database::getInstance()->fetchOne($modelClass, $condition);
+      $condition = $student ? ['thesis_id' => $id, 'student_id' => $student] : ['thesis_id' => $id, 'personnel_id' => $teacher];
+      $thesis = Database::getInstance()->fetchOne($student ? ThesisFavorites::class : ThesisPersonnelFavorites::class, $condition);
       // mark favorite or unfavorite by deleting or creating
       if ($thesis) {
         $thesis->delete();
       } else {
-        $thesis = new $modelClass();
+        $thesis = $student ? new ThesisFavorites() : new ThesisPersonnelFavorites();
         $thesis->thesis_id = $id;
-        switch ($role) {
-          case 'student':
-            $thesis->student_id = $student;
-            break;
-          case 'teacher':
-            $thesis->personnel_id = $teacher;
-            break;
-          case 'guest':
-            $thesis->guest_id = $guest;
-            break;
-          default:
+        if ($student) {
+          $thesis->student_id = $student;
+        } else if ($teacher) {
+          $thesis->personnel_id = $teacher;
         }
         $thesis->create();
       }
@@ -1017,46 +905,27 @@ class ApiController extends Controller
     $id = $request->getBodyParam('id');
     $student = $request->getBodyParam('student');
     $teacher = $request->getBodyParam('personnel');
-    $guest = $request->getBodyParam('guest');
     if (!$id) {
       return Response::json(['error' => 'Missing Thesis ID.'], StatusCode::BAD_REQUEST);
     }
-    if (!$student && !$teacher && !$guest) {
+    if (!$student && !$teacher) {
       return Response::json(['error' => 'Bad Request'], StatusCode::BAD_REQUEST);
     }
-    $role = $student ? 'student' : ($teacher ? 'teacher' : 'guest');
     try {
-      $condition = match($role) {
-        'student' => ['journal_id' => $id, 'student_id' => $student],
-        'teacher' => ['journal_id' => $id, 'personnel_id' => $teacher],
-        'guest' => ['journal_id' => $id, 'guest_id' => $guest],
-        default => []
-      };
-      $modelClass = match($role) {
-        'student' => JournalFavorites::class,
-        'teacher' => JournalPersonnelFavorites::class,
-        'guest' => JournalGuestFavorites::class,
-        default => null
-      };
+      $condition = $student ? ['journal_id' => $id, 'student_id' => $student] : ['journal_id' => $id, 'personnel_id' => $teacher];
       $db = Database::getInstance();
-      $journal = $db->fetchOne($modelClass, $condition);
+      $className = $student ? JournalFavorites::class : JournalPersonnelFavorites::class;
+      $journal = $db->fetchOne($className, $condition);
       // mark favorite or unfavorite by deleting or creating
       if ($journal) {
         $journal->delete();
       } else {
-        $journal = new $modelClass();
+        $journal = $student ? new JournalFavorites() : new JournalPersonnelFavorites();
         $journal->journal_id = $id;
-        switch ($role) {
-          case 'student':
-            $journal->student_id = $student;
-            break;
-          case 'teacher':
-            $journal->personnel_id = $teacher;
-            break;
-          case 'guest':
-            $journal->guest_id = $guest;
-            break;
-          default:
+        if ($student) {
+          $journal->student_id = $student;
+        } else if ($teacher) {
+          $journal->personnel_id = $teacher;
         }
         $journal->create();
       }
@@ -1078,9 +947,10 @@ class ApiController extends Controller
       if ($accType === 'student') {
         $thesesFav = $db->fetchMany(ThesisFavorites::class, ['student_id' => $myId]);
         $journalFav = $db->fetchMany(JournalFavorites::class, ['student_id' => $myId]);
-        $data = array_map(fn(ThesisFavorites $th) => [...$th->fk_thesis_id->toArray(), 'read_at' => $th->created_at, 'type' => 'Thesis', 'read' => $db->getRowCount(ThesisReads::class, ['thesis_id' => $th->fk_thesis_id->getPrimaryKeyValue(), 'student_id' => $myId])], $thesesFav);
-        $dataJournal = array_map(fn(JournalFavorites $jn) => [...$jn->fk_journal_id->toArray(), 'read_at' => $jn->created_at, 'type' => 'Journal', 'read' => $db->getRowCount(JournalReads::class, ['journal_id' => $jn->fk_journal_id->getPrimaryKeyValue(), 'student_id' => $myId])], $journalFav);
+        $data = array_map(fn(ThesisFavorites $th) => [...$th->fk_thesis_id->toArray(), 'read_at' => $th->created_at, 'type' => 'Thesis', 'read' => $db->getRowCount(ThesisReads::class, ['thesis_id' => $th->fk_thesis_id->getPrimaryKeyValue(), 'student_id' => RouterSession::getUserId()])], $thesesFav);
+        $dataJournal = array_map(fn(JournalFavorites $jn) => [...$jn->fk_journal_id->toArray(), 'read_at' => $jn->created_at, 'type' => 'Journal', 'read' => $db->getRowCount(JournalReads::class, ['journal_id' => $jn->fk_journal_id->getPrimaryKeyValue(), 'student_id' => RouterSession::getUserId()])], $journalFav);
         $allData = [...$data, ...$dataJournal];
+        Logger::write_info(json_encode($allData, JSON_PRETTY_PRINT));
         usort($allData, function($a, $b) {
           $interval = $a['read_at']->diff($b['read_at']);
           return !$interval->invert;
@@ -1088,48 +958,14 @@ class ApiController extends Controller
         return Response::json(['success' => [...$allData]]);
       } else if ($accType === 'personnel') {
         $thesesFav = $db->fetchMany(ThesisPersonnelFavorites::class, ['personnel_id' => $myId]);
-        $journalFav = $db->fetchMany(JournalPersonnelFavorites::class, ['personnel_id' => $myId]);
-        $dataJournal = array_map(fn(JournalPersonnelFavorites $jn) => [...$jn->fk_journal_id->toArray(), 'read_at' => $jn->created_at, 'type' => 'Journal', 'read' => $db->getRowCount(JournalPersonnelReads::class, ['journal_id' => $jn->fk_journal_id->getPrimaryKeyValue(), 'personnel_id' => $myId])], $journalFav);
-        $data = array_map(fn(ThesisPersonnelFavorites $th) => [...$th->fk_thesis_id->toArray(), 'read_at' => $th->created_at, 'type' => 'Thesis', 'read' => $db->getRowCount(ThesisPersonnelReads::class, ['thesis_id' => $th->fk_thesis_id->getPrimaryKeyValue(), 'personnel_id' => $myId])], $thesesFav);
+        $journalFav = $db->fetchMany(JournalPersonnelFavorites::class, ['student_id' => $myId]);
+        $dataJournal = array_map(fn(JournalPersonnelFavorites $jn) => [...$jn->fk_journal_id->toArray(), 'read_at' => $jn->created_at, 'type' => 'Journal', 'read' => $db->getRowCount(JournalPersonnelReads::class, ['journal_id' => $jn->fk_journal_id->getPrimaryKeyValue(), 'student_id' => RouterSession::getUserId()])], $journalFav);
+        $data = array_map(fn(ThesisPersonnelFavorites $th) => [...$th->fk_thesis_id->toArray(), 'read_at' => $th->created_at, 'type' => 'Thesis', 'read' => $db->getRowCount(ThesisPersonnelReads::class, ['thesis_id' => $th->fk_thesis_id->getPrimaryKeyValue(), 'personnel_id' => RouterSession::getUserId()])], $thesesFav);
         $allData = [...$data, ...$dataJournal];
         usort($allData, function($a, $b) {
           $interval = $a['read_at']->diff($b['read_at']);
           return !$interval->invert;
         });
-        return Response::json(['success' => [...$allData]]);
-      } else if ($accType === 'guest') {
-        $thesesFav = $db->fetchMany(ThesisGuestFavorites::class, ['guest_id' => $myId]);
-        $journalFav = $db->fetchMany(JournalGuestFavorites::class, ['guest_id' => $myId]);
-        $data = array_map(fn(ThesisGuestFavorites $th) => [
-            ...$th->fk_thesis_id->toArray(),
-            'read_at' => $th->created_at,
-            'type' => 'Thesis',
-            'read' => $db->getRowCount(
-              ThesisGuestReads::class,
-              ['thesis_id' => $th->fk_thesis_id->getPrimaryKeyValue(), 'guest_id' => $myId]
-            )
-          ],
-          $thesesFav
-        );
-        $dataJournal = array_map(fn(JournalGuestFavorites $jn) => [
-            ...$jn->fk_journal_id->toArray(),
-            'read_at' => $jn->created_at,
-            'type' => 'Journal',
-            'read' => $db->getRowCount(
-              JournalGuestReads::class,
-              ['journal_id' => $jn->fk_journal_id->getPrimaryKeyValue(), 'guest_id' => $myId]
-            )
-          ],
-          $journalFav
-        );
-        Logger::write_info("journal data: " . count($dataJournal));
-        $allData = [...$data, ...$dataJournal];
-        Logger::write_info("all data: " . count($allData));
-        usort($allData, function($a, $b) {
-          $interval = $a['read_at']->diff($b['read_at']);
-          return !$interval->invert;
-        });
-        Logger::write_info("all data sorted: " . count($allData));
         return Response::json(['success' => [...$allData]]);
       }
     } catch (\Throwable $e) {

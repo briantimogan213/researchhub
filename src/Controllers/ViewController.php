@@ -34,6 +34,9 @@ class ViewController extends Controller
   }
   public function home(): View|Response
   {
+    if (!Session::isAuthenticated()) {
+      return Response::redirect("/");
+    }
     $authData = Session::isAuthenticated() ? [
       'account' => Session::getUserAccountType(),
       'full_name' => Session::getUserFullName(),
@@ -190,14 +193,6 @@ class ViewController extends Controller
       return Response::redirect("/admin/login");
     }
     return AdminPages::view("Teacher Accounts - Admin", [], 'admin/teachers');
-  }
-
-  public function adminGuestAccounts(): View|Response
-  {
-    if (!Session::isAuthenticated() || Session::getUserAccountType() !== "admin") {
-      return Response::redirect("/admin/login");
-    }
-    return AdminPages::view("Guest Accounts - Admin", [], 'admin/guests');
   }
 
   public function manageDepartments(): View|Response

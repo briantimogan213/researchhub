@@ -1,7 +1,7 @@
 
 import { useDepartments } from "../global/useDepartments";
 import { React, Sweetalert2, pathname } from '../imports';
-import { CellAlign, TableCellType, TableColumn } from '../types';
+import { CellAlign, DepartmentCourses, TableCellType, TableColumn } from '../types';
 import { Table, TableRowAction } from "./table";
 
 const departmentColumns: TableColumn[] = [
@@ -126,7 +126,7 @@ export default function ManageDepartmentsPage() {
   const departmentTabledData = React.useMemo(() => {
     return !departments ? [] : Object.keys(departments).filter((dept?: string) => !!dept).map((department: string) => ({
       department_name: department,
-      action: <TableRowAction id={department} onView={() => handleViewDepartment(department)} onEdit={() => handleEditDepartment(department)} onDelete={() => handleDeleteDepartment(department)} />,
+      action: <TableRowAction id={department} disabledEdit={!!DepartmentCourses[department]} disabledDelete={!!DepartmentCourses[department]} onView={() => handleViewDepartment(department)} onEdit={() => handleEditDepartment(department)} onDelete={() => handleDeleteDepartment(department)} />,
     }))
   }, [departments])
 
@@ -174,7 +174,7 @@ export default function ManageDepartmentsPage() {
     if (!!selectedDepartment) {
       return departments[selectedDepartment].filter((course: any) => !!course).map((course: any) => ({
         course_name: course,
-        action: <TableRowAction id={course} onDelete={(c: any) => handleDeleteCourse(selectedDepartment, c)} />,
+        action: <TableRowAction id={course} disabledDelete={DepartmentCourses[selectedDepartment]?.includes(course)} onDelete={(c: any) => handleDeleteCourse(selectedDepartment, c)} />,
       }))
     }
     return [];
@@ -195,6 +195,10 @@ export default function ManageDepartmentsPage() {
       preConfirm(name: string) {
         if (!name) {
           Sweetalert2.fire('Error', 'Department name is required', 'error')
+          return false
+        }
+        if (Object.keys(DepartmentCourses).includes(name)) {
+          Sweetalert2.fire('Error', 'Department already exists', 'error')
           return false
         }
         return new Promise((resolve, reject) => {
@@ -294,11 +298,11 @@ export default function ManageDepartmentsPage() {
   }, [selectedDepartment]);
 
   return (<>
-    <div className="text-black w-full min-h-[calc(100vh-160px)] h-fit p-4 min-w-fit">
-      <h1 className="text-2xl my-2">Departments and Courses</h1>
+    <div className="w-full min-h-[calc(100vh-160px)] h-fit bg-[#37414e] p-4 min-w-fit">
+      <h1 className="text-white text-2xl my-2">Departments and Courses</h1>
       <div className="grid gap-y-8 lg:grid-cols-2 items-start gap-x-2 p-4">
         <div>
-          <h2 className="text-xl my-2">Departments</h2>
+          <h2 className="text-white text-xl my-2">Departments</h2>
           <div className="block relative h-fit">
             <Table columns={departmentColumns} items={departmentTabledData}>
               {/* Additional Toolbar Button */}
@@ -314,7 +318,7 @@ export default function ManageDepartmentsPage() {
           </div>
         </div>
         <div>
-          <h2 className="text-xl my-2">{selectedDepartment || "Courses"}</h2>
+          <h2 className="text-white text-xl my-2">{selectedDepartment || "Courses"}</h2>
           <div className="block relative h-fit">
             <Table columns={coursesColumns} items={coursesColumnData}>
               <div className="px-4">

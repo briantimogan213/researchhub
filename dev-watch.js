@@ -23,9 +23,13 @@ async function main() {
     runCommand('npm', ['run' ,'watch:tailwind']);
 
     console.log('Running Typescript build watcher...');
-
+    // Run TypeScript compiler in watch mode
+    // runCommand('npx', ['tsc']);
     runCommand('node', ['watch-and-transfer.js']);
 
+    // console.log('Compiling ESM React Modules watcher...');
+    // Run the custom compile script in watch mode
+    // runCommand('node', ['compile.js']);
     runCommand('browser-sync', ["start", "--proxy", "localhost/smcc-research-hub", "--files", "public/jsx/react-app.umd.js"]);
     await new Promise((resolve) => {}); // Wait forever
 }

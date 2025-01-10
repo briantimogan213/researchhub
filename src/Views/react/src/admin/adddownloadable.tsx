@@ -132,7 +132,7 @@ export default function AddDownloadableForm({ open, defaultOpen, className = "",
   return (<>
     <div className={
       clsx(
-        "max-w-[500px] min-w-[400px] bg-white text-black pt-4 px-4 rounded-lg border border-[#45515F] z-20",
+        "max-w-[500px] min-w-[400px] bg-[#252e38] pt-4 px-4 rounded-lg border border-[#45515F] z-20",
         show ? "block" : "hidden",
         className
       )
@@ -205,7 +205,7 @@ export default function AddDownloadableForm({ open, defaultOpen, className = "",
         )}
         <div className="w-full py-2 flex justify-between items-center mt-2 px-4">
           <button type="submit" disabled={isFormDisabled} className="bg-sky-500 rounded-2xl px-4 py-1 text-white shadow-lg disabled:cursor-not-allowed disabled:bg-gray-400">{isFormDisabled ? "Submitting..." : "Submit"}</button>
-          <button type="reset" onClick={() => { if (isFormDisabled) { onCancelUpload(); onCloseModal(); } else onCloseModal(); }} className="bg-white text-black rounded-2xl px-4 py-1">Cancel</button>
+          <button type="reset" onClick={() => { if (isFormDisabled) { onCancelUpload(); onCloseModal(); } else onCloseModal(); }} className="bg-[#333D49] rounded-2xl px-4 py-1 text-white">Cancel</button>
         </div>
       </form>
     </div>

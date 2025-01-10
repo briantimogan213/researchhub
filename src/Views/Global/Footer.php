@@ -28,7 +28,7 @@ class Footer {
 
   public static function admin() {
   ?>
-    <footer class="bg-[#F3F7FD] text-black font-[Roboto] font-[400] text-[16px] leading-[22.4px] w-full max-w-full min-h-[100px] mb-4 md:mb-0 grid grid-cols-1 md:grid-cols-2 gap-y-2 items-center justify-end">
+    <footer class="bg-[#37414e] text-white font-[Roboto] font-[400] text-[16px] leading-[22.4px] w-full max-w-full min-h-[100px] mb-4 md:mb-0 grid grid-cols-1 md:grid-cols-2 gap-y-2 items-center justify-end">
       <div class="flex text-center items-center justify-center">
         &copy; 2024 Saint Michael College of Caraga
       </div>
