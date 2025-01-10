@@ -13,6 +13,7 @@ const columns: TableColumn[] = [
   { label: "Email Address", key: "email", sortable: true, cellType: TableCellType.String, align: CellAlign.Center },
   { label: "School", key: "school", sortable: true, cellType: TableCellType.String, align: CellAlign.Center },
   { label: "Position", key: "position", sortable: true, cellType: TableCellType.String, align: CellAlign.Center },
+  { label: "Reasons", key: "reasons", sortable: true, cellType: TableCellType.String, align: CellAlign.Center },
   { label: "Action", key: "action", sortable: false, cellType: TableCellType.Custom, align: CellAlign.Center },
 ];
 
