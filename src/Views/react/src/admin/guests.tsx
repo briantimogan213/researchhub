@@ -4,8 +4,6 @@ import { React, Sweetalert2, pathname } from '../imports';
 import { CellAlign, TableCellType, TableColumn } from '../types';
 import { Table, TableRowAction } from "./table";
 
-console.log("What?!")
-
 const columns: TableColumn[] = [
   { label: "#", key: "no", sortable: true, cellType: TableCellType.Number, align: CellAlign.Center },
   { label: "Guest Name", key: "full_name", sortable: true, cellType: TableCellType.String, align: CellAlign.Center },
@@ -29,7 +27,10 @@ function EditGuest({
     <div className="p-8">
       <Input disabled type="email" label="Email Address" inputClassName="border-black" className="mb-2" labelColor="black" name="edit_email" placeholder="Email Address" value={formData.email} onChange={(e: any) => onChange({ ...formData, email: e.target.value })} required />
       <Input label="Full Name" inputClassName="border-black" className="mb-2" labelColor="black" name="edit_full_name" placeholder="Full Name" value={formData.full_name} onChange={(e: any) => onChange({ ...formData, full_name: e.target.value })} required />
-      <Select items={[{label: "Student", value: "student"}, {label: "Employee", value: "employee"}]} label="Role" className="mb-2" labelColor="black" name="edit_role" value={formData.role} onChange={(e: any) => onChange({ ...formData, role: e.target.value })} required />
+      <Select items={[{label: "Student", value: "student"}, {label: "Employee", value: "employee"}]} label="Role" className="mb-2" labelColor="black" name="edit_role" value={formData.role} onChange={(e: any) => {
+        const role = e.target.value;
+        onChange({ ...formData, role, school: role === "student" ? formData.school || '' : null, position: role === "employee" ? formData.position || '' : null })
+      }} required />
       {formData.role === "student" && <Input required inputClassName="border-black" className="mb-2" labelColor="black" placeholder="Name of School Attended" label="School" name="edit_school" value={formData.school} onChange={(e: any) => onChange({ ...formData, school: e.target.value, position: null })} />}
       {formData.role === "employee" && <Input required inputClassName="border-black" className="mb-2" labelColor="black" placeholder="Position" label="Position" name="edit_position" value={formData.position} onChange={(e: any) => onChange({ ...formData, position: e.target.value, school: null })} />}
       <Input readOnly inputClassName="border-black" className="mb-2" labelColor="black" placeholder="Why you want to access this hub?" label="Reasons" name="edit_reasons" value={formData.reasons} />
@@ -50,6 +51,7 @@ export default function GuestsPage() {
     school: '',
     position: '',
     reasons: '',
+    role: '',
   })
 
   const onCloseModal = React.useCallback(() => {
@@ -61,6 +63,7 @@ export default function GuestsPage() {
       school: '',
       position: '',
       reasons: '',
+      role: '',
     })
   }, [])
 
@@ -74,7 +77,8 @@ export default function GuestsPage() {
       password: '',
       school: data.school || '',
       position: data.position || '',
-      reasons: data.reasons
+      reasons: data.reasons,
+      role: data.role
     })
     setOpenEditGuest(true)
   }, [])
@@ -171,16 +175,17 @@ export default function GuestsPage() {
 
   const handleEditGuest = React.useCallback(async (close: () => void) => {
     try {
+      const bodyData = {
+        ...formData,
+        school: formData.role === "student" ? formData.school : null,
+        position: formData.role === "employee" ? formData.position : null,
+      }
       const response = await fetch(pathname('/api/update'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          ...formData,
-          school: !formData.school ? 'none' : formData.school,
-          position: !formData.position ? 'none' : formData.position
-        }),
+        body: JSON.stringify(bodyData),
       })
       const data = await response.json()
 

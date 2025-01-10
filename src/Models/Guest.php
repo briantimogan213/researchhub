@@ -13,7 +13,7 @@ class Guest extends Model
       'email' => ['VARCHAR(255)', 'NOT NULL'],
       'full_name' => ['VARCHAR(255)', 'NOT NULL'],
       'password' => ['VARCHAR(255)', 'NOT NULL'],
-      'role' => ["ENUM('student', 'employee')", 'NOT NULL', "DEFAULT 'student'"],
+      'role' => ["ENUM('student', 'employee', 'others')", 'NOT NULL', "DEFAULT 'student'"],
       'school' => ['VARCHAR(255)'],
       'position' => ['VARCHAR(255)'],
       'reasons' => ['TEXT', 'NOT NULL'],

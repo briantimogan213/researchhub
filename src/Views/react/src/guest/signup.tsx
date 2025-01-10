@@ -24,13 +24,15 @@ export default function GuestSignup() {
   const onSubmit = React.useCallback((e: React.FormEvent) => {
     e.preventDefault()
     setPending(true)
+    const bodyData = { account: 'guest', username: email, full_name: fullName, password, email,
+      school: role === "student" ? school : null, position: role === "employee" ? position : null, reasons };
     fetch(pathname('/api/signup'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json; charset=UTF-8',
         'Accept': 'application/json; charset=UTF-8',
       },
-      body: JSON.stringify({ account: 'guest', username: email, full_name: fullName, password, email, school, position, reasons }),
+      body: JSON.stringify(bodyData),
     })
     .then(response => response.json())
     .then(({ error, success }) => {
@@ -130,6 +132,7 @@ export default function GuestSignup() {
                   >
                     <option value="student">Student</option>
                     <option value="employee">Employee</option>
+                    <option value="others">Others</option>
                   </select>
                 </div>
               </div>

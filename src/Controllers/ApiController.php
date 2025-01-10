@@ -278,10 +278,11 @@ class ApiController extends Controller
         case 'guest':
           if ($data['school'] !== null) {
             $data['position'] = null;
-          } else if ($data['position'] !== null) {
+          }
+          if ($data['position'] !== null) {
             $data['school'] = null;
           }
-          $data['role'] = $data['position'] !== null ? 'employee' : 'student';
+          $data['role'] = $data['position'] !== null ? 'employee' : ($data['school'] !== null ? 'student' : 'others');
           $model = new Guest($data);
           $id = $model->create();
           break;
@@ -383,6 +384,7 @@ class ApiController extends Controller
           if ($data['position'] !== null) {
             $data['school'] = null;
           }
+          $data['role'] = $data['position'] !== null ? 'employee' : ($data['school'] !== null ? 'student' : 'others');
           $model->setAttributes($data);
           if ($model->update()) {}
           break;
