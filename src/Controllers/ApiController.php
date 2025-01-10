@@ -8,6 +8,7 @@ use DateTime;
 use Smcc\ResearchHub\Logger\Logger;
 use Smcc\ResearchHub\Models\Admin;
 use Smcc\ResearchHub\Models\AdminLogs;
+use Smcc\ResearchHub\Models\Announcements;
 use Smcc\ResearchHub\Models\Courses;
 use Smcc\ResearchHub\Models\Database;
 use Smcc\ResearchHub\Models\Departments;
@@ -45,11 +46,18 @@ class ApiController extends Controller
 
   public function homeAnnouncements(): Response
   {
-    $filePath = implode(DIRECTORY_SEPARATOR, [UPLOADS_PATH, 'announcements', 'announcements.json']);
-    if (!file_exists($filePath) ||!is_readable($filePath)) {
-      return Response::json(['error' => 'Announcements not found'], StatusCode::NOT_FOUND);
+    $db = Database::getInstance();
+    $announcements = $db->getAllRows(Announcements::class);
+    $data = [];
+    foreach ($announcements as $a) {
+      $data[] = [
+        'id' => $a->getPrimaryKeyValue(),
+        'type' => $a->a_type,
+        'title' => $a->title,
+        'url' => $a->url,
+        'expires' => DateTime::createFromFormat("d-m-Y H:i:s", $a->expires)->format("c"),
+      ];
     }
-    $data = json_decode(file_get_contents($filePath), true);
     return Response::json(['success' => $data ?? []]);
   }
 
@@ -62,18 +70,14 @@ class ApiController extends Controller
     if (!$announcementId) {
       return Response::json(['error' => 'ID is required'], StatusCode::BAD_REQUEST);
     }
-    $filePath = implode(DIRECTORY_SEPARATOR, [UPLOADS_PATH, 'announcements', 'announcements.json']);
-    if (!file_exists($filePath) ||!is_readable($filePath)) {
-      return Response::json(['error' => 'Announcements Records not found'], StatusCode::NOT_FOUND);
-    }
-    $data = json_decode(file_get_contents($filePath), true);
-    foreach($data as $n => $item) {
-      if (strval($item['id']) === strval($announcementId)) {
-        $data[$n] = [...($request->getBody())];
-        // write to file again
-        file_put_contents($filePath, json_encode($data, JSON_PRETTY_PRINT));
-        return Response::json(['success' => 'Announcement Edited']);
-      }
+    $formData = [...$request->getBody()];
+    unset($formData['id']);
+    $formData['expires'] = new DateTime($formData['expires']);
+    $db = Database::getInstance();
+    $data = $db->fetchOne(Announcements::class, ['id' => $announcementId]);
+    $data->setAttributes($formData);
+    if ($data->update()) {
+      return Response::json(['success' => 'Announcement Edited']);
     }
     return Response::json(['error' => 'Announcement not found'], StatusCode::NOT_FOUND);
   }
@@ -83,18 +87,11 @@ class ApiController extends Controller
     if (!RouterSession::isAuthenticated() || RouterSession::getUserAccountType() !== 'admin') {
       return Response::json(['error' => 'Not authenticated.'], StatusCode::UNAUTHORIZED);
     }
-    $announcementId = $request->getBodyParam('id');
-    if (!$announcementId) {
-      return Response::json(['error' => 'ID is required'], StatusCode::BAD_REQUEST);
-    }
-    $filePath = implode(DIRECTORY_SEPARATOR, [UPLOADS_PATH, 'announcements', 'announcements.json']);
-    if (!file_exists($filePath) ||!is_readable($filePath)) {
-      return Response::json(['error' => 'Announcements Records not found'], StatusCode::NOT_FOUND);
-    }
-    $data = json_decode(file_get_contents($filePath), true);
-    $data[] = [...($request->getBody())];
-    if (file_put_contents($filePath, json_encode($data, JSON_PRETTY_PRINT))) {
-      // write to file again
+    $formData = [...$request->getBody()];
+    unset($formData['id']);
+    $formData['expires'] = new DateTime($formData['expires']);
+    $data = new Announcements($formData);
+    if ($data->create()) {
       return Response::json(['success' => 'Announcement Posted']);
     }
     return Response::json(['error' => 'Announcement failed to post'], StatusCode::NOT_FOUND);
@@ -109,16 +106,9 @@ class ApiController extends Controller
     if (!$announcementId) {
       return Response::json(['error' => 'ID is required'], StatusCode::BAD_REQUEST);
     }
-    $filePath = implode(DIRECTORY_SEPARATOR, [UPLOADS_PATH, 'announcements', 'announcements.json']);
-    if (!file_exists($filePath) || !is_readable($filePath)) {
-      return Response::json(['error' => 'Announcements Records not found'], StatusCode::NOT_FOUND);
-    }
-    $data = json_decode(file_get_contents($filePath), true);
-    $data = [...(array_filter($data, function($d) use($announcementId) {
-      return strval($d['id']) !== strval($announcementId);
-    }))];
-    if (file_put_contents($filePath, json_encode($data, JSON_PRETTY_PRINT))) {
-      // write to file again
+    $db = Database::getInstance();
+    $exists = $db->fetchOne(Announcements::class, ['id' => $announcementId]);
+    if ($exists && $exists->delete()) {
       return Response::json(['success' => 'Announcement Removed']);
     }
     return Response::json(['error' => 'Announcement failed to remove'], StatusCode::NOT_FOUND);
