@@ -133,9 +133,9 @@ class Template
   ?>
     <body>
       <div class="container-fluid relative flex max-h-screen overflow-hidden w-full">
-        <aside id="sidebar-nav" class="min-w-[250px] bg-[#262e36] max-h-screen h-screen" data-sidebar-list="<?= htmlspecialchars(json_encode($sidebarListData)); ?>">
-        <nav class="text-slate-50 bg-[#262e36] max-w-[250px] h-full relative w-[250px]">
-          <div class="w-full max-h-[60px] h-[60px] flex items-center justify-center bg-[#21282f]">
+        <aside id="sidebar-nav" class="flex-shrink max-w-[250px] max-h-screen bg-white text-black shadow-lg z-10" data-sidebar-list="<?= htmlspecialchars(json_encode($sidebarListData)); ?>">
+        <nav class=" bg-white text-black max-w-[250px] h-full relative w-[250px]">
+          <div class="w-full max-h-[60px] h-[60px] flex items-center justify-center text-black">
             <a href="<?= Router::getPathname("/") ?>" class="flex flex-nowrap h-full w-fit items-center justify-start">
               <div class="aspect-square h-full py-2">
                 <svg class="w-full h-full" width="130" height="130" viewBox="0 0 130 130" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -156,11 +156,11 @@ class Template
           </div>
         </nav>
         </aside>
-        <main class="relative max-h-screen overflow-y-auto flex-grow min-h-screen bg-[#37414e]">
+        <main class="relative max-h-screen overflow-y-auto flex-grow min-h-screen bg-[#F3F7FD] text-black">
           <?php Header::admin(); ?>
           <div
             id="root"
-            class="w-full min-h-[calc(100vh-160px)]"
+            class="w-full min-h-[calc(100vh-160px)] bg-[#F3F7FD]"
             data-react-app="<?= htmlspecialchars($reactAppPath); ?>"
             data-page-data="<?= htmlspecialchars(json_encode($data)); ?>"
           ></div>

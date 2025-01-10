@@ -33,7 +33,7 @@ export default function ThesesPage() {
   const [thesisDepartment, setThesisDepartment] = React.useState("");
   const [thesisCourse, setThesisCourse] = React.useState("");
   const departmentList = React.useMemo(() => Object.keys(departmentsAndCourses).map((d) => ({ label: d, value: d })), [departmentsAndCourses])
-  const courseList = React.useMemo(() => !!thesisDepartment ? departmentsAndCourses[thesisDepartment].map((d: any) => ({ label: d, value: d })) : [], [thesisDepartment, departmentsAndCourses])
+  const courseList = React.useMemo(() => !!thesisDepartment && departmentList.length > 0 ? departmentsAndCourses[thesisDepartment].map((d: any) => ({ label: d, value: d })) : [], [thesisDepartment, departmentsAndCourses])
   const yearsList = React.useMemo(() => Array.from({ length: (new Date()).getFullYear() - 2000 }, (_, i) => (new Date()).getFullYear() - i).map((y) => ({ label: y.toString(), value: y.toString() })), [])
 
   const fetchList = () => {
@@ -288,10 +288,10 @@ export default function ThesesPage() {
     ? tableData?.filter((td: any) => td.department?.toString() === thesisDepartment?.toString() && (!!thesisCourse ? td.course?.toString() === thesisCourse?.toString() : true) && (!!thesisYear ? td.year?.toString() === thesisYear?.toString() : true))
     : (!!thesisYear ? tableData?.filter((td: any) => td.year?.toString() === thesisYear?.toString()) : tableData)
   , [tableData, thesisDepartment, thesisCourse, thesisYear])
-  console.log([{ label: "Department", value: "" }, ...departmentList])
+
   return (
-    <div className="w-full min-h-[calc(100vh-160px)] h-fit bg-[#37414e] p-4 min-w-fit">
-      <h1 className="text-white text-2xl my-2">Thesis/Capstone List</h1>
+    <div className="w-full min-h-[calc(100vh-160px)] h-fit p-4 min-w-fit">
+      <h1 className="text-2xl my-2">Thesis/Capstone List</h1>
       <Table columns={columns} items={finalData}>
         {/* Additional Toolbar Button */}
         <div className="px-4">
@@ -304,7 +304,7 @@ export default function ThesesPage() {
           <Select className="max-w-[100px] min-w-[100px] text-black" items={[{ label: "Year", value: "" }, ...yearsList]} label="Year" name="year" value={thesisYear} onChange={(e: any) => setThesisYear(e.target.value)} />
         </div>
         <div className="px-4">
-          <button type="button" onClick={() => handlePrint()} className="hover:text-blue-500 text-blue-200" title="Print List"><span className="material-symbols-outlined text-blue-200 hover:text-blue-500">print</span></button>
+          <button type="button" onClick={() => handlePrint()} className="hover:text-slate-800 text-blue-800" title="Print List"><span className="material-symbols-outlined text-blue-800 hover:text-slate-800">print</span></button>
         </div>
         <div className="px-4">
           <button type="button" onClick={() => fetchList()} className="hover:text-yellow-500" title="Refresh List"><span className="material-symbols-outlined">refresh</span></button>

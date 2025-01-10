@@ -5,21 +5,21 @@ export function TableRowAction({ id, onView, onEdit, onDelete, onDownload, disab
   return (
     <div className="grid grid-cols-2 gap-x-1 max-w-[80px] mx-auto items-center">
       {onView && (
-        <button type="button" className="p-1 text-white hover:text-green-500" title="Preview" onClick={() => onView(id)}>
+        <button type="button" className="p-1 text-green-700 hover:text-green-500" title="Preview" onClick={() => onView(id)}>
           <span className="material-symbols-outlined">
             preview
           </span>
         </button>
       )}
       {onEdit && (
-        <button type="button" disabled={disabledEdit} className="p-1 text-sky-500 hover:text-white disabled:text-gray-300 disabled:hover:text-gray-300" title="Delete" onClick={() => onEdit(id)}>
+        <button type="button" disabled={disabledEdit} className="p-1 text-sky-500 hover:text-sky-300 disabled:text-gray-300 disabled:hover:text-gray-300" title="Edit" onClick={() => onEdit(id)}>
           <span className="material-symbols-outlined">
             edit
           </span>
         </button>
       )}
       {onDownload && (
-        <button type="button" className="p-1 text-white hover:text-green-500" title="Preview" onClick={() => onDownload(id)}>
+        <button type="button" className="p-1 text-slate-600 hover:text-slate-400" title="Download" onClick={() => onDownload(id)}>
           <span className="material-symbols-outlined">
             download
           </span>
@@ -156,14 +156,14 @@ export function Table({ columns, items, search, children, defaultSortOrder, defa
 
   const onPageInputChange = React.useCallback((e: any) => Number(e.target.value) >= page && Number(e.target.value) <= totalPages && !Number.isNaN(Number.parseInt(e.target.value)) ? setPage(Number.parseInt(e.target.value)) : setPage(0), [page]);
   return (
-    <table className="w-full h-full border-collapse bg-[#262E37] font-[Montserrat] font-[500] text-[14px] leading-[17.07px]" {...props}>
+    <table className="w-full h-full border-collapse bg-white font-[Montserrat] font-[500] text-[14px] leading-[17.07px] shadow-sm shadow-[#1764E8] z-10" {...props}>
       <thead>
         <tr>
           <td colSpan={columns.length}>
-            <div className="flex flex-row justify-between items-center gap-x-2 text-white relative bg-[#323B46] p-4 w-full">
+            <div className="flex flex-row justify-between items-center gap-x-2 text-black bg-[#d6e6fe] relative p-4 w-full">
               <div className="flex flex-row flex-nowrap w-fit max-w-fit gap-x-2 flex-shrink px-4">
                 <p>Show</p>
-                <select className="bg-[#141432] rounded-[8px] p-1 text-[12px]" value={showEntries} onChange={(e) => setShowEntries(Number.parseInt(e.target.value))} title="Show Entries">
+                <select className="bg-white border-[#1764E8] rounded-[8px] p-1 text-[12px]" value={showEntries} onChange={(e) => setShowEntries(Number.parseInt(e.target.value))} title="Show Entries">
                   {
                     EntriesList.map((option) => (
                       <option key={"entry_" + option} value={option}>{option}</option>
@@ -173,27 +173,27 @@ export function Table({ columns, items, search, children, defaultSortOrder, defa
                 <p>entries</p>
               </div>
               <div className="flex flex-nowrap pr-4">
-                <button type="button" onClick={() => setPage(totalPages > 0 ? 1 : 0)} className="hover:text-yellow-500"><span className="material-symbols-outlined">keyboard_double_arrow_left</span></button>
-                <button type="button" onClick={() => setPage(Math.max(totalPages > 0 ? 1 : 0, Math.min(totalPages, page - 1)))} className="hover:text-yellow-500"><span className="material-symbols-outlined">chevron_left</span></button>
-                {!editPageNumber && <button type="button" onClick={() => setEditPageNumber(true)} className="px-2 text-yellow-300">Page {page} / {totalPages}</button>}
-                {editPageNumber && <div className="px-2 text-yellow-300 flex flex-nowrap items-center">Page <form onSubmit={onChangePage} className="flex items-end h-full"><input type="number" name="page" onChange={onPageInputChange} onBlur={(e) => { onPageInputChange(e); setEditPageNumber(false); }} className="max-w-[50px] outline-none text-center rounded bg-white text-black mx-1 hide-spinner placeholder:text-gray-500" min={totalPages > 0 ? 1 : 0} max={totalPages} placeholder={page?.toString()} /><button type="submit" className="hidden">Change</button></form> / {totalPages}</div>}
-                <button type="button" onClick={() => setPage(Math.max(totalPages > 0 ? 1 : 0, Math.min(totalPages, page + 1)))} className="hover:text-yellow-500"><span className="material-symbols-outlined">chevron_right</span></button>
-                <button type="button" onClick={() => setPage(totalPages)} className="hover:text-yellow-500"><span className="material-symbols-outlined">keyboard_double_arrow_right</span></button>
+                <button type="button" onClick={() => setPage(totalPages > 0 ? 1 : 0)} className="hover:text-slate-600"><span className="material-symbols-outlined">keyboard_double_arrow_left</span></button>
+                <button type="button" onClick={() => setPage(Math.max(totalPages > 0 ? 1 : 0, Math.min(totalPages, page - 1)))} className="hover:text-slate-600"><span className="material-symbols-outlined">chevron_left</span></button>
+                {!editPageNumber && <button type="button" onClick={() => setEditPageNumber(true)} className="px-2 text-slate-700">Page {page} / {totalPages}</button>}
+                {editPageNumber && <div className="px-2 text-slate-700 flex flex-nowrap items-center">Page <form onSubmit={onChangePage} className="flex items-end h-full"><input type="number" name="page" onChange={onPageInputChange} onBlur={(e) => { onPageInputChange(e); setEditPageNumber(false); }} className="max-w-[50px] outline-none text-center rounded bg-white text-black mx-1 hide-spinner placeholder:text-gray-500" min={totalPages > 0 ? 1 : 0} max={totalPages} placeholder={page?.toString()} /><button type="submit" className="hidden">Change</button></form> / {totalPages}</div>}
+                <button type="button" onClick={() => setPage(Math.max(totalPages > 0 ? 1 : 0, Math.min(totalPages, page + 1)))} className="hover:text-slate-600"><span className="material-symbols-outlined">chevron_right</span></button>
+                <button type="button" onClick={() => setPage(totalPages)} className="hover:text-slate-900"><span className="material-symbols-outlined">keyboard_double_arrow_right</span></button>
               </div>
               <div className="flex-grow">
                 <div className="relative">
-                  <label className="text-white absolute left-1 top-0 h-full aspect-square flex items-center justify-center"><span className="material-symbols-outlined text-[18px]">search</span></label>
-                  <input type="search" placeholder="Search..." value={searchString} onChange={(e) => onSetSearch(e.target.value)} className="text-white outline-none border border-white pl-10 pr-2 py-1.5 rounded placeholder:text-white/50 bg-[#323B46] w-full h-full" />
+                  <label className="text-[#1764E8] absolute left-1 top-0 h-full aspect-square flex items-center justify-center"><span className="material-symbols-outlined text-[18px]">search</span></label>
+                  <input type="search" placeholder="Search..." value={searchString} onChange={(e) => onSetSearch(e.target.value)} className="text-black outline-none border pl-10 pr-2 py-1.5 rounded placeholder:text-gray-500 border-[#1764E8] w-full h-full" />
                 </div>
               </div>
               {children}
             </div>
           </td>
         </tr>
-        <tr className="bg-[#323B46] h-[50px]">
+        <tr className="bg-[#F3F7FD] text-[#1764E8] h-[50px]">
           {
             columns.map((column: any) => (
-              <th key={column.key} className={clsx(" text-white text-xs px-6 py-2", column.sortable ? "cursor-pointer relative hover:bg-[#454f5c]" : "")} onClick={() => toggleSort(column.sortable, column.key)}>
+              <th key={column.key} className={clsx("text-xs px-6 py-2", column.sortable ? "cursor-pointer relative hover:bg-[#1764E8]/20" : "")} onClick={() => toggleSort(column.sortable, column.key)}>
                 {column.label}
                 {column.sortable && <div className="absolute right-1 top-0 h-full w-fit flex justify-end items-center"><div className={clsx("material-symbols-outlined h-fit w-full text-[20px]", column.key === sortColumn ? sortOrder === SortOrder.Ascending ? "rotate-[180deg]" : "" : "opacity-20 hover:opacity-50")}>sort</div></div>}
               </th>
@@ -207,7 +207,7 @@ export function Table({ columns, items, search, children, defaultSortOrder, defa
             <tr key={"rowtable_" + index} className="h-[65px]">
               {
                 columns.map((column: any) => (
-                  <td key={column.key} className={`text-white text-xs px-4 py-2 ${column.align === CellAlign.Center ? "text-center" : column.align === CellAlign.Right ? "text-right" : "text-left"}`}>
+                  <td key={column.key} className={`text-black text-xs px-4 py-2 ${column.align === CellAlign.Center ? "text-center" : column.align === CellAlign.Right ? "text-right" : "text-left"}`}>
                     {column.cellType === TableCellType.Number && Number.parseFloat(row[column.key])}
                     {column.cellType === TableCellType.Date && new Date(row[column.key]).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
                     {column.cellType === TableCellType.Custom && typeof row[column.key] === "object" && column.sortable && !!row[column.key].value && <>{row[column.key].content}</>}
@@ -223,7 +223,7 @@ export function Table({ columns, items, search, children, defaultSortOrder, defa
         {
           finalItems.length === 0 && (
             <tr className="h-[65px]">
-              <td className="text-white text-center" colSpan={columns.length}>
+              <td className="text-gray-700 text-center" colSpan={columns.length}>
                 NO RECORDS
               </td>
             </tr>

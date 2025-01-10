@@ -292,8 +292,8 @@ export default function JournalsPage() {
   , [tableData, journalDepartment, journalCourse, journalYear])
 
   return (
-    <div className="w-full min-h-[calc(100vh-160px)] h-fit bg-[#37414e] p-4 min-w-fit">
-      <h1 className="text-white text-2xl my-2">Journal List</h1>
+    <div className="w-full min-h-[calc(100vh-160px)] text-black h-fit p-4 min-w-fit">
+      <h1 className="text-black text-2xl my-2">Journal List</h1>
       <Table columns={columns} items={finalData}>
         {/* Additional Toolbar Button */}
         <div className="px-4">
@@ -306,7 +306,7 @@ export default function JournalsPage() {
           <Select className="max-w-[100px] min-w-[100px] text-black" items={[{ label: "Year", value: "" }, ...yearsList]} label="Year" name="year" value={journalYear} onChange={(e: any) => setJournalYear(e.target.value)} />
         </div>
         <div className="px-4">
-          <button type="button" onClick={() => handlePrint()} className="hover:text-blue-500 text-blue-200" title="Print List"><span className="material-symbols-outlined text-blue-200 hover:text-blue-500">print</span></button>
+          <button type="button" onClick={() => handlePrint()} className="hover:text-slate-800 text-blue-800" title="Print List"><span className="material-symbols-outlined text-blue-800 hover:text-slate-800">print</span></button>
         </div>
         <div className="px-4">
           {/* Refresh Button */}

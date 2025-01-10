@@ -29,11 +29,7 @@ async function main() {
     // Run TypeScript compiler in watch mode
     // runCommand('npx', ['tsc']);
     runCommand('npm', ['run', 'build:vite']);
-    await new Promise((resolve) => setTimeout(resolve, 8000)); // Wait for 8 second before starting other watchers
 
-    // console.log('Compiling ESM React Modules watcher...');
-    // Run the custom compile script in watch mode
-    // runCommand('node', ['compile.js']);
 }
 
 // Execute the main function
