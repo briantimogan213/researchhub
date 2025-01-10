@@ -73,7 +73,8 @@ class ApiController extends Controller
     }
     $formData = [...$request->getBody()];
     unset($formData['id']);
-    $formData['expires'] = new DateTime($formData['expires']);
+    $expires = new DateTime($formData['expires']);
+    $formData['expires'] = $expires->format('Y-m-d H:i:s');
     $db = Database::getInstance();
     $data = $db->fetchOne(Announcements::class, ['id' => $announcementId]);
     $data->setAttributes($formData);
@@ -90,7 +91,8 @@ class ApiController extends Controller
     }
     $formData = [...$request->getBody()];
     unset($formData['id']);
-    $formData['expires'] = new DateTime($formData['expires']);
+    $expires = new DateTime($formData['expires']);
+    $formData['expires'] = $expires->format('Y-m-d H:i:s');
     $data = new Announcements($formData);
     if ($data->create()) {
       return Response::json(['success' => 'Announcement Posted']);
