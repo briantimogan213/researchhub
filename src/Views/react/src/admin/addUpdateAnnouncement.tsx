@@ -12,7 +12,7 @@ function genHexString(len = 24) {
 }
 
 interface PayloadProps {
-  id: string;
+  id?: string;
   title: string;
   type: "text"|"video"
   message?: string
@@ -82,7 +82,7 @@ export default function AddUpdateAnnouncement({ title, isOpen, onSuccess, onErro
     // Post the announcement
     const url = new URL(pathname(isUpdate ? '/api/home/announcement/edit' : '/api/home/announcement/add'), window.location.origin);
     const body: PayloadProps = {
-      id: genHexString(),
+      id: data?.id,
       type: announcementType,
       title: announcementTitle,
       expires,

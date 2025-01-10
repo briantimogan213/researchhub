@@ -76,7 +76,7 @@ class ApiController extends Controller
     $expires = new DateTime($formData['expires']);
     $formData['expires'] = $expires->format('Y-m-d H:i:s');
     $db = Database::getInstance();
-    $data = $db->fetchOne(Announcements::class, ['id' => $announcementId]);
+    $data = $db->fetchOne(Announcements::class, [(new Announcements())->getPrimaryKey() => $announcementId]);
     $data->setAttributes($formData);
     if ($data->update()) {
       return Response::json(['success' => 'Announcement Edited']);
@@ -90,7 +90,9 @@ class ApiController extends Controller
       return Response::json(['error' => 'Not authenticated.'], StatusCode::UNAUTHORIZED);
     }
     $formData = [...$request->getBody()];
-    unset($formData['id']);
+    if (isset($formData['id'])) {
+      unset($formData['id']);
+    }
     $expires = new DateTime($formData['expires']);
     $formData['expires'] = $expires->format('Y-m-d H:i:s');
     $data = new Announcements($formData);
@@ -110,7 +112,7 @@ class ApiController extends Controller
       return Response::json(['error' => 'ID is required'], StatusCode::BAD_REQUEST);
     }
     $db = Database::getInstance();
-    $exists = $db->fetchOne(Announcements::class, ['id' => $announcementId]);
+    $exists = $db->fetchOne(Announcements::class, [(new Announcements())->getPrimaryKey() => $announcementId]);
     if ($exists && $exists->delete()) {
       return Response::json(['success' => 'Announcement Removed']);
     }
