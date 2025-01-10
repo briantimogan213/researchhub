@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "scripts": {
     "build": "node build.js",
-    "build:vite": "vite build && node transfer.js",
+    "build:vite": "vite build",
+    "build:vitewatch": "vite build && node transfer.js",
     "postbuild": "node transfer.js",
     "start": "./run-start",
     "watch": "node watch.js",

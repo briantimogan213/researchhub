@@ -1,6 +1,7 @@
 import DashboardPage from './admin/dashboard';
 import ManageDepartmentsPage from './admin/departments';
 import DownloadsPage from './admin/downloads';
+import GuestsPage from './admin/guests';
 import HomepageManagementPage from './admin/homepage';
 import JournalsPage from './admin/journal';
 import AdminLogin from './admin/login';
@@ -46,6 +47,7 @@ const routes: { [path: string]: any } = {
   'admin/downloads': DownloadsPage,
   'admin/students': StudentsPage,
   'admin/teachers': TeachersPage,
+  'admin/guests': GuestsPage,
   'settings': AccountSettings,
   'logs': LogsApp
 }

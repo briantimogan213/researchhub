@@ -4,7 +4,7 @@ const path = require('path');
 
 // Paths
 const jsxDist = path.resolve(__dirname, 'src', 'Views', 'react', 'src'); // src folder
-const buildScript = 'npm run build:vite';
+const buildScript = 'npm run build:vitewatch';
 // const transferScript = 'node transfer.js'; // Transfer script command
 
 // Run Vite in watch mode

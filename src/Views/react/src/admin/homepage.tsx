@@ -95,8 +95,8 @@ export default function HomepageManagementPage() {
   }, []);
 
   return (<>
-    <div className="w-full min-h-[calc(100vh-160px)] h-fit bg-[#37414e] p-4 min-w-fit">
-      <h1 className="text-white text-2xl my-2">Manage Homepage</h1>
+    <div className="w-full min-h-[calc(100vh-160px)] h-fit text-black p-4 min-w-fit">
+      <h1 className="text-2xl my-2">Manage Homepage</h1>
       <div><button type="button" className="bg-white hover:bg-slate-300 px-4 py-2 rounded shadow" onClick={() => onAddModal()}>Add New Announcement</button></div>
       <div className="p-4 tw-flex tw-flex-wrap tw-gap-8">
         {announcements.length === 0 ? <span className="">No Announcements</span> : announcements.map((announcement: Announcement) =>(

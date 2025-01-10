@@ -92,7 +92,7 @@ function ThumbnailThesis({
   if (viewLayout === ViewLayout.GRID) {
     return (<>
       <div onClick={handleView} className="text-center relative cursor-pointer border rounded-lg p-4 w-[400px]">
-        {authenticated && authData?.account !== 'admin' || authData?.account !== 'guest' && (
+        {authenticated && authData?.account !== 'admin' && (
           <button type="button" onClick={handleFavoriteClick} className="absolute right-2 top-3 z-20 hover:text-yellow-500">
             {favorite && <span className="material-symbols-outlined text-green-700">bookmark_star</span>}
             {!favorite && <span className="material-symbols-outlined">bookmark</span>}
