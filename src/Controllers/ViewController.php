@@ -210,9 +210,6 @@ class ViewController extends Controller
 
   public function thesis(): View|Response
   {
-    if (!Session::isAuthenticated()) {
-      return Response::redirect("/");
-    }
     $authData = Session::isAuthenticated() ? [
       'account' => Session::getUserAccountType(),
       'full_name' => Session::getUserFullName(),
@@ -224,9 +221,6 @@ class ViewController extends Controller
 
   public function journal(): View|Response
   {
-    if (!Session::isAuthenticated()) {
-      return Response::redirect("/");
-    }
     $authData = Session::isAuthenticated() ? [
       'account' => Session::getUserAccountType(),
       'full_name' => Session::getUserFullName(),
@@ -238,9 +232,6 @@ class ViewController extends Controller
 
   public function downloads(): View|Response
   {
-    if (!Session::isAuthenticated()) {
-      return Response::redirect("/");
-    }
     $authData = Session::isAuthenticated() ? [
       'account' => Session::getUserAccountType(),
       'full_name' => Session::getUserFullName(),
@@ -252,9 +243,6 @@ class ViewController extends Controller
 
   public function aboutUs(): View|Response
   {
-    if (!Session::isAuthenticated()) {
-      return Response::redirect("/");
-    }
     $authData = Session::isAuthenticated() ? [
       'account' => Session::getUserAccountType(),
       'full_name' => Session::getUserFullName(),
@@ -266,9 +254,6 @@ class ViewController extends Controller
 
   public function library(): View|Response
   {
-    if (!Session::isAuthenticated()) {
-      return Response::redirect("/");
-    }
     $authData = Session::isAuthenticated() ? [
       'account' => Session::getUserAccountType(),
       'full_name' => Session::getUserFullName(),
