@@ -2,6 +2,7 @@
 import { Table, TableRowAction } from "../admin/table";
 import { Input, Select } from "../global/input";
 import Modal from "../global/modal";
+import { useDepartments } from "../global/useDepartments";
 import { React, Sweetalert2, pathname } from '../imports';
 import { CellAlign, Courses, Departments, TableCellType, TableColumn, Year } from '../types';
 
@@ -24,13 +25,15 @@ function EditStudent({
     formData: any,
     onChange: (data: any) => void
   }) {
+  const { departments } = useDepartments()
+  const courses = React.useMemo(() => formData.department && Object.keys(departments).includes(formData.department) ? departments[formData.department] : [], [departments])
   return (
     <div className="p-8">
       <Input disabled label="Student ID" inputClassName="border-black" className="mb-2" labelColor="black" name="edit_student_id" placeholder="Student ID" value={formData.username} onChange={(e: any) => onChange({ ...formData, username: e.target.value })} />
       <Input disabled label="Full Name" inputClassName="border-black" className="mb-2" labelColor="black" name="edit_full_name" placeholder="Full Name" value={formData.full_name} onChange={(e: any) => onChange({ ...formData, full_name: e.target.value })} required />
       <Input type="email" label="Email Address" inputClassName="border-black" className="mb-2" labelColor="black" name="edit_email" placeholder="Email Address" value={formData.email} onChange={(e: any) => onChange({ ...formData, email: e.target.value })} required />
-      <Select labelColor="black" items={Object.entries(Departments).map(([key, value]) => ({ label: value, value }))} label="Department" name="edit_department" value={formData.department} onChange={(e: any) => onChange({ ...formData, department: e.target.value })} required />
-      <Select labelColor="black" items={Object.entries(Courses).map(([key, value]) => ({ label: value, value }))} label="Course" name="edit_course" value={formData.course} onChange={(e: any) => onChange({ ...formData, course: e.target.value })} required />
+      <Select labelColor="black" items={Object.entries(departments).map(([key, value]) => ({ label: key, value: key }))} label="Department" name="edit_department" value={formData.department} onChange={(e: any) => onChange({ ...formData, department: e.target.value })} required />
+      <Select labelColor="black" items={courses.map((value) => ({ label: value, value }))} label="Course" name="edit_course" value={formData.course} onChange={(e: any) => onChange({ ...formData, course: e.target.value })} required />
       <Select labelColor="black" items={Object.entries(Year).map(([key, value]) => ({ label: value, value }))} label="Year" name="edit_year" value={formData.year} onChange={(e: any) => onChange({ ...formData, year: e.target.value })} required />
       <Input type="password" label="Password" inputClassName="border-black" className="mb-2" labelColor="black" name="edit_password" placeholder="Password (Leave blank if not change)" value={formData.password} onChange={(e: any) => onChange({ ...formData, password: e.target.value })} />
     </div>

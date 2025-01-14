@@ -1,6 +1,7 @@
 import { Table, TableRowAction } from "../admin/table";
 import { Input, Select } from "../global/input";
 import Modal from "../global/modal";
+import { useDepartments } from '../global/useDepartments';
 import { React, Sweetalert2, pathname } from '../imports';
 import { CellAlign, Departments, TableCellType, TableColumn } from "../types";
 
@@ -21,12 +22,13 @@ function AddTeacher({
   formData: any,
   onChange: (data: any) => void
 }) {
+  const { departments } = useDepartments()
   return (
     <div className="p-8">
       <Input label="Employee ID" className="mb-2" labelColor="black" name="personnel_id" placeholder="Employee ID" value={formData.username} onChange={(e: any) => onChange({...formData, username: e.target.value })} required />
       <Input label="Full Name"  className="mb-2" labelColor="black" name="full_name" placeholder="Full Name" value={formData.full_name} onChange={(e: any) => onChange({...formData, full_name: e.target.value })} required />
       <Input type="email" label="Email Address" className="mb-2" labelColor="black" name="email" placeholder="Email Address" value={formData.email} onChange={(e: any) => onChange({...formData, email: e.target.value })} required />
-      <Select labelColor="black" items={Object.entries(Departments).map(([key, value]) => ({ label: value, value }))} label="Department" name="department" value={formData.department} onChange={(e: any) => onChange({...formData, department: e.target.value })} required />
+      <Select labelColor="black" items={Object.entries(departments).map(([key, value]) => ({ label: key, value: key }))} label="Department" name="department" value={formData.department} onChange={(e: any) => onChange({...formData, department: e.target.value })} required />
     </div>
   )
 }
@@ -39,12 +41,13 @@ function EditTeacher({
   formData: any,
   onChange: (data: any) => void
 }) {
+  const { departments } = useDepartments()
   return (
     <div className="p-8">
       <Input disabled label="Employee ID" inputClassName="border-black" className="mb-2" labelColor="black" name="edit_personnel_id" placeholder="Employee ID" value={formData.username} onChange={(e: any) => onChange({...formData, username: e.target.value })} />
       <Input label="Full Name" inputClassName="border-black"  className="mb-2" labelColor="black" name="edit_full_name" placeholder="Full Name" value={formData.full_name} onChange={(e: any) => onChange({...formData, full_name: e.target.value })} required />
       <Input type="email" label="Email Address" inputClassName="border-black"  className="mb-2" labelColor="black" name="edit_email" placeholder="Email Address" value={formData.email} onChange={(e: any) => onChange({...formData, email: e.target.value })} required />
-      <Select labelColor="black" items={Object.entries(Departments).map(([key, value]) => ({ label: value, value }))} label="Department" name="edit_department" value={formData.department} onChange={(e: any) => onChange({...formData, department: e.target.value })} required />
+      <Select labelColor="black" items={Object.entries(departments).map(([key, _]) => ({ label: key, value: key }))} label="Department" name="edit_department" value={formData.department} onChange={(e: any) => onChange({...formData, department: e.target.value })} required />
       <Input type="password" label="Password" inputClassName="border-black"  className="mb-2" labelColor="black" name="edit_password" placeholder="Password (Leave blank if not change)" value={formData.password} onChange={(e: any) => onChange({...formData, password: e.target.value })} />
     </div>
   )
