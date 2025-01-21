@@ -589,6 +589,7 @@ class ApiController extends Controller
       $journal = Journal::getRowCount();
       $student = Student::getRowCount();
       $personnel = Personnel::getRowCount();
+      $guest = Guest::getRowCount();
       $allThesis = $db->getAllRows(Thesis::class);
       $thesisPublic = array_filter($allThesis, fn($th) => $th->is_public);
       $thesisPublished = count($thesisPublic);
@@ -596,27 +597,69 @@ class ApiController extends Controller
       $journalPublic = array_filter($allJournals, fn($jn) => $jn->is_public);
       $journalPublished = count($journalPublic);
 
-      $thesisReads = [...$db->getAllRows(modelClass: ThesisReads::class), ...$db->getAllRows(ThesisPersonnelReads::class)];
+      $thesisReads = [
+        ...$db->getAllRows(modelClass: ThesisReads::class),
+        ...$db->getAllRows(ThesisPersonnelReads::class),
+        ...$db->getAllRows(ThesisGuestReads::class),
+      ];
+      $journalReads = [
+        ...$db->getAllRows(modelClass: JournalReads::class),
+        ...$db->getAllRows(JournalPersonnelReads::class),
+        ...$db->getAllRows(JournalGuestReads::class),
+      ];
+
       $now = new DateTime();
+      // weekly
       $startOfWeek = (clone $now)->modify('monday this week');
       $endOfWeek = (clone $now)->modify('sunday this week');
-      $weeklyThesisReads = count(array_filter($thesisReads, function($tr) use ($startOfWeek, $endOfWeek) {
-        $createdAt = $tr->created_at; // Ensure this is a DateTime object
-        return $createdAt >= $startOfWeek && $createdAt <= $endOfWeek;
-      }));
+      $weeklyThesisReads = count(array_filter(
+        $thesisReads,
+        function($tr) use ($startOfWeek, $endOfWeek) {
+          $createdAt = $tr->created_at; // Ensure this is a DateTime object
+          return $createdAt >= $startOfWeek && $createdAt <= $endOfWeek;
+        }
+      ));
+      $weeklyJournalReads = count(array_filter(
+        $journalReads,
+        function($tr) use ($startOfWeek, $endOfWeek) {
+          $createdAt = $tr->created_at; // Ensure this is a DateTime object
+          return $createdAt >= $startOfWeek && $createdAt <= $endOfWeek;
+        }
+      ));
+      // monthly
       $startOfTheMonth = (clone $now)->modify('first day of this month');
       $endOfTheMonth = (clone $now)->modify('last day of this month');
-      $monthlyThesisReads = count(array_filter($thesisReads, function($tr) use ($startOfTheMonth, $endOfTheMonth) {
-        $createdAt = $tr->created_at; // Ensure this is a DateTime object
-        return $createdAt >= $startOfTheMonth && $createdAt <= $endOfTheMonth;
-      }));
+      $monthlyThesisReads = count(array_filter(
+        $thesisReads,
+        function($tr) use ($startOfTheMonth, $endOfTheMonth) {
+          $createdAt = $tr->created_at; // Ensure this is a DateTime object
+          return $createdAt >= $startOfTheMonth && $createdAt <= $endOfTheMonth;
+        }
+      ));
+      $monthlyJournalReads = count(array_filter(
+        $journalReads,
+        function($tr) use ($startOfWeek, $endOfWeek) {
+          $createdAt = $tr->created_at; // Ensure this is a DateTime object
+          return $createdAt >= $startOfWeek && $createdAt <= $endOfWeek;
+        }
+      ));
+      // yearly
       $startOfTheYear = (clone $now)->modify('first day of this year');
       $endOfTheYear = (clone $now)->modify('last day of this year');
-
-      $yearlyThesisReads = count(array_filter($thesisReads, function($tr) use ($startOfTheYear, $endOfTheYear) {
-        $createdAt = $tr->created_at; // Ensure this is a DateTime object
-        return $createdAt >= $startOfTheYear && $createdAt <= $endOfTheYear;
-      }));
+      $yearlyThesisReads = count(array_filter(
+        $thesisReads,
+        function($tr) use ($startOfTheYear, $endOfTheYear) {
+          $createdAt = $tr->created_at; // Ensure this is a DateTime object
+          return $createdAt >= $startOfTheYear && $createdAt <= $endOfTheYear;
+        }
+      ));
+      $yearlyJournalReads = count(array_filter(
+        $journalReads,
+        function($tr) use ($startOfTheYear, $endOfTheYear) {
+          $createdAt = $tr->created_at; // Ensure this is a DateTime object
+          return $createdAt >= $startOfTheYear && $createdAt <= $endOfTheYear;
+        }
+      ));
 
       return Response::json(['success' => [
         "theses" => $thesis,
@@ -625,9 +668,13 @@ class ApiController extends Controller
         "publishedJournals" => $journalPublished,
         "students" => $student,
         "teachers" => $personnel,
+        "guests" => $guest,
         "weeklyThesisReads" => $weeklyThesisReads,
         "monthlyThesisReads" => $monthlyThesisReads,
         "yearlyThesisReads" => $yearlyThesisReads,
+        "weeklyJournalReads" => $weeklyJournalReads,
+        "monthlyJournalReads" => $monthlyJournalReads,
+        "yearlyJournalReads" => $yearlyJournalReads,
       ]]);
     } catch (\Throwable $e) {
       return Response::json(['error'=> $e->getMessage()], StatusCode::INTERNAL_SERVER_ERROR);

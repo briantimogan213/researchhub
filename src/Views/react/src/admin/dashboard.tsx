@@ -9,6 +9,7 @@ export default function DashboardPage() {
     publishedJournals: 0,
     students: 0,
     teachers: 0,
+    guests: 0,
     weeklyThesisReads: 0,
     weeklyJournalReads: 0,
     monthlyThesisReads: 0,
@@ -105,11 +106,11 @@ export default function DashboardPage() {
           </div>
           <div className="h-[120px] px-8 py-6 border-[#1764E8] bg-white w-full divide-y rounded shadow shadow-[#1764E8]/50">
             <div className="flex flex-nowrap justify-between pb-2 items-center">
-              <p className="font-[600] text-[20px]">{statistics.teachers}</p>
+              <p className="font-[600] text-[20px]">{statistics.guests}</p>
               <span className="material-symbols-outlined">list</span>
             </div>
             <div className="flex flex-nowrap justify-between pt-2">
-              <p className="font-[400] text-[14px] pt-3">Teachers Registered</p>
+              <p className="font-[400] text-[14px] pt-3">Guests Registered</p>
             </div>
           </div>
           <div className="h-[120px] px-8 py-6 border-[#1764E8] bg-white w-full divide-y rounded shadow shadow-[#1764E8]/50">
