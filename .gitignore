@@ -2,10 +2,12 @@
 /package-lock.json
 /composer.lock
 /jsxbuild
-/uploads/**/*.pdf
 /uploads/**/*.log
 /uploads/downloadable/**/*.*
 /uploads/thumbnail/**/*.*
+/uploads/thesis/**/*.*
+/uploads/journal/**/*.*
+/public/photo/**/*.*
 .env*.local
 
 

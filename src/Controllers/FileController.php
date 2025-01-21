@@ -130,26 +130,74 @@ class FileController extends Controller
 
   public function uploadImages(Request $request): Response
   {
-    $files = $request->getFiles("photo");
-    $filesSaved = [];
-    $count = 0;
-    $total = count($files);
-    $errors = [];
-    foreach ($files as $file) {
-      if (!in_array($file['type'], ['image/jpeg', 'image/png'])) {
-        $errors[] = [$file['name'], 'Invalid file type. Only JPEG or PNG images are allowed.'];
-        continue;
+    try {
+      $files = $request->getFiles("photo");
+      $total = $files !== null && $files instanceof File ? 1 : count([...$files] ?? []);
+      $count = 0;
+      $filesSaved = [];
+      $errors = [];
+      if ($files !== null && is_array($files)) {
+        foreach ($files as $file) {
+          if (!in_array($file->getType(), ['image/jpeg', 'image/png', 'image/gif'])) {
+            $errors[] = [$file->getName(), 'Invalid file type. Only JPEG or PNG or GIF images are allowed.'];
+            continue;
+          }
+          if ($file->getSize() > MAX_IMAGE_SIZE) {
+            $errors[] = [$file->getName(), 'File size is too large. Maximum allowed size is '. (MAX_IMAGE_SIZE / 1024 / 1024).'MB'];
+            continue;
+          }
+          if ($file->getSize() <= 51200) {
+            $filesSaved[] = [
+              "file" => base64_encode(file_get_contents($file->getTmpName())),
+              "mimetype" => $file->getType(),
+              "original_filename" => $file->getName(),
+              "type" => "base64",
+            ];
+          } else {
+            $newFilename = uniqid("photo_") . $file->getExtension();
+            move_uploaded_file($file->getTmpName(), implode(DIRECTORY_SEPARATOR, [APP_PATH, 'public', 'photo', $newFilename]));
+            $filesSaved[] = [
+              "file" => "/public/photo/$newFilename",
+              "mimetype" => $file->getType(),
+              "original_filename" => $file->getName(),
+              "type" => "url",
+            ];
+          }
+          $count++;
+        }
+      } else if ($files instanceof File) {
+        $file = $files;
+        if (!in_array($file->getType(), ['image/jpeg', 'image/png', 'image/gif'])) {
+          $errors[] = [$file->getName(), 'Invalid file type. Only JPEG or PNG or GIF images are allowed.'];
+        } else if ($files->getSize() > MAX_IMAGE_SIZE) {
+          $errors[] = [$files->getName(), 'File size is too large. Maximum allowed size is '. (MAX_IMAGE_SIZE / 1024 / 1024).'MB'];
+        } else {
+          if ($file->getSize() <= 51200) {
+            $filesSaved[] = [
+              "file" => base64_encode(file_get_contents($file->getTmpName())),
+              "mimetype" => $file->getType(),
+              "original_filename" => $file->getName(),
+              "type" => "base64",
+            ];
+          } else {
+            $newFilename = uniqid("photo_") . $files->getExtension();
+            move_uploaded_file($files->getTmpName(), implode(DIRECTORY_SEPARATOR, [APP_PATH, 'public', 'photo', $newFilename]));
+            $filesSaved[] = [
+              "file" => "/public/photo/$newFilename",
+              "mimetype" => $files->getType(),
+              "original_filename" => $files->getName(),
+              "type" => "url",
+            ];
+          }
+          $count++;
+        }
       }
-      if ($file['size'] > MAX_IMAGE_SIZE) {
-        $errors[] = [$file['name'], 'File size is too large. Maximum allowed size is '. (MAX_IMAGE_SIZE / 1024 / 1024).'MB'];
-        continue;
-      }
-      $count++;
-      $newFilename = uniqid("photo_") . ".". pathinfo($file['name'], PATHINFO_EXTENSION);
-      move_uploaded_file($file['tmp_name'], implode(DIRECTORY_SEPARATOR, [UPLOADS_PATH, 'public', 'photo', $newFilename]));
-      $filesSaved[] = "/public/photo/$newFilename";
+      return Response::json(["total" => $total, "uploaded" => $count, "failed" => (int)($total - $count), "files" => $filesSaved, "errors" => $errors], StatusCode::CREATED);
+    } catch (\Exception $e) {
+      $errors[] = $e->getMessage();
+      Logger::write_info("ERROR:\n" . json_encode($e->getTrace()));
+      return Response::json(["total" => $total, "uploaded" => $count, "failed" => (int)($total - $count), "errors" => $errors]);
     }
-    return Response::json(["total" => $total, "uploaded" => $count, "failed" => (int)($total - $count), "files" => $filesSaved, "errors" => $errors], StatusCode::CREATED);
   }
 
   public function viewPdfFile(Request $request): Response

@@ -38,9 +38,27 @@ class Router
     $this->files = [];
     if ($this->method === 'POST') {
       foreach ($_FILES as $name => $file) {
-        $this->files[$name] = new File($file);
+        $this->files[$name] = $file !== null && is_array($file["name"])
+          ? $this->getArrayFiles($file)
+          : new File($file);
       }
     }
+  }
+
+  private function getArrayFiles(array $file): array {
+    $length = count($file['tmp_name']);
+    $result_files = [];
+    for ($i = 0; $i < $length; $i++) {
+      $result_files[] = new File([
+        "name" => $file["name"][$i],
+        "full_path" => $file["full_path"][$i],
+        "type" => $file["type"][$i],
+        "tmp_name" => $file["tmp_name"][$i],
+        "error" => $file["error"][$i],
+        "size" => $file["size"][$i],
+      ]);
+    }
+    return $result_files;
   }
 
   public function request(string $uriPath, string $method, callable|array $callable): void

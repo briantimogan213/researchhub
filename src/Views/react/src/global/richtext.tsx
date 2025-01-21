@@ -23,11 +23,35 @@ const buttonGroupClass = (index: number, items: number, isToggled: boolean = fal
   };
 };
 
+const generateRandomId = () => {
+  return 'id-' + Math.random().toString(36).substring(2, 9) + '-' + Date.now();
+}
 
-export default function RichTextEditor({ data, onEdit } : { data?: string, onEdit: (htmlString: string) => void }) {
+const convertFileToBase64: (file: File) => Promise<string> = (file: File) => {
+  return new Promise((resolve, reject) => {
+    if (!file.type.startsWith("image/jpeg") && !file.type.startsWith("image/png")) {
+      return reject(new Error("File format not supported. Only JPEG and PNG are allowed."));
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      resolve(reader.result as string);
+    };
+
+    reader.onerror = (error: any) => {
+      reject(new Error("Error reading file: " + error.message));
+    };
+
+    reader.readAsDataURL(file);
+  });
+}
+
+export default function RichTextEditor({ data, onEdit } : { data?: string, onEdit: (htmlString: string, imagesUsed: any[]) => void }) {
   const editorRef = React.useRef<HTMLDivElement>(null);
   const [activeFormats, setActiveFormats] = React.useState<Set<string>>(new Set());
   const [htmlOutput, setHtmlOutput] = React.useState<string>("");
+  const [imagesUsed, setImagesUsed] = React.useState<any[]>([]);
   const isActive = (command: string) => activeFormats.has(command);
 
   const handleSelectionChange = () => {
@@ -40,8 +64,9 @@ export default function RichTextEditor({ data, onEdit } : { data?: string, onEdi
   };
 
   React.useEffect(() => {
-    onEdit && onEdit(htmlOutput);
-  }, [htmlOutput])
+    console.log(imagesUsed.length)
+    onEdit && onEdit(htmlOutput, imagesUsed);
+  }, [htmlOutput, imagesUsed])
 
   React.useEffect(() => {
     if (!!data) {
@@ -73,20 +98,100 @@ export default function RichTextEditor({ data, onEdit } : { data?: string, onEdi
   const [borderWidth, setBorderWidth] = React.useState<string>("1");
   const [borderColor, setBorderColor] = React.useState<string>("#000000");
 
-  const handleCommand = (command: string, value: string | null = null) => {
-    document.execCommand(command, false, value!);
+  const handleCommand = React.useCallback((
+    command: string,
+    value: string | null = null,
+    id?: string
+  ) => {
+
     editorRef.current?.focus();
+    if (command === "resizeImage" && value) {
+      try {
+        const { targetId, width, height } = JSON.parse(value);
+        const img = document.getElementById(targetId) as HTMLImageElement | null;
+        if (img) {
+          img.style.width = `${width}px`;
+          img.style.height = `${height}px`;
+        } else {
+          console.error(`Image with id ${targetId} not found.`);
+        }
+      } catch (error) {
+        console.error("Invalid resize value. Expected JSON format:", error);
+      }
+      return;
+    }
+
+    if (command === "insertImage" && value && id) {
+      const imageHTML = `<img src="${value}" style="max-width: 100%; height: auto;" id="${id}">`;
+      document.execCommand("insertHTML", false, imageHTML);
+    } else {
+      document.execCommand(command, false, value || "");
+    }
+
+
     handleSelectionChange();
     updateHtmlOutput();
-  };
+  }, [imagesUsed, editorRef]);
 
   const updateHtmlOutput = () => {
     setHtmlOutput(editorRef.current?.innerHTML || "");
+    // const allImages = [...(editorRef.current?.querySelectorAll("img") || [])];
+    // console.log("before imgs", imagesUsed)
+    // const imgs = allImages.map((imgnode: HTMLImageElement) => {
+    //   console.log("in update html:");
+    //   console.log(imagesUsed);
+    //   console.log("vs")
+    //   console.log(imgnode)
+    //   return [...(imagesUsed.filter((v: any[]) => v[0] === imgnode.id))]
+    // });
+    // console.log("result imgs", imgs)
   };
 
-  const insertImage = () => {
-    const url = prompt("Enter image URL:");
-    if (url) handleCommand("insertImage", url);
+  React.useEffect(() => {
+    const allImages = [...(editorRef.current?.querySelectorAll("img") || [])];
+    const imgs = allImages.map((imgnode: HTMLImageElement) => [...(imagesUsed.find((v: any[]) => v[0] === imgnode.id))]);
+    if (imgs.length !== allImages.length) {
+      if (imagesUsed.length !== imgs.length) {
+        setImagesUsed([...imgs])
+      }
+    }
+    if (imagesUsed.length !== imgs.length) {
+      setImagesUsed([...imgs])
+    }
+    // eslint-disable-next-line
+  }, [htmlOutput])
+
+  const insertImage = (isUpload: boolean = false) => {
+    if (!isUpload) {
+      const url = prompt("Enter image URL:");
+      if (url) {
+        const randId = generateRandomId()
+        setImagesUsed((imgs: any) => [...imgs, [randId, "url", url]])
+        handleCommand("insertImage", url, randId)
+      }
+    } else {
+      const inpImg = document.createElement("input")
+      inpImg.setAttribute("type", "file")
+      inpImg.setAttribute("accept", "image/jpeg, image/png")
+      inpImg.multiple = false
+      inpImg.name = "photo"
+      inpImg.addEventListener("change", async () => {
+        const files = inpImg.files;
+        if (!files || files.length === 0) {
+          console.log("No files selected");
+          return;
+        }
+        const photo = files[0]
+        convertFileToBase64(photo)
+          .then((base64Image) => {
+            const randId = generateRandomId()
+            setImagesUsed((imgs: any) => [...imgs, [randId, "upload", photo]])
+            handleCommand("insertImage", base64Image, randId)
+          })
+          .catch((err) => alert(err.message))
+      })
+      inpImg.click()
+    }
   };
 
   const insertLink = () => {
@@ -108,7 +213,10 @@ export default function RichTextEditor({ data, onEdit } : { data?: string, onEdi
         table += "</tr>";
       }
       table += "</table>";
+      editorRef.current?.focus();
+
       document.execCommand("insertHTML", false, table);
+      handleSelectionChange();
       updateHtmlOutput();
     }
   };
@@ -192,8 +300,11 @@ export default function RichTextEditor({ data, onEdit } : { data?: string, onEdi
         <button type="button" title="Insert Link" onClick={insertLink} {...buttonClass()}>
           <span className="material-icons">insert_link</span>
         </button>
-        <button type="button" title="Insert Image" onClick={insertImage} {...buttonClass()}>
+        <button type="button" title="Insert Image Link" onClick={() => insertImage()} {...buttonClass()}>
           <span className="material-icons">image</span>
+        </button>
+        <button type="button" title="Insert Image Upload" onClick={() => insertImage(true)} {...buttonClass()}>
+          <span className="material-icons">add_photo_alternate</span>
         </button>
 
         {/* Table Controls */}
@@ -241,6 +352,7 @@ export default function RichTextEditor({ data, onEdit } : { data?: string, onEdi
         contentEditable
         className="editor-area min-h-[200px] border border-[#ccc] p-[10px] bg-white rounded-b text-[16px] outlien-none overflow-y-auto"
         onInput={updateHtmlOutput}
+        id="editorRef"
         suppressContentEditableWarning
       ></div>
     </div>
