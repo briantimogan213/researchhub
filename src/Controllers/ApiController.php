@@ -1017,7 +1017,7 @@ class ApiController extends Controller
     $teacher = $request->getBodyParam('personnel');
     $guest = $request->getBodyParam('guest');
     if (!$id) {
-      return Response::json(['error' => 'Missing Thesis ID.'], StatusCode::BAD_REQUEST);
+      return Response::json(['error' => 'Missing Journal ID.'], StatusCode::BAD_REQUEST);
     }
     if (!$student && !$teacher && !$guest) {
       return Response::json(['error' => 'Bad Request'], StatusCode::BAD_REQUEST);
