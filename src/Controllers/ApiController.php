@@ -126,7 +126,8 @@ class ApiController extends Controller
       // theses
       $thesisStudents = $db->getAllRows(ThesisReads::class);
       $thesisPersonnels = $db->getAllRows(ThesisPersonnelReads::class);
-      $allThesisReads = array_merge($thesisStudents, $thesisPersonnels);
+      $thesisGuests = $db->getAllRows(ThesisGuestReads::class);
+      $allThesisReads = array_merge($thesisStudents, $thesisPersonnels, $thesisGuests);
       $frequencies = [];
       foreach ($allThesisReads as $read) {
         $thesisId = $read->thesis_id;
@@ -160,7 +161,8 @@ class ApiController extends Controller
       // journals
       $journalStudents = $db->getAllRows(JournalReads::class);
       $journalPersonnels = $db->getAllRows(JournalPersonnelReads::class);
-      $allJournalReads = array_merge($journalStudents, $journalPersonnels);
+      $journalGuests = $db->getAllRows(JournalGuestReads::class);
+      $allJournalReads = array_merge($journalStudents, $journalPersonnels, $journalGuests);
       $frequencies = [];
       foreach ($allJournalReads as $read) {
         $journalId = $read->journal_id;
