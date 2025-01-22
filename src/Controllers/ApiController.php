@@ -555,7 +555,17 @@ class ApiController extends Controller
     try {
       $db = Database::getInstance();
       $thesis = $db->getAllRows(Thesis::class);
-      return Response::json(['success' => array_map(fn($t) => [...$t->toArray(true), 'reads' => count([...$db->fetchMany(ThesisReads::class, ['thesis_id' => $t->getPrimaryKeyValue()]), ...$db->fetchMany(ThesisPersonnelReads::class, ['thesis_id' => $t->getPrimaryKeyValue()])]) ], $thesis)]);
+      return Response::json(['success' => array_map(
+        fn($t) => [
+          ...$t->toArray(true),
+          'reads' => count([
+            ...$db->fetchMany(ThesisReads::class, ['thesis_id' => $t->getPrimaryKeyValue()]),
+            ...$db->fetchMany(ThesisPersonnelReads::class, ['thesis_id' => $t->getPrimaryKeyValue()]),
+            ...$db->fetchMany(ThesisGuestReads::class, ['thesis_id' => $t->getPrimaryKeyValue()]),
+          ])
+        ],
+        $thesis
+      )]);
     } catch (\Throwable $e) {
       return Response::json(['error'=> $e->getMessage()], StatusCode::INTERNAL_SERVER_ERROR);
     }
@@ -569,10 +579,17 @@ class ApiController extends Controller
     try {
       $db = Database::getInstance();
       $journal = $db->getAllRows(Journal::class);
-      $journals = array_map(fn($j) => [
-        ...$j->toArray(true),
-      ], $journal);
-      return Response::json(['success' => [...$journals]]);
+      return Response::json(['success' => array_map(
+        fn($j) => [
+          ...$j->toArray(true),
+          'reads' => count([
+            ...$db->fetchMany(JournalReads::class, ['journal_id' => $j->getPrimaryKeyValue()]),
+            ...$db->fetchMany(JournalPersonnelReads::class, ['journal_id' => $j->getPrimaryKeyValue()]),
+            ...$db->fetchMany(JournalGuestReads::class, ['journal_id' => $j->getPrimaryKeyValue()]),
+          ])
+        ],
+        $journal
+      )]);
     } catch (\Throwable $e) {
       return Response::json(['error'=> $e->getMessage()], StatusCode::INTERNAL_SERVER_ERROR);
     }
