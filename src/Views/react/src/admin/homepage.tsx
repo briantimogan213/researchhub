@@ -1,7 +1,7 @@
 interface Announcement { id: string, a_type: "text"|"video", title: string, url?: string, message?:string, expires: string }
 
 
-import { parseMarkup, pathname, purifyHTML, React, ReactPlayerYoutube, Sweetalert2 } from '../imports';
+import { pathname, purifyHTML, React, ReactPlayerYoutube, Sweetalert2, useParseMarkup } from '../imports';
 import AddUpdateAnnouncement from './addUpdateAnnouncement';
 
 async function fetchAnnouncements() {
@@ -26,6 +26,7 @@ function VideoPlayer({ url }: { url: string }) {
 }
 
 export default function HomepageManagementPage() {
+  const { parseHTML, htmlParsed } = useParseMarkup()
   const [announcements, setAnnouncements] = React.useState<Announcement[]>([]);
   const [ticking, setTicking] = React.useState(false);
   React.useEffect(() => {
@@ -94,6 +95,14 @@ export default function HomepageManagementPage() {
     });
   }, []);
 
+  React.useEffect(() => {
+    if (announcements.length > 0) {
+      announcements.filter((ann: Announcement) => ann.a_type === "text").forEach((ann: Announcement) => {
+        parseHTML(ann.message!, `id_${ann.id}`)
+      });
+    }
+  }, [announcements])
+
   return (<>
     <div className="w-full min-h-[calc(100vh-160px)] h-fit text-black p-4 min-w-fit">
       <h1 className="text-2xl my-2">Manage Homepage</h1>
@@ -111,7 +120,7 @@ export default function HomepageManagementPage() {
                 </div>
               </div>
               <div className="text-center p-3 text-slate-900 my-3 announcement editor-area">
-                {parseMarkup(announcement.message!)?.split("\n").map((v: any) => <><span dangerouslySetInnerHTML={{ __html: v }} /><br /></> || "")}
+                {htmlParsed[`id_${announcement.id}`]}
               </div>
               <div className="text-left py-1 text-slate-700 my-3 text-sm italic px-3 border-t">
                 {checkExpired(announcement.expires) ? <span className="text-red-700 font-bold">EXPIRED</span> : <>Expires on {(new Date(announcement.expires)).toLocaleDateString('en-PH', { month: "long", day: "numeric", year: "numeric" })}</>}

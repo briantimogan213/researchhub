@@ -8,6 +8,7 @@ export { default as ReactDOMServer } from "react-dom/server";
 export { default as ReactPlayer } from "react-player";
 export { default as ReactPlayerYoutube } from "react-player/youtube";
 export { default as Sweetalert2 } from "sweetalert2";
+import React from "react";
 import * as RPDF from "react-pdf";
 import sanitizeHTML from "sanitize-html";
 
@@ -19,7 +20,8 @@ export const URI_PREFIX = window.URI_PREFIX;
 export function htmlToString(jsx: JSX.Element) {
   return ReactDOMServer.renderToString(jsx)
 }
-export function parseMarkup(inputString: string): string {
+
+export function parseMarkup(inputString: string) {
   if (!inputString) return "";
   // Replace custom markup tags with corresponding HTML tags
   inputString = inputString.replace(/\[b\](.*?)\[\/b\]/g, '<b>$1</b>');        // Bold
@@ -30,15 +32,12 @@ export function parseMarkup(inputString: string): string {
   inputString = inputString.replace(/\[c\](.*?)\[\/c\]/g, '<div class="center">$1</div>'); // center
   inputString = inputString.replace(/\[r\](.*?)\[\/r\]/g, '<div class="left">$1</div>'); // right align
   inputString = inputString.replace(/\[l\](.*?)\[\/l\]/g, '<div class="right">$1</div>'); // left align
-
   // Image tag replacement
   inputString = inputString.replace(/\[img=(https?:\/\/[^ ]+)\](.*?)\[\/img\]/g, '<img src="$1" alt="$2" />'); // Image
-
   // Anchor (link) tag replacement
   inputString = inputString.replace(/\[a=([^\]]+)\](.*?)\[\/a\]/g, (match, url, text) => {
     // Handle relative and absolute URLs
     let href = url.trim();
-
     if (href.startsWith('http://') || href.startsWith('https://')) {
       // Keep the absolute link as it is
       return `<a href="${href}" target="_blank">${text}</a>`;
@@ -52,7 +51,6 @@ export function parseMarkup(inputString: string): string {
       return `<a href="${href}" target="_blank">${text}</a>`;
     }
   });
-
 
   // Function to handle unordered and ordered lists with nested [ul] and [ol]
   function replaceListTags(input, tag) {
@@ -71,6 +69,36 @@ export function parseMarkup(inputString: string): string {
 
   // Return the transformed HTML
   return inputString;
+}
+
+export function useParseMarkup() {
+  const [htmlParsed, setHTMLParsed] = React.useState<{[key: string]: any}>({});
+  const [integrityCheck, setIntegrityCheck] = React.useState<{[key: string]: string}>()
+  const parseHTML = React.useCallback((inputString: string, key: string) => {
+    if (!Object.keys(htmlParsed).includes(key)) {
+      const newhtmlParsed = {
+        ...htmlParsed,
+        [key]: parseMarkup(inputString)?.split("\n").map((v: any) =>
+          <React.Fragment><section dangerouslySetInnerHTML={{ __html: v }} /><br /></React.Fragment>)
+      }
+      setHTMLParsed(newhtmlParsed);
+      setIntegrityCheck({...integrityCheck, [key]: inputString})
+    } else {
+      if (integrityCheck[key] !== inputString) {
+        const newhtmlParsed = {
+          ...htmlParsed,
+          [key]: parseMarkup(inputString)?.split("\n").map((v: any) =>
+            <React.Fragment><section dangerouslySetInnerHTML={{ __html: v }} /><br /></React.Fragment>)
+        }
+        setHTMLParsed(newhtmlParsed);
+        setIntegrityCheck({...integrityCheck, [key]: inputString})
+      }
+    }
+  }, [htmlParsed, integrityCheck]);
+  return {
+    parseHTML,
+    htmlParsed: React.useMemo(() => htmlParsed, [htmlParsed])
+  }
 }
 
 export function purifyHTML(inputString: string) {

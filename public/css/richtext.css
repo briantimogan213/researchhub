@@ -29,12 +29,12 @@
 }
 
 /* Highlight and Font Color */
-.rich-text-editor .editor-area span[style*="background-color"] {
+.rich-text-editor .editor-area section[style*="background-color"] {
   padding: 2px 4px;
   border-radius: 2px;
 }
 
-.rich-text-editor .editor-area span[style*="color"] {
+.rich-text-editor .editor-area section[style*="color"] {
   padding: 2px 4px;
 }
 

@@ -10,7 +10,7 @@ class Header
   public static function default()
   {
 ?>
-    <header class="font-[Quicksand] sticky top-0 left-0 h-[96px] w-full bg-white z-10">
+    <header class="font-[Quicksand] sticky top-0 left-0 h-[96px] w-full bg-white z-40">
       <div class="relative w-full h-full *:h-full flex justify-between items-center p-2 shadow">
         <h1 class="font-[700] text-[32px] leading-[35.2px] text-[#2487CE] flex-grow pl-2 md:pl-4 lg:pl-8 xl:pl-16 flex items-center">
           <a href="<?= Router::getPathname("/") ?>" class="hover:opacity-80 hover:drop-shadow-lg cursor-pointer flex flex-start items-center gap-x-2">
@@ -107,7 +107,7 @@ class Header
   public static function admin()
   {
   ?>
-    <header class="font-[Quicksand] sticky top-0 left-0 h-[60px] w-full bg-[#F3F7FD] z-10">
+    <header class="font-[Quicksand] sticky top-0 left-0 h-[60px] w-full bg-[#F3F7FD] z-40">
       <div class="flex justify-between h-full text-black">
         <div class="flex items-center justify-start h-full gap-x-4">
           <button type="button" id="sidebar-toggle-btn" class="aspect-square p-4">

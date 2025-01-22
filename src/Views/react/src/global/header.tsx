@@ -31,11 +31,11 @@ function ResponsiveHeader({ navList, authAvatarList }: { navList: NavItems[], au
 
   React.useEffect(() => {
     if (show) {
-      navRef.current?.classList.remove("-z-10", "h-0");
-      navRef.current?.classList.add("z-10", "h-screen");
+      navRef.current?.classList.remove("-z-40", "h-0");
+      navRef.current?.classList.add("z-40", "h-screen");
     } else {
-      navRef.current?.classList.remove("z-10", "h-screen");
-      navRef.current?.classList.add("h-0", "-z-10");
+      navRef.current?.classList.remove("z-40", "h-screen");
+      navRef.current?.classList.add("h-0", "-z-40");
     }
   }, [show]);
 
@@ -47,7 +47,7 @@ function ResponsiveHeader({ navList, authAvatarList }: { navList: NavItems[], au
   }, [authAvatarList, ulRef]);
 
   return (<>
-    <div ref={navRef} className="absolute bg-white top-full right-0 border w-full h-0 max-h-fit overflow-hidden -z-10 transition-[height] duration-500 delay-10 ease-in-out origin-top shadow-lg">
+    <div ref={navRef} className="absolute bg-white top-full right-0 border w-full h-0 max-h-fit overflow-hidden -z-40 transition-[height] duration-500 delay-10 ease-in-out origin-top shadow-lg">
       <div className="flex w-full h-full px-10 pb-6 pt-4 flex-col justify-start items-start gap-y-4">
         {/* <SearchInput search={search} setSearch={setSearch} /> */}
         <ul className="flex flex-col gap-2 w-full h-full font-[500]" ref={ulRef}>

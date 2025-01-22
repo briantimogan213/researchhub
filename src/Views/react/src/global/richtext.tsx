@@ -149,7 +149,7 @@ export default function RichTextEditor({ data, onEdit } : { data?: string, onEdi
 
   React.useEffect(() => {
     const allImages = [...(editorRef.current?.querySelectorAll("img") || [])];
-    const imgs = allImages.map((imgnode: HTMLImageElement) => [...(imagesUsed.find((v: any[]) => v[0] === imgnode.id))]);
+    const imgs = allImages.map((imgnode: HTMLImageElement) => [...(imagesUsed.find((v: any[]) => v[0] === imgnode.id) || [])]);
     if (imgs.length !== allImages.length) {
       if (imagesUsed.length !== imgs.length) {
         setImagesUsed([...imgs])

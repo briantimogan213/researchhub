@@ -80,7 +80,7 @@ export function render() {
   const root = ReactDOM.createRoot(containerRoot);
   if (containerRoot) {
     // containerRoot.className = "";
-    // containerRoot.classList.add(...("flex-shrink max-w-[250px] max-h-screen bg-white text-black shadow-lg z-10".split(" ")));
+    // containerRoot.classList.add(...("flex-shrink max-w-[250px] max-h-screen bg-white text-black shadow-lg z-30".split(" ")));
     const sidebarlist = JSON.parse(containerRoot.dataset.sidebarList as string);
     root.render(<SidebarNav sidebarList={sidebarlist} toggleBtn={toggleBtn} />);
   }

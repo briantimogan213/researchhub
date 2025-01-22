@@ -133,7 +133,7 @@ class Template
   ?>
     <body>
       <div class="container-fluid relative flex max-h-screen overflow-hidden w-full">
-        <aside id="sidebar-nav" class="flex-shrink max-w-[250px] max-h-screen bg-white text-black shadow-lg z-10" data-sidebar-list="<?= htmlspecialchars(json_encode($sidebarListData)); ?>">
+        <aside id="sidebar-nav" class="flex-shrink max-w-[250px] max-h-screen bg-white text-black shadow-lg z-30" data-sidebar-list="<?= htmlspecialchars(json_encode($sidebarListData)); ?>">
         <nav class=" bg-white text-black max-w-[250px] h-full relative w-[250px]">
           <div class="w-full max-h-[60px] h-[60px] flex items-center justify-center text-black">
             <a href="<?= Router::getPathname("/") ?>" class="flex flex-nowrap h-full w-fit items-center justify-start">

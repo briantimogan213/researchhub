@@ -1,6 +1,6 @@
 import Modal from './global/modal';
 import PdfViewer from './global/pdfviewer';
-import { React, ReactDOM, ReactPlayerYoutube, clsx, parseMarkup, pathname } from './imports';
+import { React, ReactDOM, ReactPlayerYoutube, clsx, pathname, useParseMarkup } from './imports';
 
 function VideoPlayer({ url }: { url: string }) {
   return <ReactPlayerYoutube url={url} width="100%" height="100%" controls />
@@ -18,6 +18,7 @@ async function fetchAnnouncements() {
 }
 
 function Announcements() {
+  const { parseHTML, htmlParsed } = useParseMarkup()
   const [isLoading, setIsLoading] = React.useState(true);
   const [announcements, setAnnouncements] = React.useState([]);
   const [ticking, setTicking] = React.useState(false);
@@ -36,6 +37,18 @@ function Announcements() {
     const expirationDate = new Date(date);
     return now > expirationDate.getTime();
   }, [ticking])
+
+  React.useEffect(() => {
+    if (announcements.length > 0) {
+      announcements.filter((ann: any) => ann.a_type === "text").forEach((ann: any) => {
+        parseHTML(ann.message!, `id_${ann.id}`)
+      });
+    }
+  }, [announcements])
+
+  React.useEffect(() => {
+    console.log(htmlParsed)
+  }, [htmlParsed]);
 
   if (isLoading) {
     return <div className="w-16 h-16 border-4 border-t-4 border-gray-300 border-t-blue-500 border-solid rounded-full animate-spin"></div>
@@ -56,7 +69,7 @@ function Announcements() {
         <div className="w-[500px] md:w-[700px] lg:w-[1000px] min-w-[500px] bg-gray-100 rounded rich-text-editor">
           <div className="text-xl py-3 px-4  border-b text-blue-500 font-semibold"><h2>{announcement.title}</h2></div>
           <div className="text-center p-3 text-slate-900 my-3 announcement editor-area">
-            {parseMarkup(announcement.message!)?.split("\n").map((v: any) => <><span dangerouslySetInnerHTML={{ __html: v }} /><br /></> || "")}
+            {htmlParsed[`id_${announcement.id}`]}
           </div>
         </div>
       )}
@@ -108,7 +121,7 @@ function MostViewsTheses() {
   return (<>
     <div
       className={clsx(
-        "bg-slate-50 p-3 mb-4 border shadow relative overflow-hidden transition-all delay-0 duration-500",
+        "bg-slate-50 p-3 mb-4 border shadow relative overflow-hidden transition-all delay-0 duration-500 z-30",
         openView ? "" : "h-[50px]"
       )}
     >
@@ -117,7 +130,7 @@ function MostViewsTheses() {
         {!openView && <span className="material-symbols-outlined">menu</span>}
         {openView && <span className="material-symbols-outlined">close</span>}
       </button>
-      <div className="max-h-[180px] overflow-y-auto">
+      <div className="max-h-[300px] overflow-y-auto">
         <div className="grid grid-cols-1">
           {isLoading && (
             <div className="w-full mt-4"><div className="mx-auto w-8 h-8 border-4 border-t-transparent border-blue-500 border-solid rounded-full animate-spin"></div></div>
@@ -126,7 +139,7 @@ function MostViewsTheses() {
             <div className="w-full mt-4"><div className="mx-auto text-center text-slate-600">No thesis has been viewed yet.</div></div>
           )}
           {!isLoading && data.length > 0 && (
-            data.map((thesis: { title: string, views: number, id: number|string }, i: number) => (
+            [...data, ...data, data[0]].map((thesis: { title: string, views: number, id: number|string }, i: number) => (
               <div onClick={() => handleView(thesis as any)} key={"thesis_" + i + "_" + thesis.id} className="py-4 px-2 cursor-pointer *:hover:text-blue-500 border-b border-gray-200 flex flex-nowrap justify-between items-center">
                 <div className="font-[400] text-slate-900">{thesis.title}</div>
                 <div className="text-slate-900 text-md pr-4"><span className="material-symbols-outlined text-sm translate-y-0.5">visibility</span>&nbsp;{thesis.views}</div>
