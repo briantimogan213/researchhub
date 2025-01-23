@@ -14,7 +14,12 @@ async function fetchAnnouncements() {
   if (error) {
     throw new Error(error);
   }
-  return success || [];
+  return success ? [...(success.toSorted(
+    (a: any, b: any) => {
+      const ae = (new Date(a.expires)).getTime();
+      const be = (new Date(b.expires)).getTime();
+      return ae > be ? -1 : ae < be ? 1 : 0;
+    }))] : [];
 }
 
 function Announcements() {
@@ -24,7 +29,7 @@ function Announcements() {
   const [ticking, setTicking] = React.useState(false);
   React.useEffect(() => {
     fetchAnnouncements()
-      .then((data) => { setAnnouncements(data); setIsLoading(false); })
+      .then((data: any) => { setAnnouncements(data); setIsLoading(false); })
       .catch(console.log);
   }, []);
 
@@ -68,7 +73,7 @@ function Announcements() {
       {announcement.a_type === "text" && !checkExpired(announcement.expires) && (
         <div className="w-[500px] md:w-[700px] lg:w-[1000px] min-w-[500px] bg-gray-100 rounded rich-text-editor">
           <div className="text-xl py-3 px-4  border-b text-blue-500 font-semibold"><h2>{announcement.title}</h2></div>
-          <div className="text-center p-3 text-slate-900 my-3 announcement editor-area">
+          <div className="p-3 text-slate-900 my-3 announcement editor-area">
             {htmlParsed[`id_${announcement.id}`]}
           </div>
         </div>

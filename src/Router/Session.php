@@ -7,7 +7,9 @@ use Exception;
 use Smcc\ResearchHub\Logger\Logger;
 use Smcc\ResearchHub\Models\Admin;
 use Smcc\ResearchHub\Models\AdminLogs;
+use Smcc\ResearchHub\Models\Courses;
 use Smcc\ResearchHub\Models\Database;
+use Smcc\ResearchHub\Models\Departments;
 use Smcc\ResearchHub\Models\PersonnelLogs;
 use Smcc\ResearchHub\Models\Session as SessionModel;
 use Smcc\ResearchHub\Models\StudentLogs;
@@ -40,6 +42,9 @@ class Session
       }
       // seed an admin account if not exists
       Admin::seed();
+      // seed departments and Courses
+      Departments::seed();
+      Courses::seed();
     } catch (\Throwable $e) {
       Logger::write_error("Failed to initialize session: ". $e->getMessage());
       new Error500Page('Internal Server Error', ["message" => $e->getMessage() . "\n" . $e->getTraceAsString()]);

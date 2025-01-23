@@ -119,7 +119,7 @@ export default function HomepageManagementPage() {
                   <button type="button" onClick={() => onEditModal(announcement)} className="px-2 text-sm bg-yellow-100 hover:bg-yellow-200 text-black shadow">Edit</button>
                 </div>
               </div>
-              <div className="text-center p-3 text-slate-900 my-3 announcement editor-area">
+              <div className="p-3 text-slate-900 my-3 announcement editor-area">
                 {htmlParsed[`id_${announcement.id}`]}
               </div>
               <div className="text-left py-1 text-slate-700 my-3 text-sm italic px-3 border-t">
