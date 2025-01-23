@@ -139,7 +139,7 @@ function MostViewsTheses() {
             <div className="w-full mt-4"><div className="mx-auto text-center text-slate-600">No thesis has been viewed yet.</div></div>
           )}
           {!isLoading && data.length > 0 && (
-            [...data, ...data, data[0]].map((thesis: { title: string, views: number, id: number|string }, i: number) => (
+            data.map((thesis: { title: string, views: number, id: number|string }, i: number) => (
               <div onClick={() => handleView(thesis as any)} key={"thesis_" + i + "_" + thesis.id} className="py-4 px-2 cursor-pointer *:hover:text-blue-500 border-b border-gray-200 flex flex-nowrap justify-between items-center">
                 <div className="font-[400] text-slate-900">{thesis.title}</div>
                 <div className="text-slate-900 text-md pr-4"><span className="material-symbols-outlined text-sm translate-y-0.5">visibility</span>&nbsp;{thesis.views}</div>
