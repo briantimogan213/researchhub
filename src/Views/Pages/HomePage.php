@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Smcc\ResearchHub\Views\Pages;
 
-use Smcc\ResearchHub\Router\Router;
 use Smcc\ResearchHub\Views\Global\Template;
 use Smcc\ResearchHub\Views\Global\View;
 
@@ -20,9 +19,8 @@ class HomePage extends View
     <aside class="relative mx-auto mb-3 lg:mx-0 lg:absolute right-2 top-4 min-w-[400px] max-w-[500px] p-3" id="most-view-container-theses"></aside>
     <aside class="relative mx-auto mb-3 lg:mx-0 lg:absolute left-2 top-4 min-w-[400px] max-w-[500px] p-3" id="most-view-container-journals"></aside>
     <div class="flex-grow max-w-[600px] mx-auto">
-      <div class="mx-auto flex flex-col justify-center items-center text-center my-8 font-[Poppins] font-[600] text-[48px] leading-[72px] text-[#16507B]">
-        <h1>Where Knowledge Meets</h1>
-        <h1>Innovation</h1>
+      <div class="mx-auto flex flex-col justify-center items-center text-center my-8">
+        <h1 class="text-[22px] md:text-[28px] lg:text-[32px] font-[Poppins] font-[600] leading-[72px] text-[#16507B]">Where Knowledge Meets Innovation</h1>
       </div>
     </div>
   </div>

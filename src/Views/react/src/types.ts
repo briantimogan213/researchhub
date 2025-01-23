@@ -95,8 +95,8 @@ export enum Year {
   SecondYear = '2',
   ThirdYear = '3',
   FourthYear = '4',
-  Grade11 = '5',
-  Grade12 = '6',
+  Grade11 = '11',
+  Grade12 = '12',
 }
 
 // College of Computing and Information Science

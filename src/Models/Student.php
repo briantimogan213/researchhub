@@ -14,7 +14,7 @@ class Student extends Model
       'email' => ['VARCHAR(255)', 'NOT NULL'],
       'department' => ['VARCHAR(255)', 'NOT NULL'],
       'course' => ['VARCHAR(255)', 'NOT NULL'],
-      'year' => ["ENUM('1','2','3','4')", 'NOT NULL'],
+      'year' => ["ENUM('1','2','3','4', '11', '12')", 'NOT NULL'],
       'created_at' => ['TIMESTAMP', 'NOT NULL', 'DEFAULT CURRENT_TIMESTAMP'],
       'updated_at' => ['TIMESTAMP', 'NOT NULL', 'DEFAULT CURRENT_TIMESTAMP', 'ON UPDATE CURRENT_TIMESTAMP'],
     ];

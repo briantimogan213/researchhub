@@ -10,5 +10,6 @@
 /public/photo/**/*.*
 .env*.local
 
+/dist
 
 /src/Views/react/dist

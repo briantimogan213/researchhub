@@ -9,7 +9,8 @@
     "start": "./run-start",
     "watch": "node watch.js",
     "dev": "node dev-watch.js",
-    "watch:tailwind": "npx postcss \"./src/tailwind.css\" -o \"./public/css/main.min.css\" --watch"
+    "watch:tailwind": "npx postcss \"./src/tailwind.css\" -o \"./public/css/main.min.css\" --watch",
+    "deploy": "build.bat"
   },
   "author": "",
   "license": "ISC",

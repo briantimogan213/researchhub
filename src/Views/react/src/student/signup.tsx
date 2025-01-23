@@ -223,7 +223,7 @@ export default function StudentSignup() {
               <option value="">-- Select Year --</option>
               {
                 Object.entries(Year).map(([key, value]) => (
-                  <option key={key} value={value as any}>{value === '1' ? "1st Year" : value === '2' ? "2nd Year" : value === '3' ? "3rd Year" : value === '4' ?  "4th Year" : value === '5' ? "Grade 11" : "Grade 12"}</option>
+                  <option key={key} value={value as any}>{value === '1' ? "1st Year" : value === '2' ? "2nd Year" : value === '3' ? "3rd Year" : value === '4' ?  "4th Year" : value === '11' ? "Grade 11" : "Grade 12"}</option>
                 ))
               }
             </select>
