@@ -12,7 +12,7 @@ use Smcc\ResearchHub\Router\Response;
 use Smcc\ResearchHub\Router\Router;
 use Smcc\ResearchHub\Router\Session;
 
-class routes {
+class Routes {
   public static function init(): void {
     // load assets first to avoid problems with loading
     Router::publicAssets();
