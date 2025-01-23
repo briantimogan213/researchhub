@@ -97,6 +97,7 @@ async function fetchMostViews(type: "journals"|"theses", setIsLoading: any) {
 function MostViewsTheses() {
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
   const [data, setData] = React.useState<any[]>([]);
+  const displayData = React.useMemo(() => data.length >= 5 ? Array.from({ length: 5 }, (_, i: number) => data[i]) : data, [data])
 
   React.useEffect(() => {
     fetchMostViews("theses", setIsLoading).then(setData).catch(console.log).finally(() => setIsLoading(false));
@@ -140,11 +141,11 @@ function MostViewsTheses() {
           {isLoading && (
             <div className="w-full mt-4"><div className="mx-auto w-8 h-8 border-4 border-t-transparent border-blue-500 border-solid rounded-full animate-spin"></div></div>
           )}
-          {!isLoading && data.length === 0 && (
+          {!isLoading && displayData.length === 0 && (
             <div className="w-full mt-4"><div className="mx-auto text-center text-slate-600">No thesis has been viewed yet.</div></div>
           )}
-          {!isLoading && data.length > 0 && (
-            data.map((thesis: { title: string, views: number, id: number|string }, i: number) => (
+          {!isLoading && displayData.length > 0 && (
+            displayData.map((thesis: { title: string, views: number, id: number|string }, i: number) => (
               <div onClick={() => handleView(thesis as any)} key={"thesis_" + i + "_" + thesis.id} className="py-4 px-2 cursor-pointer *:hover:text-blue-500 border-b border-gray-200 flex flex-nowrap justify-between items-center">
                 <div className="font-[400] text-slate-900">{thesis.title}</div>
                 <div className="text-slate-900 text-md pr-4"><span className="material-symbols-outlined text-sm translate-y-0.5">visibility</span>&nbsp;{thesis.views}</div>
@@ -161,6 +162,8 @@ function MostViewsTheses() {
 function MostViewsJournals() {
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
   const [data, setData] = React.useState<any[]>([]);
+  const displayData = React.useMemo(() => data.length >= 5 ? Array.from({ length: 5 }, (_, i: number) => data[i]) : data, [data])
+
 
   React.useEffect(() => {
     fetchMostViews("journals", setIsLoading).then(setData).catch(console.log).finally(() => setIsLoading(false));
@@ -192,11 +195,11 @@ function MostViewsJournals() {
         {isLoading && (
           <div className="w-full mt-4"><div className="mx-auto w-8 h-8 border-4 border-t-transparent border-blue-500 border-solid rounded-full animate-spin"></div></div>
         )}
-        {!isLoading && data.length === 0 && (
+        {!isLoading && displayData.length === 0 && (
           <div className="w-full mt-4"><div className="mx-auto text-center text-slate-600">No journal has been viewed yet.</div></div>
         )}
-        {!isLoading && data.length > 0 && (
-          data.map((journal: { title: string, views: number, id: number|string }, i: number) => (
+        {!isLoading && displayData.length > 0 && (
+          displayData.map((journal: { title: string, views: number, id: number|string }, i: number) => (
             <div onClick={() => handleView(journal as any)} key={"journal_" + i + "_" + journal.id} className="py-4 px-2 cursor-pointer hover:*:text-blue-500 border-gray-200 flex flex-nowrap justify-between items-center">
               <div className="font-semibold text-slate-900">{i + 1}. {journal.title}</div>
               <div className="text-slate-600 italic text-xs"><span className="material-symbols-outlined text-xs">visibility</span>&nbsp;{journal.views}</div>
