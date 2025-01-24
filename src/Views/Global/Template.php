@@ -41,6 +41,7 @@ class Template
         </script>
       <?php } ?>
     </body>
+  </html>
   <?php
   }
 
@@ -76,6 +77,7 @@ class Template
         ReactApp.renderApp('root', true, <?php if ($reactFileName === null): ?> true <?php else: ?> false <?php endif ?>);
       </script>
     </body>
+  </html>
   <?php
   }
 
@@ -103,6 +105,7 @@ class Template
         ReactApp.renderApp('root');
       </script>
     </body>
+  </html>
   <?php
   }
 
@@ -132,6 +135,7 @@ class Template
         ReactApp.renderApp('root', true);
       </script>
     </body>
+  </html>
   <?php
   }
 
@@ -188,6 +192,7 @@ class Template
         ReactApp.renderApp('root', true, false, true);
       </script>
     </body>
+  </html>
   <?php
   }
 }
