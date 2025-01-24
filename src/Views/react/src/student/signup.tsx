@@ -243,7 +243,7 @@ export default function StudentSignup() {
         <div className="mt-8 text-center font-bold">
           Complete your registration with the details above
           <br />
-          <a href={pathname("/signup")} className="text-sky-500 hover:text-sky-300 hover:underline mt-2">or Scan QR Code again if is not your Student ID</a>
+          <a href={pathname("/student/signup")} className="text-sky-500 hover:text-sky-300 hover:underline mt-2">or Scan QR Code again if is not your Student ID</a>
         </div>
       </div>
     </div>
