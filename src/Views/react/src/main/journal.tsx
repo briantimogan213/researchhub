@@ -244,7 +244,7 @@ export default function Journal() {
   const [showAllCategories, setShowAllCategories] = React.useState<boolean>(false)
 
   return (<>
-    <div className="flex flex-col-reverse lg:flex-row py-4 px-3 lg:px-8 mt-4">
+    <div className="flex flex-col-reverse gap-y-8 lg:gap-y-0 lg:flex-row py-4 px-3 lg:px-8 mt-4">
       <div className="flex-grow lg:mt-3 max-w-full">
         <div className="relative">
           <h1 className="text-2xl font-bold text-center">Journals</h1>
