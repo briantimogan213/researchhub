@@ -2,6 +2,10 @@ const { spawn } = require('child_process');
 const fs = require('fs');
 const tscOutputDir = './src/Views/react/dist';
 
+require('dotenv').config({
+    path: ".env.production"
+});
+
 // Helper function to run a command and log its output
 function runCommand(command, args = [], options = {}) {
     return spawn(command, args, {
@@ -25,8 +29,19 @@ async function main() {
     console.log('Running Typescript build watcher...');
 
     runCommand('node', ['watch-and-transfer.js']);
-
-    runCommand('browser-sync', ["start", "--proxy", "localhost/smcc-research-hub", "--files", "public/jsx/react-app.umd.js"]);
+    console.log("Serving Development Server..");
+    runCommand('browser-sync', [
+        "start",
+        "--proxy",
+        `localhost${process.env.URI_PREFIX}`,
+        "--files",
+        "public/jsx/react-app.umd.js, src/**/*.php, public/css/*.css",
+        "--https",
+        "--cert",
+        "cert/server.crt",
+        "--key",
+        "cert/server.key"
+    ]);
     await new Promise((resolve) => {}); // Wait forever
 }
 

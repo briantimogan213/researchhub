@@ -10,7 +10,7 @@ class Header
   public static function default()
   {
 ?>
-    <header class="font-[Quicksand] sticky top-0 left-0 h-[96px] w-full bg-white z-40">
+    <header class="font-[Quicksand] h-[96px] w-full bg-white z-40">
       <div class="relative w-full h-full *:h-full flex justify-between items-center p-2 shadow">
         <h1 class="font-[700] text-[32px] leading-[35.2px] text-[#2487CE] flex-grow pl-2 md:pl-4 lg:pl-8 xl:pl-16 flex items-center">
           <a href="<?= Router::getPathname("/") ?>" class="hover:opacity-80 hover:drop-shadow-lg cursor-pointer flex flex-start items-center gap-x-2">
@@ -25,7 +25,7 @@ class Header
                 </defs>
               </svg>
             </div>
-            Research Hub
+            <span class="text-[26px] md:text-[32px]">Research Hub</span>
           </a>
         </h1>
         <nav class="hidden xl:flex flex-row justify-between gap-x-8 text-center items-center px-10 *:h-full whitespace-nowrap">
@@ -79,7 +79,7 @@ class Header
                 </div>
                 <ul class="py-2 text-sm text-gray-700">
                   <li>
-                    <a href="<?= Router::getPathname("/settings") ?>" class="block px-4 py-2 hover:bg-gray-200">Settings</a>
+                    <a href="<?= Router::getPathname(Session::getUserAccountType() === "admin" ? "/admin/settings" : "/settings") ?>" class="block px-4 py-2 hover:bg-gray-200">Settings</a>
                   </li>
                 </ul>
                 <div class="pt-2">

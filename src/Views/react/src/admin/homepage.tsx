@@ -107,12 +107,12 @@ export default function HomepageManagementPage() {
     <div className="w-full min-h-[calc(100vh-160px)] h-fit text-black p-4 min-w-fit">
       <h1 className="text-2xl my-2">Manage Homepage</h1>
       <div><button type="button" className="bg-white hover:bg-slate-300 px-4 py-2 rounded shadow" onClick={() => onAddModal()}>Add New Announcement</button></div>
-      <div className="p-4 tw-flex tw-flex-wrap tw-gap-8">
+      <div className="mt-4 tw-flex tw-flex-wrap tw-gap-8">
         {announcements.length === 0 ? <span className="">No Announcements</span> : announcements.map((announcement: Announcement) =>(
           <>
           {announcement.a_type === "text" && (
-            <div key={announcement.id} className="rich-text-editor w-[500px] md:w-[700px] lg:w-[1000px] min-w-[500px] bg-gray-100 border-l-2 border-blue-500 rounded">
-              <div className="text-xl py-3 px-4  border-b text-blue-500 font-semibold flex justify-between flex-nowrap">
+            <div key={announcement.id} className="rich-text-editor w-full min-w-full md:min-w-[500px] md:w-[500px] lg:w-[700px] xl:w-[1000px] bg-gray-100 border-l-2 border-blue-500 rounded">
+              <div className="text-xl py-3 px-4 border-b text-blue-500 font-semibold flex justify-between flex-nowrap">
                 <h2>{announcement.title}</h2>
                 <div className="flex flex-nowrap gap-x-2">
                   <button type="button" onClick={() => onDelete(announcement)} className="px-2 text-sm bg-red-100 hover:bg-red-200 text-black shadow">Delete</button>
@@ -128,8 +128,8 @@ export default function HomepageManagementPage() {
             </div>
           )}
           {announcement.a_type === "video" && (
-            <div key={announcement.id} className="w-[500px] md:w-[700px] lg:w-[1000px] min-w-[500px] bg-gray-100 border-l-2 border-blue-500 rounded">
-              <div className="text-xl py-3 px-4 border-b  text-blue-500 font-semibold flex justify-between flex-nowrap">
+            <div key={announcement.id} className="w-full min-w-full md:min-w-[500px] md:w-[500px] lg:w-[700px] xl:w-[1000px] bg-gray-100 border-l-2 border-blue-500 rounded">
+              <div className="text-xl py-3 px-4 border-b text-blue-500 font-semibold flex justify-between flex-nowrap">
                 <h2>{announcement.title}</h2>
                 <div className="flex flex-nowrap gap-x-2">
                   <button type="button" onClick={() => onDelete(announcement)} className="px-2 text-sm bg-red-100 hover:bg-red-200 text-black shadow">Delete</button>

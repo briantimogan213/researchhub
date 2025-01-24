@@ -61,6 +61,30 @@ function EditTeacher({
   )
 }
 
+function EditGuest({
+  formData,
+  onChange,
+}:
+{
+  formData: any,
+  onChange: (data: any) => void
+}) {
+  return (
+    <div className="p-8 min-w-96">
+      <Input disabled label="Email Address" inputClassName="border-black" className="mb-2" labelColor="black" name="edit_username" placeholder="Email Address" value={formData.email} />
+      <Input label="Full Name" inputClassName="border-black"  className="mb-2" labelColor="black" name="edit_full_name" placeholder="Full Name" value={formData.full_name} onChange={(e: any) => onChange({...formData, full_name: e.target.value })} required />
+      <Input disabled label="Role" inputClassName="border-black"  className="mb-2" labelColor="black" name="edit_role" placeholder="Role" value={formData.role?.[0].toUpperCase() + formData.role?.substring(1)} />
+      {formData.role === 'student' && (
+        <Input label="School" inputClassName="border-black"  className="mb-2" labelColor="black" name="edit_school" placeholder="Name of School Attended" value={formData.school}  onChange={(e: any) => onChange({...formData, full_name: e.target.value })} required />
+      )}
+      {formData.role === 'employee' && (
+        <Input label="Position" inputClassName="border-black"  className="mb-2" labelColor="black" name="edit_position" placeholder="Position" value={formData.position}  onChange={(e: any) => onChange({...formData, position: e.target.value })} required />
+      )}
+      <Input type="password" label="Password" inputClassName="border-black"  className="mb-2" labelColor="black" name="edit_password" placeholder="Password (Leave blank if not change)" value={formData.password} onChange={(e: any) => onChange({...formData, password: e.target.value })} />
+    </div>
+  )
+}
+
 export default function AccountSettings() {
   const { authenticated, authData } = React.useContext(MainContext)
   if (!authenticated || !authData) {
@@ -71,10 +95,13 @@ export default function AccountSettings() {
   const account = React.useMemo(() => authenticated ? authData.account : null, [authenticated, authData])
 
   const [formData, setFormData] = React.useState({
-    username: account === 'admin' ? authData?.admin_user || '' : account === 'student' ? authData?.student_id || '' : account === 'personnel' ? authData?.personnel_id || '' : '',
+    username: account === 'admin' ? authData?.admin_user || '' : account === 'student' ? authData?.student_id || '' : account === 'personnel' ? authData?.personnel_id || '' : account === 'guest' ? authData?.email : '',
     full_name: authData?.full_name || '',
     email: authData?.email || '',
     password: '',
+    role: authData?.role || '',
+    school: authData?.school || '',
+    position: authData?.position || '',
     department: authData?.department || '',
     course: authData?.course || '',
     year: authData?.year || '',
@@ -133,6 +160,7 @@ export default function AccountSettings() {
           { account === 'admin' && <EditAdmin formData={formData} onChange={setFormData} />}
           { account === 'personnel' && <EditTeacher formData={formData} onChange={setFormData} />}
           { account === 'student' && <EditStudent formData={formData} onChange={setFormData} />}
+          { account === 'guest' && <EditGuest formData={formData} onChange={setFormData} />}
         </div>
         <div className="ml-8">
           <button type="button" className="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2" onClick={() => window.history.back()}>Cancel</button>

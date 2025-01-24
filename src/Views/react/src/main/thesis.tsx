@@ -4,7 +4,6 @@ import PdfViewer from "../global/pdfviewer";
 import { useDepartments } from '../global/useDepartments';
 import { React, Sweetalert2, clsx, pathname } from '../imports';
 import SearchHeaderInput from "../main/search";
-import { Departments } from "../types";
 
 enum ViewLayout {
   GRID = "grid",
@@ -146,7 +145,7 @@ function ThumbnailThesis({
 
 export default function Thesis() {
   const { departments } = useDepartments();
-  const departmentCourses = React.useMemo(() => Object.keys(departments), [departments]);
+  const departmentCourses = React.useMemo(() => ["All Departments", ...Object.keys(departments)], [departments]);
   const { authenticated, authData } = React.useContext(MainContext)
   const [search, setSearch] = React.useState((new URLSearchParams((new URL(window.location.href)).search)).get('search') || '')
   const searchParams = React.useMemo(() => new URLSearchParams((new URL(window.location.href)).search), []);
@@ -179,16 +178,16 @@ export default function Thesis() {
     }
     const minYear = Math.min(...allYears);
     const maxYear = Math.max(...allYears);
-    return Array.from({ length: maxYear - minYear + 1 }, (_, i) => minYear + i).reverse();
+    return ["All", ...Array.from({ length: maxYear - minYear + 1 }, (_, i) => minYear + i).reverse()];
   }, [data]);
 
-  const [selectedDepartment, setSelectedDepartment] = React.useState<any>(Departments.CCIS);
-  const [selectedYears, setSelectedYears] = React.useState(Object.fromEntries(Object.entries(Departments).map(([key, dep]: [string, string]) => [dep, (new Date()).getFullYear().toString()])));
+  const [selectedDepartment, setSelectedDepartment] = React.useState<any>("All Departments");
+  const [selectedYears, setSelectedYears] = React.useState(() => Object.fromEntries([...departmentCourses.map((dep: string) => [dep, "All"])]));
 
   const displayData = React.useMemo(() => data.filter(
-    (item: any) => item.department?.toString().toLowerCase() === selectedDepartment.toString().toLowerCase()
+    (item: any) => (selectedDepartment === "All Departments" || item.department?.toString().toLowerCase() === selectedDepartment.toString().toLowerCase())
       && ((!search || item.title.toLowerCase().includes(search)) || item.abstract.toLowerCase().includes(search) || item.author.toLowerCase().includes(search) || item.year.toString().includes(search))
-      && (!!selectedYears[item.department?.toString()] && selectedYears[item.department?.toString()].toString() === item.year?.toString())
+      && (!!selectedYears[item.department?.toString()] && (selectedYears[item.department?.toString()].toString() === "All" || selectedYears[item.department?.toString()].toString() === item.year?.toString()))
     )
   , [data, selectedDepartment, selectedYears, search])
 
@@ -234,12 +233,14 @@ export default function Thesis() {
     setPdfAuthor(author);
   }, []);
 
+  const [showAllCategories, setShowAllCategories] = React.useState<boolean>(false)
+
   return (<>
-    <div className="flex py-4 px-8 mt-4">
-      <div className="flex-grow mt-3">
+    <div className="flex flex-col-reverse lg:flex-row py-4 px-3 lg:px-8 mt-4">
+      <div className="flex-grow lg:mt-3 max-w-full">
         <div className="relative">
           <h1 className="text-2xl font-bold text-center">Thesis/Capstone</h1>
-          <button type="button" onClick={() => setViewLayout(viewLayout === ViewLayout.LIST ? ViewLayout.GRID : ViewLayout.LIST)} title="Switch View Layout" className="absolute right-2 top-1/4 aspect-square text-slate-600/90 hover:text-slate-800/90 hover:bg-black/10 rounded p-1"><span className="material-symbols-outlined">{viewLayout === ViewLayout.LIST ? "view_list" : "grid_view"}</span></button>
+          <button type="button" onClick={() => setViewLayout(viewLayout === ViewLayout.LIST ? ViewLayout.GRID : ViewLayout.LIST)} title="Switch View Layout" className="absolute right-0 top-0 lg:right-2 lg:top-1/4 aspect-square text-slate-600/90 hover:text-slate-800/90 hover:bg-black/10 rounded p-1"><span className="material-symbols-outlined">{viewLayout === ViewLayout.LIST ? "view_list" : "grid_view"}</span></button>
         </div>
         <div className="flex flex-wrap p-4 gap-4">
           { !!selectedDepartment && finalDisplay?.map((item: any) => (
@@ -270,7 +271,7 @@ export default function Thesis() {
           )}
         </div>
       </div>
-      <div className="min-w-[326px] max-w-[326px] h-[600px] flex flex-col">
+      <div className={clsx("min-w-full lg:min-w-[326px] lg:max-w-[326px] flex flex-col", showAllCategories ? "h-[600px] max-h-[600px]" : "lg:h-[600px] lg:max-h-[600px] h-[140px] max-h-[140px] overflow-hidden mb-2 lg:overflow-visible lg:mb-0")}>
         <div className="flex-shrink text-slate-700 font-[600] w-full mb-3">
           <SearchHeaderInput search={search} onSearch={onSearch} />
         </div>
@@ -294,10 +295,10 @@ export default function Thesis() {
           <button type="button" className="p-1 hover:text-yellow-700" onClick={nextPage}>Next {">"}</button>
           <button type="button" className="p-1 hover:text-yellow-700" onClick={() => setPage(totalPages)}>{">>"}</button>
         </div>
-        <div className="min-h-[400px] flex-grow pt-2 border-t">
-          <div className="font-bold text-xl mb-4 w-full">
-            Categories
-          </div>
+        <div className="flex-grow pt-2 border-t min-h-[400px]">
+          <button type="button" onClick={() => setShowAllCategories(!showAllCategories)} className="lg:cursor-default hover:bg-gray-400 font-bold text-xl mb-4 w-full bg-gray-100 lg:bg-transparent lg:hover:bg-transparent rounded text-center lg:text-start px-2 py-1">
+            <span>Categories</span>{' '}{showAllCategories ? <span className="material-symbols-outlined lg:hidden">arrow_drop_down</span> : <span className="material-symbols-outlined lg:hidden">arrow_right</span>}
+          </button>
           {departmentCourses.length === 0 && (
             <div>
               Loading...
@@ -314,7 +315,7 @@ export default function Thesis() {
                 {value}
               </button>
               <select className="max-w-16 p-1 text-sm absolute right-4 top-1/4" value={selectedYears[value?.toString()] || ""} onChange={(e) => !!Object.keys(selectedYears).includes && setSelectedYears((prev: any) => ({...prev, [value.toString()]: e.target.value}))}>
-                {yearsList.map((yr: number) => (
+                {yearsList.map((yr: number|string) => (
                   <option key={"year__" + yr} value={yr}>
                     {yr}
                   </option>

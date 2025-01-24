@@ -63,16 +63,16 @@ function Announcements() {
   {announcements.map((announcement: {a_type: "video"|"text", url?: string, message?: string, title: string, expires: string, id?: string|number}, i: number) => (
     <React.Fragment key={"announcement_" + i + announcement?.id}>
       {announcement.a_type === "video" && !checkExpired(announcement.expires) && (
-        <div className="w-[500px] md:w-[700px] lg:w-[1000px] min-w-[500px] bg-gray-100 rounded">
-          <div className="text-xl py-3 px-4 border-b  text-blue-500 font-semibold"><h2>{announcement.title}</h2></div>
+        <div className="max-w-screen min-w-full md:min-w-[500px] md:w-[500px] lg:w-[700px] xl:w-[1000px] max-w-screen bg-gray-100 border-l-2 border-blue-500 rounded">
+          <div className="text-xl py-3 px-4 border-b text-blue-500 font-semibold"><h2>{announcement.title}</h2></div>
           <div className="w-full h-full px-[10%] py-[5%] aspect-video">
             <VideoPlayer url={announcement.url || ""} />
           </div>
         </div>
       )}
       {announcement.a_type === "text" && !checkExpired(announcement.expires) && (
-        <div className="w-[500px] md:w-[700px] lg:w-[1000px] min-w-[500px] bg-gray-100 rounded rich-text-editor">
-          <div className="text-xl py-3 px-4  border-b text-blue-500 font-semibold"><h2>{announcement.title}</h2></div>
+        <div className="max-w-screen min-w-full md:min-w-[500px] md:w-[500px] lg:w-[700px] xl:w-[1000px] max-w-screen bg-gray-100 border-l-2 border-blue-500 rounded rich-text-editor">
+          <div className="text-xl py-3 px-4 border-b text-blue-500 font-semibold"><h2>{announcement.title}</h2></div>
           <div className="p-3 text-slate-900 my-3 announcement editor-area">
             {htmlParsed[`id_${announcement.id}`]}
           </div>
@@ -127,7 +127,7 @@ function MostViewsTheses() {
   return (<>
     <div
       className={clsx(
-        "bg-slate-50 p-3 mb-4 border shadow relative overflow-hidden transition-all delay-0 duration-500 z-30",
+        "max-w-screen bg-slate-50 p-3 mb-4 border shadow relative overflow-hidden transition-all delay-0 duration-500 z-30",
         openView ? "" : "h-[50px]"
       )}
     >

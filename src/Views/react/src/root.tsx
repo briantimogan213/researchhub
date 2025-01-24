@@ -17,7 +17,7 @@ export default function RootPage(): React.ReactNode {
           <img src={pathname("/images/smcc-research.png")} className="object-contain w-[150px] h-[150px]" alt="SMCC Research" />
         </div>
       </div>
-      <div className="w-[400px] h-[420px] max-w-[400px] max-h-[420px] font-[Poppins] flex flex-col shadow">
+      <div className="w-full md:w-[400px] h-[420px] max-w-[400px] max-h-[420px] font-[Poppins] flex flex-col shadow">
         <div className="h-[50px] bg-[#192F5D] text-white text-center flex items-center justify-center w-full rounded-t">
           SMCC WEB BASED RESEARCH HUB
         </div>

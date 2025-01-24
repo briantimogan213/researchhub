@@ -206,8 +206,8 @@ export default function AddUpdateAnnouncement({ title, isOpen, onSuccess, onErro
   }
 
   return ReactDOMClient.createPortal(
-    <div className="fixed left-0 top-0 w-full min-h-screen bg-black/50 flex justify-center items-center z-40 max-h-screen h-screen">
-      <div className="relative p-6 bg-white rounded-lg shadow-md z-50 max-h-[calc(100vh-50px)]">
+    <div className="fixed left-0 top-0 w-full min-h-screen bg-black/50 flex justify-center items-start lg:items-center z-40 max-h-screen h-screen">
+      <div className="relative p-6 bg-white rounded-lg shadow-md z-50 max-h-[calc(100vh-50px)] max-w-full">
         <button
           onClick={onClose}
           className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 transition"

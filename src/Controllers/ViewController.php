@@ -6,6 +6,7 @@ namespace Smcc\ResearchHub\Controllers;
 
 use Smcc\ResearchHub\Models\Admin;
 use Smcc\ResearchHub\Models\Database;
+use Smcc\ResearchHub\Models\Guest;
 use Smcc\ResearchHub\Models\Journal;
 use Smcc\ResearchHub\Models\Personnel;
 use Smcc\ResearchHub\Models\Student;
@@ -286,7 +287,7 @@ class ViewController extends Controller
     }
     $account = Session::getUserAccountType();
     $db = Database::getInstance();
-    $user = $db->getRowById($account === 'student' ? Student::class : Personnel::class, Session::getUserId());
+    $user = $db->getRowById($account === 'student' ? Student::class : ($account === 'guest' ? Guest::class : Personnel::class), Session::getUserId());
     $authData = $user->toArray();
     $authData['account'] = $account;
     unset($authData['password']); // remove password for security reasons
