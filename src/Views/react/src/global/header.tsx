@@ -88,7 +88,7 @@ function ResponsiveHeader({ navList, authAvatarList }: { navList: NavItems[], au
                 </form>
               ) : (
                 <div className="px-4 flex flex-col gap-2">
-                  <a href={pathname("/signup")} className="text-yellow-600 hover:text-sky-300">Sign Up</a>
+                  <a href={pathname("/guest/signup")} className="text-yellow-600 hover:text-sky-300">Sign Up</a>
                 </div>
               )
             }
