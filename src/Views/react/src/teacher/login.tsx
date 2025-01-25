@@ -61,7 +61,7 @@ export default function TeacherLogin() {
           <img src={pathname("/images/smcc-research.png")} className="object-contain w-[120px] h-[120px]" alt="SMCC Research" />
         </div>
         <div className="bg-[#192F5D] text-white rounded-t text-center p-4">
-          <h4 className="flex justify-center">TEACHER LOGIN</h4>
+          <h4 className="flex justify-center">SMCC TEACHER</h4>
         </div>
         <div className="w-full min-h-[300px]" style={{background: "#ffffff", boxShadow: "0 5px 15px rgba(0,0,0,.05)", padding: "20px 40px 15px"}}>
           <form onSubmit={onLogin} className="w-full">
