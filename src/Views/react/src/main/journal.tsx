@@ -190,7 +190,7 @@ export default function Journal() {
     return ["All", ...Array.from({ length: maxYear - minYear + 1 }, (_, i) => minYear + i).reverse()];
   }, [data]);
 
-  const [selectedDepartment, setSelectedDepartment] = React.useState<any>("");
+  const [selectedDepartment, setSelectedDepartment] = React.useState<any>("All Departments");
   const [selectedYears, setSelectedYears] = React.useState(() => Object.fromEntries([...departmentCourses.map((dep: string) => [dep, "All"])]));
 
   React.useEffect(() => {
