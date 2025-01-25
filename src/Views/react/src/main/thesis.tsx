@@ -281,7 +281,7 @@ export default function Thesis() {
         </div>
       </div>
     )}
-  </>, [finalDisplay, selectedDepartment])
+  </>, [finalDisplay, selectedDepartment, viewLayout])
 
   return (<>
     <div className="flex flex-col-reverse gap-y-8 lg:gap-y-0 lg:flex-row py-4 px-3 lg:px-8 mt-4">
