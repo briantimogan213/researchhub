@@ -128,7 +128,7 @@ function MostViewsTheses() {
     <div
       className={clsx(
         "max-w-screen bg-slate-50 p-3 mb-4 border shadow relative overflow-hidden transition-all delay-0 duration-500 z-30",
-        openView ? "" : "h-[50px]"
+        openView ? "lg:max-w-96" : "lg:max-w-64 lg:opacity-60 lg:hover:opacity-100 h-[50px]"
       )}
     >
       <h1 className="font-bold text-lg">Most Viewed Thesis</h1>
@@ -147,15 +147,15 @@ function MostViewsTheses() {
           {!isLoading && displayData.length > 0 && (
             displayData.map((thesis: { title: string, views: number, id: number|string }, i: number) => (
               <div onClick={() => handleView(thesis as any)} key={"thesis_" + i + "_" + thesis.id} className="py-4 px-2 cursor-pointer *:hover:text-blue-500 border-b border-gray-200 flex flex-nowrap justify-between items-center">
-                <div className="font-[400] text-slate-900">{thesis.title}</div>
-                <div className="text-slate-900 text-md pr-4"><span className="material-symbols-outlined text-sm translate-y-0.5">visibility</span>&nbsp;{thesis.views}</div>
+                <div className="font-[400] text-slate-900 pr-1">{thesis.title}</div>
+                <div className="text-slate-900 text-md pr-4 whitespace-nowrap text-nowrap"><span className="material-symbols-outlined text-sm translate-y-0.5">visibility</span>&nbsp;{thesis.views}</div>
               </div>
             ))
           )}
         </div>
       </div>
     </div>
-    <Modal open={!!pdfUrl} onClose={() => { setPdfUrl(undefined); setPdfTitle(undefined); setPdfAuthor(undefined); }} content={!!authenticated ? <PdfViewer src={pdfUrl} /> : <div className="w-full text-center min-h-[150px] pt-16">Please <a href={pathname("/login")} className="text-sky-700 underline">login</a> to view journal.</div>} header={pdfTitle} showCancelButton={false} showConfirmButton={false} footer={pdfAuthor} />
+    <Modal open={!!pdfUrl} onClose={() => { setPdfUrl(undefined); setPdfTitle(undefined); setPdfAuthor(undefined); }} content={!!authenticated ? <PdfViewer src={pdfUrl} /> : <div className="w-full text-center min-h-[150px] pt-16">Please <a href={pathname("/login")} className="text-sky-700 underline">login</a> to view this document.</div>} header={pdfTitle} showCancelButton={false} showConfirmButton={false} footer={pdfAuthor} />
   </>)
 }
 
@@ -208,7 +208,7 @@ function MostViewsJournals() {
         )}
       </div>
     </div>
-    <Modal open={!!pdfUrl} onClose={() => { setPdfUrl(undefined); setPdfTitle(undefined); setPdfAuthor(undefined); }} content={!!authenticated ? <PdfViewer src={pdfUrl} /> : <div className="w-full text-center min-h-[150px] pt-16">Please <a href={pathname("/login")} className="text-sky-700 underline">login</a> to view journal.</div>} header={pdfTitle} showCancelButton={false} showConfirmButton={false} footer={pdfAuthor} />
+    <Modal open={!!pdfUrl} onClose={() => { setPdfUrl(undefined); setPdfTitle(undefined); setPdfAuthor(undefined); }} content={!!authenticated ? <PdfViewer src={pdfUrl} /> : <div className="w-full text-center min-h-[150px] pt-16">Please <a href={pathname("/login")} className="text-sky-700 underline">login</a> to view this document.</div>} header={pdfTitle} showCancelButton={false} showConfirmButton={false} footer={pdfAuthor} />
   </>)
 }
 

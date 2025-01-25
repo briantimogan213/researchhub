@@ -184,12 +184,30 @@ export default function Thesis() {
   const [selectedDepartment, setSelectedDepartment] = React.useState<any>("All Departments");
   const [selectedYears, setSelectedYears] = React.useState(() => Object.fromEntries([...departmentCourses.map((dep: string) => [dep, "All"])]));
 
-  const displayData = React.useMemo(() => data.filter(
-    (item: any) => (selectedDepartment === "All Departments" || item.department?.toString().toLowerCase() === selectedDepartment.toString().toLowerCase())
-      && ((!search || item.title.toLowerCase().includes(search)) || item.abstract.toLowerCase().includes(search) || item.author.toLowerCase().includes(search) || item.year.toString().includes(search))
+  React.useEffect(() => {
+    if (!!departmentCourses && departmentCourses.length > 1) {
+      departmentCourses.forEach((dep: string) => {
+        setSelectedYears((prev: any) => ({...prev, [dep.toString()]: "All"}))
+      })
+    }
+  }, [departmentCourses]);
+
+  const displayData = React.useMemo(() => {
+    let filtered: any[] = data.filter(
+    (item: any) => selectedDepartment === "All Departments" ? (
+      ((!search || item.title.toLowerCase().includes(search.toLowerCase())) || item.abstract.toLowerCase().includes(search.toLowerCase()) || item.author.toLowerCase().includes(search.toLowerCase()) || item.year.toString().includes(search.toLowerCase()))
+      && (!!selectedYears["All Departments"] && (selectedYears["All Departments"].toString() === "All" || selectedYears["All Departments"].toString() === item.year?.toString()))
+    ) : (
+      item.department?.toString().toLowerCase() === selectedDepartment.toString().toLowerCase()
+      && ((!search || item.title.toLowerCase().includes(search.toLowerCase())) || item.abstract.toLowerCase().includes(search.toLowerCase()) || item.author.toLowerCase().includes(search.toLowerCase()) || item.year.toString().includes(search.toLowerCase()))
       && (!!selectedYears[item.department?.toString()] && (selectedYears[item.department?.toString()].toString() === "All" || selectedYears[item.department?.toString()].toString() === item.year?.toString()))
-    )
-  , [data, selectedDepartment, selectedYears, search])
+    ));
+    // sort by latest
+    filtered = filtered.sort((a, b) => {
+      return new Date(b).getTime() - new Date(a).getTime();
+    });
+    return filtered;
+  }, [data, selectedDepartment, selectedYears, search, departmentCourses])
 
   const [page, setPage] = React.useState(1)
   const totalPages = React.useMemo(() => Math.ceil(displayData.length / 20), [displayData])
@@ -219,7 +237,7 @@ export default function Thesis() {
   }
 
   React.useEffect(() => {
-    fetchData().catch()
+    fetchData().catch();
   }, [])
 
 
@@ -235,6 +253,36 @@ export default function Thesis() {
 
   const [showAllCategories, setShowAllCategories] = React.useState<boolean>(false)
 
+  const ListOfTheses = React.useMemo(() => <>
+      {((!selectedDepartment && !!finalDisplay && finalDisplay.length > 0) || (!!selectedDepartment && !!finalDisplay && finalDisplay.length > 0)) ? (
+      finalDisplay?.map((item: any) => (
+        <ThumbnailThesis
+          key={item.id}
+          viewLayout={viewLayout}
+          id={item.id}
+          title={item.title}
+          adviser={item.adviser}
+          abstract={item.abstract}
+          author={item.author}
+          course={item.course}
+          year={item.year}
+          favorite={item.favorite}
+          url={item.url}
+          totalViews={item.totalViews}
+          onViewPdf={handleViewPdf}
+          onRefresh={fetchData}
+      />
+      ))) : (
+      <div className="lg:col-span-2 xl:col-span-3 mx-auto">
+        <div className="h-[200px] mb-2">
+          <div className="border-2 border-gray-300 rounded-lg p-4">
+            <div className="text-gray-500">No thesis found.</div>
+          </div>
+        </div>
+      </div>
+    )}
+  </>, [finalDisplay, selectedDepartment])
+
   return (<>
     <div className="flex flex-col-reverse gap-y-8 lg:gap-y-0 lg:flex-row py-4 px-3 lg:px-8 mt-4">
       <div className="flex-grow lg:mt-3 max-w-full">
@@ -243,32 +291,7 @@ export default function Thesis() {
           <button type="button" onClick={() => setViewLayout(viewLayout === ViewLayout.LIST ? ViewLayout.GRID : ViewLayout.LIST)} title="Switch View Layout" className="absolute right-0 top-0 lg:right-2 lg:top-1/4 aspect-square text-slate-600/90 hover:text-slate-800/90 hover:bg-black/10 rounded p-1"><span className="material-symbols-outlined">{viewLayout === ViewLayout.LIST ? "view_list" : "grid_view"}</span></button>
         </div>
         <div className="flex flex-wrap p-4 gap-4">
-          { !!selectedDepartment && finalDisplay?.map((item: any) => (
-            <ThumbnailThesis
-              key={item.id}
-              viewLayout={viewLayout}
-              id={item.id}
-              title={item.title}
-              adviser={item.adviser}
-              abstract={item.abstract}
-              author={item.author}
-              course={item.course}
-              year={item.year}
-              favorite={item.favorite}
-              url={item.url}
-              totalViews={item.totalViews}
-              onViewPdf={handleViewPdf}
-              onRefresh={fetchData}
-            />
-          )) || (
-            <div className="lg:col-span-2 xl:col-span-3 mx-auto">
-              <div className="h-[200px] mb-2">
-                <div className="border-2 border-gray-300 rounded-lg p-4">
-                  <div className="text-gray-500">No thesis found.</div>
-                </div>
-              </div>
-            </div>
-          )}
+          {ListOfTheses}
         </div>
       </div>
       <div className={clsx("min-w-full lg:min-w-[326px] lg:max-w-[326px] flex flex-col", showAllCategories ? "h-[600px] max-h-[600px]" : "lg:h-[600px] lg:max-h-[600px] h-[140px] max-h-[140px] overflow-hidden mb-2 lg:overflow-visible lg:mb-0")}>
@@ -314,7 +337,7 @@ export default function Thesis() {
               >
                 {value}
               </button>
-              <select className="max-w-16 p-1 text-sm absolute right-4 top-1/4" value={selectedYears[value?.toString()] || ""} onChange={(e) => !!Object.keys(selectedYears).includes && setSelectedYears((prev: any) => ({...prev, [value.toString()]: e.target.value}))}>
+              <select className="max-w-16 p-1 text-sm absolute right-4 top-1/4" value={selectedYears[value?.toString()] || ""} onChange={(e) => !!Object.keys(selectedYears) && setSelectedYears((prev: any) => ({...prev, [value.toString()]: e.target.value}))}>
                 {yearsList.map((yr: number|string) => (
                   <option key={"year__" + yr} value={yr}>
                     {yr}
@@ -326,6 +349,6 @@ export default function Thesis() {
         </div>
       </div>
     </div>
-    <Modal open={!!pdfUrl} onClose={() => { setPdfUrl(null); setPdfTitle(null); setPdfAuthor(null); fetchData().catch(console.log); }} content={authenticated ? <PdfViewer src={pdfUrl} /> : <div className="w-full text-center min-h-[150px] pt-16">Please <a href={pathname("/login")} className="text-sky-700 underline">login</a> to view thesis.</div>} header={pdfTitle} showCancelButton={false} showConfirmButton={false} footer={pdfAuthor} />
+    <Modal open={!!pdfUrl} onClose={() => { setPdfUrl(null); setPdfTitle(null); setPdfAuthor(null); fetchData().catch(console.log); }} content={authenticated ? <PdfViewer src={pdfUrl} /> : <div className="w-full text-center min-h-[150px] pt-16">Please <a href={pathname("/login")} className="text-sky-700 underline">login</a> to view this document.</div>} header={pdfTitle} showCancelButton={false} showConfirmButton={false} footer={pdfAuthor} />
   </>)
 }

@@ -102,6 +102,6 @@ export default function Library() {
         </div>
       </div>
     </div>
-    <Modal open={!!pdfUrl} onClose={() => { setPdfUrl(null); setPdfTitle(null); setPdfAuthor(null); }} content={authenticated ? <PdfViewer src={pdfUrl} /> : <div className="w-full text-center min-h-[150px] pt-16">Please <a href={pathname("/login")} className="text-sky-700 underline">login</a> to view.</div>} header={pdfTitle} showCancelButton={false} showConfirmButton={false} footer={pdfAuthor} />
+    <Modal open={!!pdfUrl} onClose={() => { setPdfUrl(null); setPdfTitle(null); setPdfAuthor(null); }} content={authenticated ? <PdfViewer src={pdfUrl} /> : <div className="w-full text-center min-h-[150px] pt-16">Please <a href={pathname("/login")} className="text-sky-700 underline">login</a> to view this document.</div>} header={pdfTitle} showCancelButton={false} showConfirmButton={false} footer={pdfAuthor} />
   </>)
 }
