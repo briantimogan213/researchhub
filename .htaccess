@@ -1,5 +1,8 @@
 RewriteEngine On
 
+php_flag display_errors off
+php_value error_reporting 0
+
 RewriteCond %{HTTPS} off
 RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
@@ -7,7 +10,8 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^ ./index.php [L,QSA]
 
-ErrorDocument 404 /index.php
+ErrorDocument 404 ./index.php
+ErrorDocument 500 ./index.php
 
 <FilesMatch "^\.">
     Order deny,allow

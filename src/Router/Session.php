@@ -13,42 +13,37 @@ use Smcc\ResearchHub\Models\Departments;
 use Smcc\ResearchHub\Models\PersonnelLogs;
 use Smcc\ResearchHub\Models\Session as SessionModel;
 use Smcc\ResearchHub\Models\StudentLogs;
-use Smcc\ResearchHub\Views\Pages\Error500Page;
 
 class Session
 {
   public static function index(): void
   {
     session_start();
-    try {
-      $db = Database::getInstance();
-      $cookieSession = Cookies::get('session_id');
-      if (!$cookieSession) {
-        Logger::write_debug("No session cookie found");
-        $cookieSession = Cookies::set('session_id', bin2hex(random_bytes(16)), 60 * 60 * 8);
-        // Initialize session data to database
-        $session = new SessionModel(['session_id' => $cookieSession, 'ip_address' => self::getClientIpAddress(), 'user_agent' => self::getClientAgent()]);
-        $session->create();
-        Logger::write_info("New session created: session_id={$cookieSession}");
-      } else {
-        Logger::write_debug("Session cookie found");
-        $session = $db->fetchOne(SessionModel::class, ['session_id' => $cookieSession, 'ip_address' => self::getClientIpAddress(), 'user_agent' => self::getClientAgent()]);
-        if (!$session) {
-          Logger::write_debug("Session not found in the database");
-          unset($_SESSION['auth']);
-          // decode JWT token to get user id and expiration time
-          Cookies::delete('session_id');
-        }
-      }
-      // seed an admin account if not exists
-      Admin::seed();
-      // seed departments and Courses
-      Departments::seed();
-      Courses::seed();
-    } catch (\Throwable $e) {
-      Logger::write_error("Failed to initialize session: ". $e->getMessage());
-      new Error500Page('Internal Server Error', ["message" => $e->getMessage() . "\n" . $e->getTraceAsString()]);
+    $db = Database::getInstance();
+    $cookieSession = Cookies::get('session_id');
+    if (!$cookieSession) {
+      Logger::write_debug("No session cookie found");
+      $cookieSession = Cookies::set('session_id', bin2hex(random_bytes(16)), 60 * 60 * 8);
+      // Initialize session data to database
+      $session = new SessionModel(['session_id' => $cookieSession, 'ip_address' => self::getClientIpAddress(), 'user_agent' => self::getClientAgent()]);
+      $session->create();
+      Logger::write_info("New session created: session_id={$cookieSession}");
     }
+    else {
+      Logger::write_info("Session cookie found");
+      $session = $db->fetchOne(SessionModel::class, ['session_id' => $cookieSession, 'ip_address' => self::getClientIpAddress(), 'user_agent' => self::getClientAgent()]);
+      if (!$session) {
+        Logger::write_debug("Session not found in the database");
+        unset($_SESSION['auth']);
+        // decode JWT token to get user id and expiration time
+        Cookies::delete('session_id');
+      }
+    }
+    // seed an admin account if not exists
+    Admin::seed();
+    // seed departments and Courses
+    Departments::seed();
+    Courses::seed();
   }
 
   public static function getSession(): ?array
@@ -82,7 +77,7 @@ class Session
     return false;
   }
 
-  public static function create(string $account, mixed $id, string $full_name): bool
+  public static function create(string $account, $id, string $full_name): bool
   {
     $db = Database::getInstance();
     Logger::write_debug("creating jwt token for");
@@ -125,7 +120,10 @@ class Session
     return self::isAuthenticated() ? json_decode($_SESSION['auth'], true)['full_name'] : null;
   }
 
-  public static function getUserId(): string|int|null
+  /**
+   * @return string|int|null
+   */
+  public static function getUserId()
   {
     return self::isAuthenticated() ? json_decode($_SESSION['auth'], true)['id'] : null;
   }

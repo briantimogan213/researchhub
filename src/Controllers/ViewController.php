@@ -13,17 +13,21 @@ use Smcc\ResearchHub\Models\Student;
 use Smcc\ResearchHub\Models\Thesis;
 use Smcc\ResearchHub\Router\Response;
 use Smcc\ResearchHub\Router\Session;
-use Smcc\ResearchHub\Views\Global\View;
+use Smcc\ResearchHub\Views\Shared\View;
 use Smcc\ResearchHub\Views\Pages\AdminPages;
 use Smcc\ResearchHub\Views\Pages\ReactPages;
 use Smcc\ResearchHub\Views\Pages\Error400Page;
 use Smcc\ResearchHub\Views\Pages\Error500Page;
 use Smcc\ResearchHub\Views\Pages\HomePage;
 use Smcc\ResearchHub\Views\Pages\UserPages;
+use Smcc\ResearchHub\Logger\Logger;
 
 class ViewController extends Controller
 {
-  public function root(): View|Response
+  /**
+   * @return View|Response
+   */
+  public function root()
   {
     if (Session::isAuthenticated()) {
       if (Session::getUserAccountType() === "admin") {
@@ -33,7 +37,10 @@ class ViewController extends Controller
     }
     return ReactPages::view("Welcome", [], "root");
   }
-  public function home(): View|Response
+  /**
+   * @return View|Response
+   */
+  public function home()
   {
     $authData = Session::isAuthenticated() ? [
       'account' => Session::getUserAccountType(),
@@ -44,7 +51,10 @@ class ViewController extends Controller
     return HomePage::view("Home", $data, "home");
   }
 
-  public function guestLogin(): View|Response
+  /**
+   * @return View|Response
+   */
+  public function guestLogin()
   {
     if (Session::isAuthenticated()) {
       return Response::redirect("/home");
@@ -52,7 +62,10 @@ class ViewController extends Controller
     return ReactPages::view("Guest Login", [], 'guest/login');
   }
 
-  public function adminLogin(): View|Response
+  /**
+   * @return View|Response
+   */
+  public function adminLogin()
   {
     if (Session::isAuthenticated()) {
       if (Session::getUserAccountType() === "admin") {
@@ -63,7 +76,10 @@ class ViewController extends Controller
     return ReactPages::view("Admin Login", [], 'admin/login');
   }
 
-  public function studentLogin(): View|Response
+  /**
+   * @return View|Response
+   */
+  public function studentLogin()
   {
     if (Session::isAuthenticated()) {
       return Response::redirect("/home");
@@ -71,7 +87,10 @@ class ViewController extends Controller
     return ReactPages::view("Student Login", [], 'student/login');
   }
 
-  public function teacherLogin(): View|Response
+  /**
+   * @return View|Response
+   */
+  public function teacherLogin()
   {
     if (Session::isAuthenticated()) {
       return Response::redirect("/home");
@@ -79,7 +98,10 @@ class ViewController extends Controller
     return ReactPages::view("Teacher Login", [], 'teacher/login');
   }
 
-  public function guestSignup(): View|Response
+  /**
+   * @return View|Response
+   */
+  public function guestSignup()
   {
     if (Session::isAuthenticated()) {
       return Response::redirect("/home");
@@ -88,7 +110,10 @@ class ViewController extends Controller
     return ReactPages::view("Guest Registration", $data, 'guest/signup');
   }
 
-  public function studentSignup(): View|Response
+  /**
+   * @return View|Response
+   */
+  public function studentSignup()
   {
     if (Session::isAuthenticated()) {
       return Response::redirect("/home");
@@ -105,7 +130,10 @@ class ViewController extends Controller
     return Response::redirect("/admin/login");
   }
 
-  public function adminDashboard(): View|Response
+  /**
+   * @return View|Response
+   */
+  public function adminDashboard()
   {
     if (!Session::isAuthenticated() || Session::getUserAccountType() !== "admin") {
       return Response::redirect("/admin/login");
@@ -113,7 +141,10 @@ class ViewController extends Controller
     return AdminPages::view("Admin Dashboard", [], 'admin/dashboard');
   }
 
-  public function adminThesisList(): View|Response
+  /**
+   * @return View|Response
+   */
+  public function adminThesisList()
   {
     if (!Session::isAuthenticated() || Session::getUserAccountType() !== "admin") {
       return Response::redirect("/admin/login");
@@ -121,7 +152,10 @@ class ViewController extends Controller
     return AdminPages::view("Thesis List - Admin", [], 'admin/theses');
   }
 
-  public function adminJournalList(): View|Response
+  /**
+   * @return View|Response
+   */
+  public function adminJournalList()
   {
     if (!Session::isAuthenticated() || Session::getUserAccountType() !== "admin") {
       return Response::redirect("/admin/login");
@@ -129,7 +163,10 @@ class ViewController extends Controller
     return AdminPages::view("Journal List - Admin", [], 'admin/journal');
   }
 
-  public function adminPrintThesis(): View|Response
+  /**
+   * @return View|Response
+   */
+  public function adminPrintThesis()
   {
     if (!Session::isAuthenticated() || Session::getUserAccountType() !== "admin") {
       return Response::redirect("/admin/login");
@@ -141,7 +178,10 @@ class ViewController extends Controller
     ], 'print/page');
   }
 
-  public function adminPrintJournal(): View|Response
+  /**
+   * @return View|Response
+   */
+  public function adminPrintJournal()
   {
     if (!Session::isAuthenticated() || Session::getUserAccountType() !== "admin") {
       return Response::redirect("/admin/login");
@@ -153,7 +193,10 @@ class ViewController extends Controller
     ], 'print/page');
   }
 
-  public function adminDepartmentList(): View|Response
+  /**
+   * @return View|Response
+   */
+  public function adminDepartmentList()
   {
     if (!Session::isAuthenticated() || Session::getUserAccountType() !== "admin") {
       return Response::redirect("/admin/login");
@@ -161,7 +204,10 @@ class ViewController extends Controller
     return AdminPages::view("Department List - Admin", [], 'admin/departments');
   }
 
-  public function adminHomepage(): View|Response
+  /**
+   * @return View|Response
+   */
+  public function adminHomepage()
   {
     if (!Session::isAuthenticated() || Session::getUserAccountType() !== "admin") {
       return Response::redirect("/admin/login");
@@ -169,7 +215,10 @@ class ViewController extends Controller
     return AdminPages::view("Manage Homepage - Admin", [], 'admin/homepage');
   }
 
-  public function adminDownloads(): View|Response
+  /**
+   * @return View|Response
+   */
+  public function adminDownloads()
   {
     if (!Session::isAuthenticated() || Session::getUserAccountType() !== "admin") {
       return Response::redirect("/admin/login");
@@ -177,7 +226,10 @@ class ViewController extends Controller
     return AdminPages::view("Downloads - Admin", [], 'admin/downloads');
   }
 
-  public function adminStudentList(): View|Response
+  /**
+   * @return View|Response
+   */
+  public function adminStudentList()
   {
     if (!Session::isAuthenticated() || Session::getUserAccountType() !== "admin") {
       return Response::redirect("/admin/login");
@@ -185,7 +237,10 @@ class ViewController extends Controller
     return AdminPages::view("Student List - Admin", [], 'admin/students');
   }
 
-  public function adminTeacherAccounts(): View|Response
+  /**
+   * @return View|Response
+   */
+  public function adminTeacherAccounts()
   {
     if (!Session::isAuthenticated() || Session::getUserAccountType() !== "admin") {
       return Response::redirect("/admin/login");
@@ -193,7 +248,10 @@ class ViewController extends Controller
     return AdminPages::view("Teacher Accounts - Admin", [], 'admin/teachers');
   }
 
-  public function adminGuestAccounts(): View|Response
+  /**
+   * @return View|Response
+   */
+  public function adminGuestAccounts()
   {
     if (!Session::isAuthenticated() || Session::getUserAccountType() !== "admin") {
       return Response::redirect("/admin/login");
@@ -201,7 +259,10 @@ class ViewController extends Controller
     return AdminPages::view("Guest Accounts - Admin", [], 'admin/guests');
   }
 
-  public function manageDepartments(): View|Response
+  /**
+   * @return View|Response
+   */
+  public function manageDepartments()
   {
     if (!Session::isAuthenticated() || Session::getUserAccountType() !== "admin") {
       return Response::redirect("/admin/login");
@@ -209,7 +270,10 @@ class ViewController extends Controller
     return AdminPages::view("Manage Departments - Admin", [], 'admin/departments');
   }
 
-  public function thesis(): View|Response
+  /**
+   * @return View|Response
+   */
+  public function thesis()
   {
     $authData = Session::isAuthenticated() ? [
       'account' => Session::getUserAccountType(),
@@ -220,7 +284,10 @@ class ViewController extends Controller
     return UserPages::view("Thesis/Capstone", $data,'main/thesis');
   }
 
-  public function journal(): View|Response
+  /**
+   * @return View|Response
+   */
+  public function journal()
   {
     $authData = Session::isAuthenticated() ? [
       'account' => Session::getUserAccountType(),
@@ -231,7 +298,10 @@ class ViewController extends Controller
     return UserPages::view("Journal", $data,'main/journal');
   }
 
-  public function downloads(): View|Response
+  /**
+   * @return View|Response
+   */
+  public function downloads()
   {
     $authData = Session::isAuthenticated() ? [
       'account' => Session::getUserAccountType(),
@@ -242,7 +312,10 @@ class ViewController extends Controller
     return UserPages::view("Downloads", $data, 'main/downloads');
   }
 
-  public function aboutUs(): View|Response
+  /**
+   * @return View|Response
+   */
+  public function aboutUs()
   {
     $authData = Session::isAuthenticated() ? [
       'account' => Session::getUserAccountType(),
@@ -253,7 +326,10 @@ class ViewController extends Controller
     return UserPages::view("About Us", $data,'main/about');
   }
 
-  public function library(): View|Response
+  /**
+   * @return View|Response
+   */
+  public function library()
   {
     $authData = Session::isAuthenticated() ? [
       'account' => Session::getUserAccountType(),
@@ -264,7 +340,10 @@ class ViewController extends Controller
     return UserPages::view("Library", $data,'main/library');
   }
 
-  public function adminSettings(): View|Response
+  /**
+   * @return View|Response
+   */
+  public function adminSettings()
   {
     if (!Session::isAuthenticated() || Session::getUserAccountType() !== "admin") {
       return Response::redirect("/admin/login");
@@ -280,7 +359,10 @@ class ViewController extends Controller
     return AdminPages::view("Account Settings", $data, 'settings');
   }
 
-  public function accountSettings(): View|Response
+  /**
+   * @return View|Response
+   */
+  public function accountSettings()
   {
     if (!Session::isAuthenticated() || Session::getUserAccountType() === "admin") {
       return Response::redirect("/");
@@ -305,8 +387,10 @@ class ViewController extends Controller
       die("ERROR?: " . $e->getMessage());
     }
   }
-  public function error($message): View
+  public function error($message, $trace = []): View
   {
+    Logger::write_error("Error 500 - {$this->head_title}: {$message}");
+    Logger::write_error("Trace Error: " . json_encode($trace, JSON_PRETTY_PRINT));
     return Error500Page::view("Error 500 - {$this->head_title}", ["message" => $message]);
   }
 

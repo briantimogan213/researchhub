@@ -8,26 +8,6 @@ use DateTime;
 use PDO;
 use PDOException;
 use ReflectionClass;
-use Smcc\ResearchHub\Logger\Logger;
-
-interface ModelInterface
-{
-  function getTableName(): string;
-  function getColumns(): array;
-  function getPrimaryKey(): string;
-  function getPrimaryKeyValue(): mixed;
-  function getPrimaryKeyPDOType(): int;
-  function getForeignConstraints(): array;
-  function getUniqueKeys(): array;
-  function createTable(Database $database): void;
-  function createForeignConstraints(Database $database): void;
-  function get(string $columnName): mixed;
-  function create(bool $includePrimaryKeyValue = false): string|false;
-  function update(): bool;
-  function delete(): bool;
-  function toArray(): array;
-  function setAttributes(array $attributes): void;
-}
 
 // superclass for all model classes
 class Model implements ModelInterface
@@ -113,7 +93,7 @@ class Model implements ModelInterface
 
   private function fetchForeignKey(string $modelClass, $fkValue)
   {
-    if (is_null($fkValue)) {
+    if ($fkValue === null) {
       return null;
     }
 
@@ -188,12 +168,12 @@ class Model implements ModelInterface
   /**
    * @inheritDoc
    */
-  public function create(bool $includePrimaryKeyValue = false): string|false
+  public function create(bool $includePrimaryKeyValue = false)
   {
     if (!$this->isCreateOnly) {
       $db = Database::getInstance();
 
-      $columns = $includePrimaryKeyValue ? array_filter(array_keys($this->getColumns()), fn($k) => !is_null($this->get($k))) : array_filter(array_keys($this->getColumns()), fn($col) => $col !== $this->getPrimaryKey() && !is_null($this->get($col)));
+      $columns = $includePrimaryKeyValue ? array_filter(array_keys($this->getColumns()), fn($k) => $this->get($k) !== null) : array_filter(array_keys($this->getColumns()), fn($col) => $col !== $this->getPrimaryKey() && $this->get($col) !== null);
       $colNames = implode(",", $columns);
       $colNameParams = implode(",", array_map(fn ($key) => ":$key", $columns));
       $db->getDb()->beginTransaction();
@@ -312,7 +292,7 @@ class Model implements ModelInterface
   /**
    * @inheritDoc
    */
-  public function getPrimaryKeyValue(): mixed
+  public function getPrimaryKeyValue()
   {
     if (!$this->isCreateOnly && $this->getPrimaryKey() !== '') {
       return $this->data[$this->getPrimaryKey()];
@@ -385,7 +365,7 @@ class Model implements ModelInterface
   /**
    * @inheritDoc
    */
-  public function get(string $columnName): mixed {
+  public function get(string $columnName) {
     if (!$this->isCreateOnly && $this->getPrimaryKey() !== '' && array_key_exists($columnName, $this->data)) {
       return $this->data[$columnName];
     }

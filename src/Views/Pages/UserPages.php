@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Smcc\ResearchHub\Views\Pages;
 
-use Smcc\ResearchHub\Views\Global\Template;
-use Smcc\ResearchHub\Views\Global\View;
+use Smcc\ResearchHub\Views\Shared\Template;
+use Smcc\ResearchHub\Views\Shared\View;
 
 class UserPages extends View
 {

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Smcc\ResearchHub\Views\Global;
+namespace Smcc\ResearchHub\Views\Shared;
 
 use Smcc\ResearchHub\Router\Router;
 

@@ -1,0 +1,39 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Smcc\ResearchHub\Router;
+
+class StatusCode
+{
+  const OK = 200;
+  const CREATED = 201;
+  const ACCEPTED = 202;
+  const NO_CONTENT = 204;
+  const MOVED_PERMANENTLY = 301;
+  const FOUND = 302;
+  const NOT_MODIFIED = 304;
+  const BAD_REQUEST = 400;
+  const UNAUTHORIZED = 401;
+  const FORBIDDEN = 403;
+  const NOT_FOUND = 404;
+  const METHOD_NOT_ALLOWED = 405;
+  const CONFLICT = 409;
+  const GONE = 410;
+  const LENGTH_REQUIRED = 411;
+  const PRECONDITION_FAILED = 412;
+  const PAYLOAD_TOO_LARGE = 413;
+  const REQUEST_URI_TOO_LONG = 414;
+  const UNSUPPORTED_MEDIA = 415;
+  const REQUESTED_RANGE_NOT_SATISFIABLE = 416;
+  const EXPECTATION_FAILED = 417;
+  const UNPROCESSABLE_ENTITY = 422;
+  const TOO_MANY_REQUESTS = 429;
+  const REQUEST_HEADER_FIELDS_TOO_LARGE = 431;
+  const UNAVAILABLE_FOR_LEGAL_REASONS = 451;
+  const INTERNAL_SERVER_ERROR = 500;
+  const NOT_IMPLEMENTED = 501;
+  const SERVICE_UNAVAILABLE = 503;
+  const GATEWAY_TIMEOUT = 504;
+  const HTTP_VERSION_NOT_SUPPORTED = 505;
+}

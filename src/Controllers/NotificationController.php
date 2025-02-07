@@ -9,7 +9,6 @@ use Smcc\ResearchHub\Router\Response;
 
 class NotificationController extends Controller
 {
-
   public function logs(): Response
   {
     $logContents = Logger::read_log_file();

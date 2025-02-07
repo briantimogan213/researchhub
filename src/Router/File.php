@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Smcc\ResearchHub\Router;
 
-use Smcc\ResearchHub\Logger\Logger;
-
 interface FileInterface
 {
   public function getName(): string;

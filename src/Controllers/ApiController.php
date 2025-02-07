@@ -241,38 +241,54 @@ class ApiController extends Controller
 
       $accountType = $request->getBodyParam('account');
       // Validate and sanitize inputs here
-      $data = match ($accountType) {
-        'guest' => [
-          'email' => $request->getBodyParam('username'),
-          'full_name' => $request->getBodyParam('full_name'),
-          'school' => $request->getBodyParam('school'),
-          'position' => $request->getBodyParam('position'),
-          'reasons' => $request->getBodyParam('reasons'),
-          'password' => password_hash($request->getBodyParam('password'), PASSWORD_DEFAULT),
-        ],
-        'admin' => [
-          'admin_user' => $request->getBodyParam('username'),
-          'full_name' => $request->getBodyParam('full_name'),
-          'email' => $request->getBodyParam('email'),
-          'password' => password_hash($request->getBodyParam('password'), PASSWORD_DEFAULT),
-        ],
-        'personnel' => [
-          'personnel_id' => $request->getBodyParam('username'),
-          'full_name' => $request->getBodyParam('full_name'),
-          'email' => $request->getBodyParam('email'),
-          'department' => $request->getBodyParam('department'),
-          'password' => password_hash($request->getBodyParam('password'), PASSWORD_DEFAULT),
-        ],
-        'student' => [
-          'student_id' => $request->getBodyParam('username'),
-          'full_name' => $request->getBodyParam('full_name'),
-          'email' => $request->getBodyParam('email'),
-          'password' => password_hash($request->getBodyParam('password'), PASSWORD_DEFAULT),
-          'department' => $request->getBodyParam('department'),
-          'course' => $request->getBodyParam('course'),
-          'year' => intval($request->getBodyParam('year')),
-        ],
-      };
+      switch ($accountType) {
+        case 'guest':
+            $data = [
+                'email' => $request->getBodyParam('username'),
+                'full_name' => $request->getBodyParam('full_name'),
+                'school' => $request->getBodyParam('school'),
+                'position' => $request->getBodyParam('position'),
+                'reasons' => $request->getBodyParam('reasons'),
+                'password' => password_hash($request->getBodyParam('password'), PASSWORD_DEFAULT),
+            ];
+            break;
+
+        case 'admin':
+            $data = [
+                'admin_user' => $request->getBodyParam('username'),
+                'full_name' => $request->getBodyParam('full_name'),
+                'email' => $request->getBodyParam('email'),
+                'password' => password_hash($request->getBodyParam('password'), PASSWORD_DEFAULT),
+            ];
+            break;
+
+        case 'personnel':
+            $data = [
+                'personnel_id' => $request->getBodyParam('username'),
+                'full_name' => $request->getBodyParam('full_name'),
+                'email' => $request->getBodyParam('email'),
+                'department' => $request->getBodyParam('department'),
+                'password' => password_hash($request->getBodyParam('password'), PASSWORD_DEFAULT),
+            ];
+            break;
+
+        case 'student':
+            $data = [
+                'student_id' => $request->getBodyParam('username'),
+                'full_name' => $request->getBodyParam('full_name'),
+                'email' => $request->getBodyParam('email'),
+                'password' => password_hash($request->getBodyParam('password'), PASSWORD_DEFAULT),
+                'department' => $request->getBodyParam('department'),
+                'course' => $request->getBodyParam('course'),
+                'year' => intval($request->getBodyParam('year')),
+            ];
+            break;
+
+        default:
+            $data = [];
+            break;
+      }
+
       switch ($accountType) {
         case 'guest':
           if ($data['school'] !== null) {
@@ -340,30 +356,45 @@ class ApiController extends Controller
 
       $accountType = $body['account'];
       // Validate and sanitize inputs here
-      $data = match ($accountType) {
-        'guest' => [
-          'full_name' => $body['full_name'],
-          'email' => $body['email'],
-          'school' => $body['school'],
-          'position' => $body['position'],
-        ],
-        'admin' => [
-          'full_name' => $body['full_name'],
-          'email' => $body['email'],
-        ],
-        'personnel' => [
-          'full_name' => $body['full_name'],
-          'email' => $body['email'],
-          'department' => $body['department'],
-        ],
-        'student' => [
-          'full_name' => $body['full_name'],
-          'email' => $body['email'],
-          'department' => $body['department'],
-          'course' => $body['course'],
-          'year' => intval($body['year']),
-        ],
-      };
+      switch ($accountType) {
+        case 'guest':
+            $data = [
+                'full_name' => $body['full_name'],
+                'email' => $body['email'],
+                'school' => $body['school'],
+                'position' => $body['position'],
+            ];
+            break;
+
+        case 'admin':
+            $data = [
+                'full_name' => $body['full_name'],
+                'email' => $body['email'],
+            ];
+            break;
+
+        case 'personnel':
+            $data = [
+                'full_name' => $body['full_name'],
+                'email' => $body['email'],
+                'department' => $body['department'],
+            ];
+            break;
+
+        case 'student':
+            $data = [
+                'full_name' => $body['full_name'],
+                'email' => $body['email'],
+                'department' => $body['department'],
+                'course' => $body['course'],
+                'year' => intval($body['year']),
+            ];
+            break;
+
+        default:
+            $data = [];
+            break;
+      }
 
       if (!empty($body['password'])) {
         // Logger::write_debug('Password: ' . $body['password']);
@@ -498,11 +529,21 @@ class ApiController extends Controller
 
       // Check if password matches
       if ($user && password_verify($password, $user->password)) {
-        $userId = match ($account) {
-          'guest' => $user->id,
-          'admin' => $user->id,
-          'personnel' => $user->personnel_id,
-          'student' => $user->student_id,
+        switch ($account) {
+          case 'guest':
+            $userId = $user->id;
+            break;
+          case 'admin':
+            $userId = $user->id;
+            break;
+          case 'personnel':
+            $userId = $user->personnel_id;
+            break;
+          case 'student':
+            $userId = $user->student_id;
+            break;
+          default:
+            $userId = null;
         };
         // Logger::write_debug("User found: account={$account}, id={$userId}, full_name={$user->full_name}");
         // Create JWT token and update session data
@@ -615,12 +656,12 @@ class ApiController extends Controller
       $journalPublished = count($journalPublic);
 
       $thesisReads = [
-        ...$db->getAllRows(modelClass: ThesisReads::class),
+        ...$db->getAllRows(ThesisReads::class),
         ...$db->getAllRows(ThesisPersonnelReads::class),
         ...$db->getAllRows(ThesisGuestReads::class),
       ];
       $journalReads = [
-        ...$db->getAllRows(modelClass: JournalReads::class),
+        ...$db->getAllRows(JournalReads::class),
         ...$db->getAllRows(JournalPersonnelReads::class),
         ...$db->getAllRows(JournalGuestReads::class),
       ];
@@ -1034,18 +1075,24 @@ class ApiController extends Controller
     }
     $role = $student ? 'student' : ($teacher ? 'teacher' : 'guest');
     try {
-      $condition = match($role) {
-        'student' => ['thesis_id' => $id, 'student_id' => $student],
-        'teacher' => ['thesis_id' => $id, 'personnel_id' => $teacher],
-        'guest' => ['thesis_id' => $id, 'guest_id' => $guest],
-        default => []
-      };
-      $modelClass = match($role) {
-        'student' => ThesisFavorites::class,
-        'teacher' => ThesisPersonnelFavorites::class,
-        'guest' => ThesisGuestFavorites::class,
-        default => null
-      };
+      switch ($role) {
+        case 'student':
+          $condition = ['thesis_id' => $id, 'student_id' => $student];
+          $modelClass = ThesisFavorites::class;
+          break;
+        case 'teacher':
+          $condition = ['thesis_id' => $id, 'personnel_id' => $teacher];
+          $modelClass = ThesisPersonnelFavorites::class;
+          break;
+        case 'guest':
+          $condition = ['thesis_id' => $id, 'guest_id' => $guest];
+          $modelClass = ThesisGuestFavorites::class;
+          break;
+        default:
+          $condition = [];
+          $modelClass = null;
+          break;
+      }
       $thesis = Database::getInstance()->fetchOne($modelClass, $condition);
       // mark favorite or unfavorite by deleting or creating
       if ($thesis) {
@@ -1090,18 +1137,24 @@ class ApiController extends Controller
     }
     $role = $student ? 'student' : ($teacher ? 'teacher' : 'guest');
     try {
-      $condition = match($role) {
-        'student' => ['journal_id' => $id, 'student_id' => $student],
-        'teacher' => ['journal_id' => $id, 'personnel_id' => $teacher],
-        'guest' => ['journal_id' => $id, 'guest_id' => $guest],
-        default => []
-      };
-      $modelClass = match($role) {
-        'student' => JournalFavorites::class,
-        'teacher' => JournalPersonnelFavorites::class,
-        'guest' => JournalGuestFavorites::class,
-        default => null
-      };
+      switch ($role) {
+        case 'student':
+          $condition = ['journal_id' => $id, 'student_id' => $student];
+          $modelClass = JournalFavorites::class;
+          break;
+        case 'teacher':
+          $condition = ['journal_id' => $id, 'personnel_id' => $teacher];
+          $modelClass = JournalPersonnelFavorites::class;
+          break;
+        case 'guest':
+          $condition = ['journal_id' => $id, 'guest_id' => $guest];
+          $modelClass = JournalGuestFavorites::class;
+          break;
+        default:
+          $condition = [];
+          $modelClass = null;
+          break;
+      }
       $db = Database::getInstance();
       $journal = $db->fetchOne($modelClass, $condition);
       // mark favorite or unfavorite by deleting or creating
@@ -1337,8 +1390,8 @@ class ApiController extends Controller
   public function editDepartment(Request $request): Response
   {
     try {
-      $department = $request->getBodyParam(key: 'old_department');
-      $newDepartment = $request->getBodyParam(key: 'new_department');
+      $department = $request->getBodyParam('old_department');
+      $newDepartment = $request->getBodyParam('new_department');
       $db = Database::getInstance();
       $exists = $db->fetchOne(Departments::class, ['department' => $department]);
       if (!$exists) {

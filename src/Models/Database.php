@@ -8,28 +8,16 @@ use PDO;
 use ReflectionClass;
 use Smcc\ResearchHub\Logger\Logger;
 
-interface BaseDatabase
-{
-  public function getRowById(string $modelClass, int $id): object|false;
-  public function fetchOne(string $modelClass, array $conditions = []): object|false;
-  public function getAllRows(string $modelClass): array;
-  public function fetchMany(string $modelClass, array $conditions = []): array;
-  public function search(string $modelClass, array $conditions = []): array;
-  public function getRowCount(string $modelClass, array $conditions = []);
-}
-
-$_open_database = null;
-
 class Database implements BaseDatabase
 {
-  private ?PDO $db;
+  private ?PDO $db = null;
+  private static ?Database $instance = null;
 
   public function __construct(string $host = MYSQL_HOST, string $port = MYSQL_PORT, string $dbname = MYSQL_DATABASE, string $user = MYSQL_USER, string $password = MYSQL_PASSWORD)
   {
-    global $_open_database;
     // Logger::write_debug("Connecting to database: $host, $port, $dbname, $user, $password");
     // Check if database connection already exists
-    if (!is_null($_open_database)) {
+    if (self::$instance !== null) {
       Logger::write_debug("Database connection already exists.");
       return;
     }
@@ -37,55 +25,25 @@ class Database implements BaseDatabase
     $dsn = "mysql:host=$host;port=$port;dbname=$dbname";
     $options = [
       PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-      PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_PROPS_LATE,
+      PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
       PDO::ATTR_EMULATE_PREPARES   => false,
     ];
     $this->db = new PDO($dsn, $user, $password, $options);
-    $_open_database = $this;
-    // Logger::write_debug("Connecting to database: HOST=$host, PORT=$port, USER={$this->quoteIdentifier($user)}, DATABASE={$this->quoteIdentifier($dbname)}");
-    // Logger::write_debug("Database connection established successfully.");
+    self::$instance = $this;
+    Logger::write_debug("Connecting to database: HOST=$host, PORT=$port, USER={$this->quoteIdentifier($user)}, DATABASE={$this->quoteIdentifier($dbname)}");
+    Logger::write_debug("Database connection established successfully.");
 
     $models = array_map(fn($t) => new $t([], true), getAllModels());
 
-    // Logger::write_debug("\nCreating tables if not exists:\n"
-    //   . implode(
-    //       "\n",
-    //       array_map(
-    //         fn($t) => "{$this->quoteIdentifier($dbname)}.{$this->quoteIdentifier($t->getTableName())}",
-    //         $models
-    //       )
-    //     )
-    //   );
     // Create tables for all models
     foreach ($models as $model) {
       $model->createTable($this);
     }
 
-    // Logger::write_debug("\nAlter table for foreign key constraints if not exists:\n"
-    // . implode(
-    //     "\n",
-    //     array_map(
-    //       fn($t) => implode(", ", array_map(fn($k) => $this->quoteIdentifier($t->getTableName()). ".". $this->quoteIdentifier($k), array_keys($t->getForeignConstraints()))),
-    //       array_filter($models, fn($t) => count($t->getForeignConstraints()) > 0)
-    //     )
-    //   )
-    // );
-
     // alter table for foreign key constraints for all models
     foreach ($models as $model) {
       $model->createForeignConstraints($this);
     }
-
-    // Logger::write_debug("Database tables migrated completed successfully.");
-    // Logger::write_debug("\nTable row counts:\n"
-    // . implode(
-    //   "\n",
-    //     array_map(
-    //       fn($t) => "{$this->quoteIdentifier($dbname)}.{$this->quoteIdentifier($t->getTableName())} = {$t::getRowCount()} records",
-    //       $models
-    //     )
-    //   )
-    // );
   }
 
   public function getDb(): PDO
@@ -93,13 +51,12 @@ class Database implements BaseDatabase
     return $this->db;
   }
 
-  static function getInstance(): Database
+  public static function getInstance(): Database
   {
-    global $_open_database;
-    if (is_null($_open_database)) {
-      $_open_database = new Database();
+    if (self::$instance === null) {
+      self::$instance = new Database();
     }
-    return $_open_database;
+    return self::$instance;
   }
   /**
    * @inheritDoc
@@ -119,7 +76,7 @@ class Database implements BaseDatabase
   /**
    * @inheritDoc
    */
-  public function getRowById(string $modelClass, mixed $id): object|false
+  public function getRowById(string $modelClass, $id)
   {
     if (is_subclass_of($modelClass, Model::class)) {
       $model = new $modelClass();
@@ -174,7 +131,7 @@ class Database implements BaseDatabase
   /**
    * @inheritDoc
    */
-  public function fetchOne(string $modelClass, array $conditions = []): object|false
+  public function fetchOne(string $modelClass, array $conditions = [])
   {
     if (is_subclass_of($modelClass, Model::class)) {
       $model = new $modelClass();
@@ -220,15 +177,6 @@ class Database implements BaseDatabase
       return '`' . str_replace('`', '``', $identifier) . '`';
   }
 
-  public function __destruct()
-  {
-    global $_open_database;
-    // close database connection when object is destroyed
-    if (!is_null($_open_database)) {
-      $_open_database = null;
-      $this->db = null;
-    }
-  }
 }
 
 function getAllModels(): array

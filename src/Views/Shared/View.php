@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Smcc\ResearchHub\Views\Global;
+namespace Smcc\ResearchHub\Views\Shared;
 
 interface ViewBase {
   public function render(): void;
   public function getTitle(): string;
   public function getData(): array;
   public function getReactAppPath(): string;
-  public static function view(string $view, array $data = [], string $reactAppPath = ""): static;
+  public static function view(string $view, array $data = [], string $reactAppPath = "");
 }
 
 class View implements ViewBase {
@@ -54,7 +54,7 @@ class View implements ViewBase {
   /**
    * @inheritDoc
    */
-  public static function view(string $view, array $data = [], string $reactAppPath = ""): static
+  public static function view(string $view, array $data = [], string $reactAppPath = "")
   {
     return new static($view, $data, $reactAppPath);
   }

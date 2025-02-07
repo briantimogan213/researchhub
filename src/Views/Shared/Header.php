@@ -1,6 +1,6 @@
 <?php
 
-namespace Smcc\ResearchHub\Views\Global;
+namespace Smcc\ResearchHub\Views\Shared;
 
 use Smcc\ResearchHub\Router\Router;
 use Smcc\ResearchHub\Router\Session;

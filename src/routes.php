@@ -16,6 +16,7 @@ class Routes {
   public static function init(): void {
     // load assets first to avoid problems with loading
     Router::publicAssets();
+
     // initialize session_id for session tracking
     Session::index();
 

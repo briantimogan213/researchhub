@@ -236,7 +236,7 @@ class FileController extends Controller
               break;
             }
             case "journal": {
-              $readDocument = in_array('journal', haystack: $parts)
+              $readDocument = in_array('journal', $parts)
                 ? new JournalReads([
                   'journal_id' => $id,
                   'student_id' => Session::getUserId(),
@@ -332,7 +332,7 @@ class FileController extends Controller
   public function uploadFile(Request $request): Response
   {
     if (Session::isAuthenticated() && Session::getUserAccountType() === 'admin') {
-      $docTitle = $request->getBodyParam(key: 'title');
+      $docTitle = $request->getBodyParam('title');
       $file = $request->getFiles("file");
 
       if (!$docTitle) {
