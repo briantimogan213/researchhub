@@ -10,7 +10,7 @@ class Session extends Model
   {
     return [
       'id' => ['BIGINT', 'NOT NULL', 'AUTO_INCREMENT'],
-      'session_id' => ['VARCHAR(255)', 'NOT NULL'],
+      'session_id' => ['VARCHAR(191)', 'NOT NULL'],
       'ip_address' => ['VARCHAR(64)', 'NOT NULL'],
       'user_agent' => ['VARCHAR(512)', 'NOT NULL'],
       'token' => ['TEXT',],

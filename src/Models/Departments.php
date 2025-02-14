@@ -13,7 +13,7 @@ class Departments extends Model
   {
     return [
       'id' => ['BIGINT', 'NOT NULL', 'AUTO_INCREMENT'],
-      'department' => ['VARCHAR(255)', 'NOT NULL'],
+      'department' => ['VARCHAR(191)', 'NOT NULL'],
       'created_at' => ['TIMESTAMP', 'NOT NULL', 'DEFAULT CURRENT_TIMESTAMP'],
       'updated_at' => ['TIMESTAMP', 'NOT NULL', 'DEFAULT CURRENT_TIMESTAMP', 'ON UPDATE CURRENT_TIMESTAMP'],
     ];

@@ -13,7 +13,7 @@ class Courses extends Model
     return [
       'id' => ['BIGINT', 'NOT NULL', 'AUTO_INCREMENT'],
       'department_id' => ['BIGINT', 'NOT NULL'],
-      'course' => ['VARCHAR(255)', 'NOT NULL'],
+      'course' => ['VARCHAR(191)', 'NOT NULL'],
       'created_at' => ['TIMESTAMP', 'NOT NULL', 'DEFAULT CURRENT_TIMESTAMP'],
       'updated_at' => ['TIMESTAMP', 'NOT NULL', 'DEFAULT CURRENT_TIMESTAMP', 'ON UPDATE CURRENT_TIMESTAMP'],
     ];

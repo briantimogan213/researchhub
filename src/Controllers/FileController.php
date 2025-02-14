@@ -132,7 +132,7 @@ class FileController extends Controller
   {
     try {
       $files = $request->getFiles("photo");
-      $total = $files !== null && $files instanceof File ? 1 : count([...$files] ?? []);
+      $total = $files !== null && $files instanceof File ? 1 : count($files ?? []);
       $count = 0;
       $filesSaved = [];
       $errors = [];

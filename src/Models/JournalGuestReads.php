@@ -11,7 +11,7 @@ class JournalGuestReads extends Model
     return [
       'id' => ['BIGINT', 'NOT NULL', 'AUTO_INCREMENT'],
       'journal_id' => ['BIGINT', 'NOT NULL'],
-      'guest_id' => ['VARCHAR(255)', 'NOT NULL'],
+      'guest_id' => ['VARCHAR(191)', 'NOT NULL'],
       'created_at' => ['TIMESTAMP', 'NOT NULL', 'DEFAULT CURRENT_TIMESTAMP'],
       'updated_at' => ['TIMESTAMP', 'NOT NULL', 'DEFAULT CURRENT_TIMESTAMP', 'ON UPDATE CURRENT_TIMESTAMP'],
     ];

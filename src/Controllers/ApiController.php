@@ -71,7 +71,7 @@ class ApiController extends Controller
     if (!$announcementId) {
       return Response::json(['error' => 'ID is required'], StatusCode::BAD_REQUEST);
     }
-    $formData = [...$request->getBody()];
+    $formData = $request->getBody();
     unset($formData['id']);
     $expires = new DateTime($formData['expires']);
     $formData['expires'] = $expires->format('Y-m-d H:i:s');
@@ -89,7 +89,7 @@ class ApiController extends Controller
     if (!RouterSession::isAuthenticated() || RouterSession::getUserAccountType() !== 'admin') {
       return Response::json(['error' => 'Not authenticated.'], StatusCode::UNAUTHORIZED);
     }
-    $formData = [...$request->getBody()];
+    $formData = $request->getBody();
     if (isset($formData['id'])) {
       unset($formData['id']);
     }
@@ -1195,8 +1195,8 @@ class ApiController extends Controller
       if ($accType === 'student') {
         $thesesFav = $db->fetchMany(ThesisFavorites::class, ['student_id' => $myId]);
         $journalFav = $db->fetchMany(JournalFavorites::class, ['student_id' => $myId]);
-        $data = array_map(fn(ThesisFavorites $th) => [...$th->fk_thesis_id->toArray(), 'read_at' => $th->created_at, 'type' => 'Thesis', 'read' => $db->getRowCount(ThesisReads::class, ['thesis_id' => $th->fk_thesis_id->getPrimaryKeyValue(), 'student_id' => $myId])], $thesesFav);
-        $dataJournal = array_map(fn(JournalFavorites $jn) => [...$jn->fk_journal_id->toArray(), 'read_at' => $jn->created_at, 'type' => 'Journal', 'read' => $db->getRowCount(JournalReads::class, ['journal_id' => $jn->fk_journal_id->getPrimaryKeyValue(), 'student_id' => $myId])], $journalFav);
+        $data = array_map(fn(ThesisFavorites $th) => array_merge($th->fk_thesis_id->toArray(), ['read_at' => $th->created_at, 'type' => 'Thesis', 'read' => $db->getRowCount(ThesisReads::class, ['thesis_id' => $th->fk_thesis_id->getPrimaryKeyValue(), 'student_id' => $myId])]), $thesesFav);
+        $dataJournal = array_map(fn(JournalFavorites $jn) => array_merge($jn->fk_journal_id->toArray(), ['read_at' => $jn->created_at, 'type' => 'Journal', 'read' => $db->getRowCount(JournalReads::class, ['journal_id' => $jn->fk_journal_id->getPrimaryKeyValue(), 'student_id' => $myId])]), $journalFav);
         $allData = [...$data, ...$dataJournal];
         usort($allData, function($a, $b) {
           $interval = $a['read_at']->diff($b['read_at']);
@@ -1206,8 +1206,8 @@ class ApiController extends Controller
       } else if ($accType === 'personnel') {
         $thesesFav = $db->fetchMany(ThesisPersonnelFavorites::class, ['personnel_id' => $myId]);
         $journalFav = $db->fetchMany(JournalPersonnelFavorites::class, ['personnel_id' => $myId]);
-        $dataJournal = array_map(fn(JournalPersonnelFavorites $jn) => [...$jn->fk_journal_id->toArray(), 'read_at' => $jn->created_at, 'type' => 'Journal', 'read' => $db->getRowCount(JournalPersonnelReads::class, ['journal_id' => $jn->fk_journal_id->getPrimaryKeyValue(), 'personnel_id' => $myId])], $journalFav);
-        $data = array_map(fn(ThesisPersonnelFavorites $th) => [...$th->fk_thesis_id->toArray(), 'read_at' => $th->created_at, 'type' => 'Thesis', 'read' => $db->getRowCount(ThesisPersonnelReads::class, ['thesis_id' => $th->fk_thesis_id->getPrimaryKeyValue(), 'personnel_id' => $myId])], $thesesFav);
+        $dataJournal = array_map(fn(JournalPersonnelFavorites $jn) => array_merge($jn->fk_journal_id->toArray(), ['read_at' => $jn->created_at, 'type' => 'Journal', 'read' => $db->getRowCount(JournalPersonnelReads::class, ['journal_id' => $jn->fk_journal_id->getPrimaryKeyValue(), 'personnel_id' => $myId])]), $journalFav);
+        $data = array_map(fn(ThesisPersonnelFavorites $th) => array_merge($th->fk_thesis_id->toArray(), ['read_at' => $th->created_at, 'type' => 'Thesis', 'read' => $db->getRowCount(ThesisPersonnelReads::class, ['thesis_id' => $th->fk_thesis_id->getPrimaryKeyValue(), 'personnel_id' => $myId])]), $thesesFav);
         $allData = [...$data, ...$dataJournal];
         usort($allData, function($a, $b) {
           $interval = $a['read_at']->diff($b['read_at']);

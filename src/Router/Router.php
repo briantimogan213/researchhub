@@ -33,7 +33,7 @@ class Router
       $rawData = file_get_contents('php://input');
       $this->body = json_decode($rawData, true);
     } else {
-      $this->body = $this->method !== 'GET' ? [...$_POST] : [];
+      $this->body = $this->method !== 'GET' ? $_POST : [];
     }
     $this->files = [];
     if ($this->method === 'POST') {

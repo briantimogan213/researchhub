@@ -321,7 +321,7 @@ class Model implements ModelInterface
   {
     return [
       // 'id' => ['BIGINT', 'NOT NULL', 'AUTO_INCREMENT'],
-      // 'fullname' => ['VARCHAR(255)', 'NOT NULL'],
+      // 'fullname' => ['VARCHAR(191)', 'NOT NULL'],
       // 'parent' => ['BIGINT'],
       // 'age' => ['INT', 'NOT NULL'],
       // 'price' => ['DECIMAL(10,2)', 'NOT NULL'],
@@ -376,7 +376,7 @@ class Model implements ModelInterface
    */
   public function toArray(bool $includeForeignKeys = false, bool $includeChildrenForeignKeys = false): array {
     if ($includeForeignKeys) {
-      return [...$this->data] + array_reduce(
+      return array_merge($this->data, array_reduce(
         array_keys($this->getForeignConstraints()),
         function($init, $fkname) use ($includeChildrenForeignKeys) {
           $fkValue = $this->{static::FOREIGN_KEY_PREFIX . $fkname};
@@ -384,9 +384,9 @@ class Model implements ModelInterface
           return $init;
         },
         []
-      );
+      ));
     }
-    return [...$this->data];
+    return $this->data;
   }
 
 }

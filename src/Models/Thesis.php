@@ -10,12 +10,12 @@ class Thesis extends Model
   {
     return [
       'id' => ['BIGINT', 'NOT NULL', 'AUTO_INCREMENT'],
-      'title' => ['VARCHAR(255)', 'NOT NULL'],
-      'author' => ['VARCHAR(255)', 'NOT NULL'],
+      'title' => ['VARCHAR(191)', 'NOT NULL'],
+      'author' => ['VARCHAR(191)', 'NOT NULL'],
       'year' => ['YEAR', 'NOT NULL'],
-      'department' => ['VARCHAR(255)', 'NOT NULL'],
-      'course' => ['VARCHAR(255)', 'NOT NULL'],
-      'adviser' => ['VARCHAR(255)', "DEFAULT ''"],
+      'department' => ['VARCHAR(191)', 'NOT NULL'],
+      'course' => ['VARCHAR(191)', 'NOT NULL'],
+      'adviser' => ['VARCHAR(191)', "DEFAULT ''"],
       'url' => ['TEXT', 'NOT NULL'],
       'abstract' => ['TEXT', 'NOT NULL'],
       'is_public' => ['BOOLEAN', 'DEFAULT FALSE'],
