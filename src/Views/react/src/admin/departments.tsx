@@ -16,7 +16,6 @@ const coursesColumns: TableColumn[] = [
 
 export default function ManageDepartmentsPage() {
   const { departments, refresh } = useDepartments();
-  console.log("departments", departments);
   const [selectedDepartment, setSelectedDepartment] = React.useState<string>("")
 
   const handleViewDepartment = (department: string) => {
@@ -171,11 +170,11 @@ export default function ManageDepartmentsPage() {
     })
   }
   const coursesColumnData = React.useMemo(() => {
-    if (!!selectedDepartment) {
+    if (!!selectedDepartment && Object.keys(departments).includes(selectedDepartment) && departments[selectedDepartment]?.length > 0) {
       return departments[selectedDepartment].filter((course: any) => !!course).map((course: any) => ({
         course_name: course,
         action: <TableRowAction id={course} onDelete={(c: any) => handleDeleteCourse(selectedDepartment, c)} />,
-      }))
+      })) || [];
     }
     return [];
   }, [selectedDepartment, departments])
