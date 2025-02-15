@@ -31,7 +31,7 @@ class Header
         <nav class="hidden xl:flex flex-row justify-between gap-x-8 text-center items-center px-10 *:h-full whitespace-nowrap">
           <?php
           // read file json file and display menu items
-          $menuItems = file_get_contents(implode(DIRECTORY_SEPARATOR, [VIEW_PATH, 'Global', 'menu.json']));
+          $menuItems = file_get_contents(implode(DIRECTORY_SEPARATOR, [VIEW_PATH, 'Shared', 'menu.json']));
           $menuItems = json_decode($menuItems, true);
           foreach ($menuItems as $menuItem) {
           ?>
