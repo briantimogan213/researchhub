@@ -597,14 +597,14 @@ class ApiController extends Controller
       $db = Database::getInstance();
       $thesis = $db->getAllRows(Thesis::class);
       return Response::json(['success' => array_map(
-        fn($t) => [
-          ...$t->toArray(true),
-          'reads' => count([
+        fn($t) => array_merge(
+          $t->toArray(true),
+          ['reads' => count([
             ...$db->fetchMany(ThesisReads::class, ['thesis_id' => $t->getPrimaryKeyValue()]),
             ...$db->fetchMany(ThesisPersonnelReads::class, ['thesis_id' => $t->getPrimaryKeyValue()]),
             ...$db->fetchMany(ThesisGuestReads::class, ['thesis_id' => $t->getPrimaryKeyValue()]),
           ])
-        ],
+        ]),
         $thesis
       )]);
     } catch (\Throwable $e) {
@@ -621,14 +621,14 @@ class ApiController extends Controller
       $db = Database::getInstance();
       $journal = $db->getAllRows(Journal::class);
       return Response::json(['success' => array_map(
-        fn($j) => [
-          ...$j->toArray(true),
-          'reads' => count([
+        fn($j) => array_merge(
+          $j->toArray(true),
+          ['reads' => count([
             ...$db->fetchMany(JournalReads::class, ['journal_id' => $j->getPrimaryKeyValue()]),
             ...$db->fetchMany(JournalPersonnelReads::class, ['journal_id' => $j->getPrimaryKeyValue()]),
             ...$db->fetchMany(JournalGuestReads::class, ['journal_id' => $j->getPrimaryKeyValue()]),
-          ])
-        ],
+            ])
+        ]),
         $journal
       )]);
     } catch (\Throwable $e) {
@@ -879,33 +879,33 @@ class ApiController extends Controller
       if ($student) {
         $favorites = $db->fetchMany(ThesisFavorites::class, ['student_id' => $student]);
         $mapped = array_map(fn($fav) => $fav->thesis_id, $favorites);
-        $theses = array_map( fn($thesis) => [
-          ...$thesis->toArray(true),
-          "favorite" => in_array($thesis->getPrimaryKeyValue(), $mapped ?? []),
+        $theses = array_map( fn($thesis) => array_merge(
+          $thesis->toArray(true),
+          ["favorite" => in_array($thesis->getPrimaryKeyValue(), $mapped ?? []),
           "totalViews" => self::getThesisViewCount($thesis->id),
-        ], $valueTheses);
+        ]), $valueTheses);
       } else if ($teacher) {
         $favorites = $db->fetchMany(ThesisPersonnelFavorites::class, ['personnel_id' => $teacher]);
         $mapped = array_map(fn($fav) => $fav->thesis_id, $favorites);
-        $theses = array_map( fn($thesis) => [
-          ...$thesis->toArray(true),
-          "favorite" => in_array($thesis->getPrimaryKeyValue(), $mapped ?? []),
+        $theses = array_map( fn($thesis) => array_merge(
+          $thesis->toArray(true),
+          ["favorite" => in_array($thesis->getPrimaryKeyValue(), $mapped ?? []),
           "totalViews" => self::getThesisViewCount($thesis->id),
-        ], $valueTheses);
+        ]), $valueTheses);
       } else if ($guest) {
         $favorites = $db->fetchMany(ThesisGuestFavorites::class, ['guest_id' => $guest]);
         $mapped = array_map(fn($fav) => $fav->thesis_id, $favorites);
-        $theses = array_map( fn($thesis) => [
-          ...$thesis->toArray(true),
-          "favorite" => in_array($thesis->getPrimaryKeyValue(), $mapped ?? []),
+        $theses = array_map( fn($thesis) => array_merge(
+          $thesis->toArray(true),
+          ["favorite" => in_array($thesis->getPrimaryKeyValue(), $mapped ?? []),
           "totalViews" => self::getThesisViewCount($thesis->id),
-        ], $valueTheses);
+        ]), $valueTheses);
       } else {
-        $theses = array_map(fn($t) => [
-          ...$t->toArray(true),
-          "favorite" => false,
+        $theses = array_map(fn($t) => array_merge(
+          $t->toArray(true),
+          ["favorite" => false,
           "totalViews" => self::getThesisViewCount($t->id),
-        ], $valueTheses);
+        ]), $valueTheses);
       }
       return Response::json(['success' => [...$theses]]);
     } catch (\Throwable $e) {
@@ -928,33 +928,33 @@ class ApiController extends Controller
       if ($student) {
         $favorites = $db->fetchMany(JournalFavorites::class, ['student_id' => $student]);
         $mapped = array_map(fn($fav) => $fav->journal_id, $favorites);
-        $journals = array_map( fn($journal) => [
-          ...$journal->toArray(true),
-          "favorite" => in_array($journal->getPrimaryKeyValue(), $mapped ?? []),
+        $journals = array_map( fn($journal) => array_merge(
+          $journal->toArray(true),
+          ["favorite" => in_array($journal->getPrimaryKeyValue(), $mapped ?? []),
           "totalViews" => self::getJournalViewCount($journal->id),
-        ], $valueJournals);
+        ]), $valueJournals);
       } else if ($teacher) {
         $favorites = $db->fetchMany(JournalPersonnelFavorites::class, ['personnel_id' => $teacher]);
         $mapped = array_map(fn($fav) => $fav->journal_id, $favorites);
-        $journals = array_map( fn($journal) => [
-          ...$journal->toArray(true),
-          "favorite" => in_array($journal->getPrimaryKeyValue(), $mapped ?? []),
+        $journals = array_map( fn($journal) => array_merge(
+          $journal->toArray(true),
+          ["favorite" => in_array($journal->getPrimaryKeyValue(), $mapped ?? []),
           "totalViews" => self::getJournalViewCount($journal->id),
-        ], $valueJournals);
+        ]), $valueJournals);
       } else if ($guest) {
         $favorites = $db->fetchMany(JournalGuestFavorites::class, ['guest_id' => $guest]);
         $mapped = array_map(fn($fav) => $fav->journal_id, $favorites);
-        $journals = array_map( fn($journal) => [
-          ...$journal->toArray(true),
-          "favorite" => in_array($journal->getPrimaryKeyValue(), $mapped ?? []),
+        $journals = array_map( fn($journal) => array_merge(
+          $journal->toArray(true),
+          ["favorite" => in_array($journal->getPrimaryKeyValue(), $mapped ?? []),
           "totalViews" => self::getJournalViewCount($journal->id),
-        ], $valueJournals);
+        ]), $valueJournals);
       } else {
-        $journals = array_map(fn($j) => [
-          ...$j->toArray(true),
-          "favorites" => false,
+        $journals = array_map(fn($j) => array_merge(
+          $j->toArray(true),
+          ["favorites" => false,
           "totalViews" => self::getJournalViewCount($j->id),
-        ], $valueJournals);
+        ]), $valueJournals);
       }
       return Response::json(['success' => [...$journals]]);
     } catch (\Throwable $e) {
@@ -1217,26 +1217,26 @@ class ApiController extends Controller
       } else if ($accType === 'guest') {
         $thesesFav = $db->fetchMany(ThesisGuestFavorites::class, ['guest_id' => $myId]);
         $journalFav = $db->fetchMany(JournalGuestFavorites::class, ['guest_id' => $myId]);
-        $data = array_map(fn(ThesisGuestFavorites $th) => [
-            ...$th->fk_thesis_id->toArray(),
-            'read_at' => $th->created_at,
+        $data = array_map(fn(ThesisGuestFavorites $th) => array_merge(
+            $th->fk_thesis_id->toArray(),
+            ['read_at' => $th->created_at,
             'type' => 'Thesis',
             'read' => $db->getRowCount(
               ThesisGuestReads::class,
               ['thesis_id' => $th->fk_thesis_id->getPrimaryKeyValue(), 'guest_id' => $myId]
             )
-          ],
+          ]),
           $thesesFav
         );
-        $dataJournal = array_map(fn(JournalGuestFavorites $jn) => [
-            ...$jn->fk_journal_id->toArray(),
-            'read_at' => $jn->created_at,
+        $dataJournal = array_map(fn(JournalGuestFavorites $jn) => array_merge(
+            $jn->fk_journal_id->toArray(),
+            ['read_at' => $jn->created_at,
             'type' => 'Journal',
             'read' => $db->getRowCount(
               JournalGuestReads::class,
               ['journal_id' => $jn->fk_journal_id->getPrimaryKeyValue(), 'guest_id' => $myId]
             )
-          ],
+          ]),
           $journalFav
         );
         Logger::write_info("journal data: " . count($dataJournal));
